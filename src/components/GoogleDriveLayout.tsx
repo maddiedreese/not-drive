@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sidebar } from "./GoogleDriveSidebar";
 import { FileGrid } from "./FileGrid";
 import { Breadcrumbs } from "./Breadcrumbs";
+import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 export function GoogleDriveLayout() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,16 +21,10 @@ export function GoogleDriveLayout() {
       <header className="h-16 border-b border-border bg-background px-4 flex items-center gap-4">
         {/* Google Drive Logo */}
         <div className="flex items-center gap-3 min-w-[200px]">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-green-400 to-yellow-400 rounded-lg flex items-center justify-center shadow-sm">
-            <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center">
-              <svg viewBox="0 0 24 24" className="w-5 h-5">
-                <path fill="#4285f4" d="M10 2l3 12h9l-3-12z"/>
-                <path fill="#ea4335" d="M10 2L2 17l4 5h12l2-5z"/>
-                <path fill="#34a853" d="M22 14H2l8-12z"/>
-              </svg>
-            </div>
+          <div className="w-10 h-10 relative">
+            <img src={googleDriveLogo} alt="Google Drive" className="w-10 h-10" />
           </div>
-          <h1 className="text-[22px] text-[#5f6368] font-normal">Drive</h1>
+          <h1 className="text-[22px] text-[#5f6368] font-normal font-roboto">Drive</h1>
         </div>
 
         {/* Search Bar */}

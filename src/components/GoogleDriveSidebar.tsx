@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 const sidebarItems = [
   { label: "Home", icon: Home, active: true },
@@ -41,12 +42,7 @@ export function Sidebar() {
       <div className="p-4 pb-2">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 relative">
-            <svg viewBox="0 0 48 48" className="w-10 h-10">
-              <polygon fill="#0066DA" points="16,10.85 26.42,4 38,20 27.58,26.85"/>
-              <polygon fill="#00AC47" points="27.58,26.85 38,20 48,36 37.58,42.85"/>
-              <polygon fill="#EA4335" points="10,36 20.42,42.85 32,26 21.58,20"/>
-              <polygon fill="#FFBA00" points="21.58,20 32,26 42.42,10.85 32,4"/>
-            </svg>
+            <img src={googleDriveLogo} alt="Google Drive" className="w-10 h-10" />
           </div>
           <h1 className="text-[22px] text-[#5f6368] font-normal font-roboto">Drive</h1>
         </div>
