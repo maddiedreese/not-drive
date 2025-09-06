@@ -568,9 +568,9 @@ export default function DocumentEditor() {
         </div>
 
         {/* Toolbar */}
-        <div className="w-full bg-gray-100 border-b border-gray-200">
+        <div className="w-full border-b border-gray-200">
           <div className="flex items-center justify-center px-4 py-2">
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
               <Button 
                 variant="ghost" 
                 size="icon" 
