@@ -51,7 +51,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 px-3">
         {/* First Group */}
         <div className="space-y-0.5 mb-6">
           {sidebarItems.slice(0, 3).map((item) => {
@@ -119,7 +119,7 @@ export function Sidebar() {
         </div>
 
         {/* Third Group - Shared drives */}
-        <div className="space-y-0.5 mb-6">
+        <div className="space-y-0.5 pb-6">
           {sidebarItems.slice(4, 5).map((item) => {
             const Icon = item.icon;
             return (
