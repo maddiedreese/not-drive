@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus } from "lucide-react";
+import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +11,8 @@ export function GoogleDriveLayout() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPath, setCurrentPath] = useState(["My Drive"]);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+  const [showMigrationBanner, setShowMigrationBanner] = useState(true);
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-background">
@@ -59,35 +61,121 @@ export function GoogleDriveLayout() {
         {/* Main Content */}
         <main className="flex-1 flex flex-col">
           {/* Toolbar */}
-          <div className="h-16 border-b border-border bg-background px-6 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
+          <div className="border-b border-border bg-background px-6 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
+                  className={rightSidebarOpen ? "bg-gray-100" : ""}
+                >
+                  <Info className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => setViewMode("list")}
+                        className={viewMode === "list" ? "bg-gray-100" : ""}>
+                  <List className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => setViewMode("grid")} 
+                        className={viewMode === "grid" ? "bg-gray-100" : ""}>
+                  <Grid3X3 className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
-
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="icon" onClick={() => setViewMode("grid")} 
-                      className={viewMode === "grid" ? "bg-muted" : ""}>
-                <Grid3X3 className="w-4 h-4" />
+            
+            {/* Filter Bar */}
+            <div className="flex items-center gap-2 mt-3">
+              <Button variant="outline" size="sm" className="gap-1 h-8 bg-white border-gray-300 text-gray-700">
+                Type <ChevronDown className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="icon" onClick={() => setViewMode("list")}
-                      className={viewMode === "list" ? "bg-muted" : ""}>
-                <List className="w-4 h-4" />
+              <Button variant="outline" size="sm" className="gap-1 h-8 bg-white border-gray-300 text-gray-700">
+                People <ChevronDown className="w-4 h-4" />
               </Button>
-              <Separator orientation="vertical" className="h-6" />
-              <Button variant="ghost" size="sm" className="gap-2">
-                <FolderPlus className="w-4 h-4" />
-                New folder
+              <Button variant="outline" size="sm" className="gap-1 h-8 bg-white border-gray-300 text-gray-700">
+                Modified <ChevronDown className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="gap-2">
-                <Upload className="w-4 h-4" />
-                Upload
+              <Button variant="outline" size="sm" className="gap-1 h-8 bg-white border-gray-300 text-gray-700">
+                Source <ChevronDown className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
+          {/* Migration Banner */}
+          {showMigrationBanner && (
+            <div className="bg-green-50 border-b border-green-200 px-6 py-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center">
+                    <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
+                  </div>
+                  <div>
+                    <div className="font-medium text-green-900">Copy your organization's files from Microsoft OneDrive to Google Drive</div>
+                    <div className="text-sm text-green-700">All your important files, in one place</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" className="bg-green-700 hover:bg-green-800 text-white">
+                    Migrate
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    onClick={() => setShowMigrationBanner(false)}
+                    className="w-8 h-8 text-green-700 hover:bg-green-100"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* File Content Area */}
-          <div className="flex-1 p-6">
-            <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} />
+          <div className="flex-1 flex">
+            <div className="flex-1 p-6">
+              <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} />
+            </div>
+            
+            {/* Right Sidebar */}
+            {rightSidebarOpen && (
+              <div className="w-80 border-l border-border bg-white flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b border-border">
+                  <h3 className="font-medium">My Drive</h3>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setRightSidebarOpen(false)}
+                    className="w-8 h-8"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+                
+                <div className="flex border-b border-border">
+                  <Button variant="ghost" className="flex-1 rounded-none border-b-2 border-blue-500 text-blue-600 font-medium">
+                    Details
+                  </Button>
+                  <Button variant="ghost" className="flex-1 rounded-none text-gray-600">
+                    Activity
+                  </Button>
+                </div>
+                
+                <div className="flex-1 flex items-center justify-center p-8 text-center">
+                  <div className="space-y-4">
+                    <div className="w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mx-auto">
+                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Search className="w-6 h-6 text-blue-600" />
+                      </div>
+                    </div>
+                    <p className="text-gray-600">Select an item to see the details</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </main>
       </div>

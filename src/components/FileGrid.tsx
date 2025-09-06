@@ -55,6 +55,30 @@ export function FileGrid({ viewMode, searchQuery, currentPath }: FileGridProps) 
     file.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Show welcome state when in Home or empty
+  const isWelcomeState = currentPath.includes("Home") || currentPath.length === 0 || (currentPath.includes("My Drive") && filteredFiles.length === 0);
+
+  if (isWelcomeState) {
+    const isHome = currentPath.includes("Home") || currentPath.length === 0;
+    return (
+      <div className="flex flex-col items-center justify-center h-96 text-center">
+        <div className="w-48 h-48 mb-8 bg-gradient-to-br from-blue-100 to-green-100 rounded-full flex items-center justify-center">
+          <div className="w-32 h-32 bg-gradient-to-br from-blue-200 to-green-200 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-500 rounded"></div>
+            </div>
+          </div>
+        </div>
+        <h2 className="text-2xl font-normal text-gray-900 mb-2">
+          {isHome ? "Welcome to Drive" : "A place for all of your files"}
+        </h2>
+        <p className="text-gray-600">
+          Drag your files and folders here or use the "New" button to upload
+        </p>
+      </div>
+    );
+  }
+
   const getFileIcon = (item: FileItem) => {
     if (item.type === "folder") return Folder;
     if (item.fileType === "document") return FileText;

@@ -8,44 +8,44 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Google Drive Color System */
+    /* Google Drive Color System - Exact Match */
     --background: 0 0% 100%;
-    --foreground: 0 0% 13%;
+    --foreground: 0 0% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
+    --card-foreground: 0 0% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover-foreground: 0 0% 20%;
 
-    /* Google Blue Primary */
-    --primary: 217 91% 60%;
+    /* Google Blue Primary - Exact Google Blue */
+    --primary: 217 89% 61%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 91% 55%;
+    --primary-hover: 217 89% 57%;
 
     /* Google Gray Secondary */
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 45%;
+    --secondary: 0 0% 97%;
+    --secondary-foreground: 0 0% 40%;
     --secondary-hover: 0 0% 94%;
 
-    /* Muted backgrounds and text */
-    --muted: 0 0% 96%;
+    /* Muted backgrounds and text - Google Drive gray */
+    --muted: 0 0% 97%;
     --muted-foreground: 0 0% 45%;
 
     /* Accent colors */
-    --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 13%;
+    --accent: 0 0% 97%;
+    --accent-foreground: 0 0% 20%;
 
     /* Destructive (delete/error) */
-    --destructive: 0 84% 60%;
+    --destructive: 4 90% 58%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders and inputs */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 217 91% 60%;
+    /* Borders and inputs - Google Drive subtle borders */
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 217 89% 61%;
 
-    --radius: 0.5rem;
+    --radius: 4px;
 
     --sidebar-background: 0 0% 98%;
 
