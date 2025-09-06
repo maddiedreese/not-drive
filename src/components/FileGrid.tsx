@@ -1,251 +1,200 @@
-import { useState } from "react";
+import React from "react";
 import { 
-  Folder,
+  File, 
+  Folder, 
+  Star, 
+  MoreVertical, 
+  Download, 
+  Trash2, 
+  Share2, 
+  Edit3, 
   FileText,
   Image,
-  File,
-  MoreVertical,
-  Download,
-  Trash2,
-  Star,
-  Share,
-  Edit3
+  Video,
+  Music,
+  Archive,
+  Presentation,
+  Sheet
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-
-interface FileItem {
-  id: string;
-  name: string;
-  type: "folder" | "file";
-  fileType?: "document" | "image" | "other";
-  size?: string;
-  modified: string;
-  starred?: boolean;
-}
-
-// Mock data
-const mockFiles: FileItem[] = [
-  { id: "1", name: "Documents", type: "folder", modified: "Mar 15, 2024" },
-  { id: "2", name: "Photos", type: "folder", modified: "Mar 14, 2024" },
-  { id: "3", name: "Project Proposal.docx", type: "file", fileType: "document", size: "1.2 MB", modified: "Mar 13, 2024", starred: true },
-  { id: "4", name: "Team Meeting Notes.txt", type: "file", fileType: "document", size: "45 KB", modified: "Mar 12, 2024" },
-  { id: "5", name: "Screenshot 2024-03-11.png", type: "file", fileType: "image", size: "2.1 MB", modified: "Mar 11, 2024" },
-  { id: "6", name: "Budget Spreadsheet.xlsx", type: "file", fileType: "other", size: "856 KB", modified: "Mar 10, 2024" },
-];
+import { Button } from "./ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Card } from "./ui/card";
+import { useDocuments, Document } from "@/hooks/useDocuments";
+import { formatDistanceToNow } from "date-fns";
 
 interface FileGridProps {
   viewMode: "grid" | "list";
   searchQuery: string;
   currentPath: string[];
+  currentFolderId?: string;
 }
 
-export function FileGrid({ viewMode, searchQuery, currentPath }: FileGridProps) {
-  const [files, setFiles] = useState<FileItem[]>(mockFiles);
+const getFileIcon = (document: Document) => {
+  if (document.is_folder) return Folder;
   
-  // Filter files based on search
-  const filteredFiles = files.filter(file =>
-    file.name.toLowerCase().includes(searchQuery.toLowerCase())
+  switch (document.type) {
+    case 'document':
+      return FileText;
+    case 'spreadsheet':
+      return Sheet;
+    case 'presentation':
+      return Presentation;
+    case 'folder':
+      return Folder;
+    default:
+      if (document.mime_type?.startsWith('image/')) return Image;
+      if (document.mime_type?.startsWith('video/')) return Video;
+      if (document.mime_type?.startsWith('audio/')) return Music;
+      if (document.mime_type?.includes('zip') || document.mime_type?.includes('archive')) return Archive;
+      return File;
+  }
+};
+
+const formatFileSize = (bytes?: number): string => {
+  if (!bytes) return '—';
+  
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+};
+
+export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }: FileGridProps) {
+  const { documents, loading, deleteDocument, downloadFile } = useDocuments(currentFolderId);
+
+  const filteredDocuments = documents.filter((doc) =>
+    doc.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Show welcome state when in Home or empty
-  const isWelcomeState = currentPath.includes("Home") || currentPath.length === 0 || (currentPath.includes("My Drive") && filteredFiles.length === 0);
+  const handleDownload = async (document: Document) => {
+    if (document.file_path) {
+      await downloadFile(document);
+    }
+  };
 
-  if (isWelcomeState) {
-    const isHome = currentPath.includes("Home") || currentPath.length === 0;
+  const handleDelete = async (document: Document) => {
+    if (confirm(`Are you sure you want to delete "${document.name}"?`)) {
+      await deleteDocument(document.id);
+    }
+  };
+
+  const FileIcon = ({ document }: { document: Document }) => {
+    const IconComponent = getFileIcon(document);
+    return <IconComponent className="w-6 h-6 text-blue-600" />;
+  };
+
+  const FileActions = ({ document }: { document: Document }) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="w-8 h-8">
+          <MoreVertical className="w-4 h-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {document.file_path && (
+          <DropdownMenuItem onClick={() => handleDownload(document)}>
+            <Download className="w-4 h-4 mr-2" />
+            Download
+          </DropdownMenuItem>
+        )}
+        <DropdownMenuItem>
+          <Share2 className="w-4 h-4 mr-2" />
+          Share
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Edit3 className="w-4 h-4 mr-2" />
+          Rename
+        </DropdownMenuItem>
+        <DropdownMenuItem 
+          className="text-red-600"
+          onClick={() => handleDelete(document)}
+        >
+          <Trash2 className="w-4 h-4 mr-2" />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 text-center">
-        <div className="w-48 h-48 mb-8 bg-gradient-to-br from-blue-100 to-green-100 rounded-full flex items-center justify-center">
-          <div className="w-32 h-32 bg-gradient-to-br from-blue-200 to-green-200 rounded-full flex items-center justify-center">
-            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
-              <div className="w-8 h-8 bg-blue-500 rounded"></div>
-            </div>
-          </div>
-        </div>
-        <h2 className="text-2xl font-normal text-gray-900 mb-2">
-          {isHome ? "Welcome to Drive" : "A place for all of your files"}
-        </h2>
-        <p className="text-gray-600">
-          Drag your files and folders here or use the "New" button to upload
-        </p>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-gray-500">Loading documents...</div>
       </div>
     );
   }
 
-  const getFileIcon = (item: FileItem) => {
-    if (item.type === "folder") return Folder;
-    if (item.fileType === "document") return FileText;
-    if (item.fileType === "image") return Image;
-    return File;
-  };
-
-  const handleStarToggle = (id: string) => {
-    setFiles(files.map(file => 
-      file.id === id ? { ...file, starred: !file.starred } : file
-    ));
-  };
+  if (filteredDocuments.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <Folder className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500">
+            {searchQuery ? 'No documents match your search' : 'No documents yet'}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (viewMode === "grid") {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
-        {filteredFiles.map((item) => {
-          const Icon = getFileIcon(item);
-          return (
-            <div
-              key={item.id}
-              className="group relative p-3 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-            >
-              <div className="flex flex-col items-center text-center space-y-2">
-                <div className={cn(
-                  "w-12 h-12 flex items-center justify-center rounded-lg",
-                  item.type === "folder" 
-                    ? "text-blue-500" 
-                    : item.fileType === "document" 
-                      ? "text-blue-600"
-                      : item.fileType === "image"
-                        ? "text-green-500"
-                        : "text-gray-500"
-                )}>
-                  <Icon className="w-8 h-8" />
-                </div>
-                
-                <div className="w-full">
-                  <p className="text-sm font-medium text-foreground truncate">
-                    {item.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {item.modified}
-                  </p>
-                </div>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 w-6 h-6"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Share className="w-4 h-4 mr-2" />
-                    Share
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleStarToggle(item.id)}>
-                    <Star className={cn("w-4 h-4 mr-2", item.starred && "fill-current")} />
-                    {item.starred ? "Remove from starred" : "Add to starred"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Move to trash
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {filteredDocuments.map((document) => (
+          <Card
+            key={document.id}
+            className="p-4 hover:shadow-md transition-shadow cursor-pointer group"
+          >
+            <div className="flex flex-col items-center text-center space-y-2">
+              <div className="relative">
+                <FileIcon document={document} />
+              </div>
+              <div className="w-full">
+                <p className="text-sm font-medium truncate" title={document.name}>
+                  {document.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {formatDistanceToNow(new Date(document.updated_at), { addSuffix: true })}
+                </p>
+              </div>
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <FileActions document={document} />
+              </div>
             </div>
-            </div>
-          );
-        })}
+          </Card>
+        ))}
       </div>
     );
   }
 
-  // List view
   return (
     <div className="space-y-1">
-      <div className="grid grid-cols-12 gap-4 px-4 py-2 text-sm font-medium text-muted-foreground border-b border-border">
-        <div className="col-span-6">Name</div>
-        <div className="col-span-2">Modified</div>
-        <div className="col-span-2">Size</div>
-        <div className="col-span-2"></div>
-      </div>
-      
-      {filteredFiles.map((item) => {
-        const Icon = getFileIcon(item);
-        return (
-          <div
-            key={item.id}
-            className="group grid grid-cols-12 gap-4 px-4 py-2 hover:bg-muted/50 rounded-lg cursor-pointer items-center"
-          >
-            <div className="col-span-6 flex items-center gap-3">
-              <Icon className={cn(
-                "w-5 h-5",
-                item.type === "folder" 
-                  ? "text-blue-500" 
-                  : item.fileType === "document" 
-                    ? "text-blue-600"
-                    : item.fileType === "image"
-                      ? "text-green-500"
-                      : "text-gray-500"
-              )} />
-              <span className="text-sm font-medium truncate">{item.name}</span>
-              {item.starred && <Star className="w-4 h-4 fill-current text-yellow-500" />}
-            </div>
-            
-            <div className="col-span-2 text-sm text-muted-foreground">
-              {item.modified}
-            </div>
-            
-            <div className="col-span-2 text-sm text-muted-foreground">
-              {item.size || "—"}
-            </div>
-            
-            <div className="col-span-2 flex justify-end">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="opacity-0 group-hover:opacity-100 w-8 h-8"
-                  >
-                    <MoreVertical className="w-4 h-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem>
-                    <Share className="w-4 h-4 mr-2" />
-                    Share
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleStarToggle(item.id)}>
-                    <Star className={cn("w-4 h-4 mr-2", item.starred && "fill-current")} />
-                    {item.starred ? "Remove from starred" : "Add to starred"}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="text-destructive">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Move to trash
-                  </DropdownMenuItem>
-                 </DropdownMenuContent>
-               </DropdownMenu>
+      {filteredDocuments.map((document) => (
+        <div
+          key={document.id}
+          className="flex items-center px-4 py-2 hover:bg-gray-50 rounded-lg group cursor-pointer"
+        >
+          <div className="flex items-center flex-1 min-w-0">
+            <FileIcon document={document} />
+            <div className="ml-3 flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{document.name}</p>
             </div>
           </div>
-        );
-      })}
+          
+          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+            <span className="w-20 text-right">You</span>
+            <span className="w-24 text-right">
+              {formatDistanceToNow(new Date(document.updated_at), { addSuffix: true })}
+            </span>
+            <span className="w-16 text-right">{formatFileSize(document.file_size)}</span>
+            
+            <div className="flex items-center space-x-1">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                <FileActions document={document} />
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

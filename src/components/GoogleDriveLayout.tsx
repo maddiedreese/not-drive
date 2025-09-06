@@ -1,11 +1,17 @@
-import { useState } from "react";
-import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Sidebar } from "./GoogleDriveSidebar";
 import { FileGrid } from "./FileGrid";
 import { Breadcrumbs } from "./Breadcrumbs";
+import { AuthModal } from "./AuthModal";
+import { CreateDocumentModal } from "./CreateDocumentModal";
+import { FileUpload } from "./FileUpload";
+import { useAuth } from "./AuthProvider";
+import { useDocuments } from "@/hooks/useDocuments";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 export function GoogleDriveLayout() {
@@ -14,6 +20,30 @@ export function GoogleDriveLayout() {
   const [currentPath, setCurrentPath] = useState(["My Drive"]);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [showMigrationBanner, setShowMigrationBanner] = useState(true);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { user, signOut, loading } = useAuth();
+  const { createDocument, refetch } = useDocuments();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      setShowAuthModal(true);
+    }
+  }, [user, loading]);
+
+  const handleCreateDocument = async (name: string, type: string) => {
+    await createDocument(name, type);
+    refetch();
+  };
+
+  const handleFileUploaded = () => {
+    refetch();
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setShowAuthModal(true);
+  };
 
   return (
     <div className="min-h-screen flex flex-col w-full bg-white">
@@ -56,9 +86,31 @@ export function GoogleDriveLayout() {
           <Button variant="ghost" size="icon" className="w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <LayoutGrid className="w-5 h-5" />
           </Button>
-          <div className="w-8 h-8 bg-[#ea4335] rounded-full flex items-center justify-center ml-2 cursor-pointer">
-            <span className="text-white text-sm font-medium">U</span>
-          </div>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="w-8 h-8 bg-[#ea4335] rounded-full flex items-center justify-center ml-2 cursor-pointer">
+                  <span className="text-white text-sm font-medium">
+                    {user.email?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={handleSignOut}>
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => setShowAuthModal(true)}
+              className="ml-2"
+            >
+              Sign In
+            </Button>
+          )}
         </div>
       </header>
 
@@ -74,6 +126,24 @@ export function GoogleDriveLayout() {
           <div className="bg-white px-6 py-3 rounded-tl-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
+                {user && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="gap-2">
+                        <Plus className="w-4 h-4" />
+                        New
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuItem onClick={() => setShowCreateModal(true)}>
+                        Create Document
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <FileUpload onFileUploaded={handleFileUploaded} />
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
                 <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
               </div>
               
@@ -189,6 +259,18 @@ export function GoogleDriveLayout() {
           </div>
         </main>
       </div>
+
+      {/* Modals */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
+      
+      <CreateDocumentModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onCreateDocument={handleCreateDocument}
+      />
     </div>
   );
 }

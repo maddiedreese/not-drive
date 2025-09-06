@@ -1,0 +1,139 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/components/AuthProvider';
+import { toast } from 'sonner';
+
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  content?: string;
+  parent_folder_id?: string;
+  file_path?: string;
+  file_size?: number;
+  mime_type?: string;
+  is_folder: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export const useDocuments = (currentFolderId?: string) => {
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+
+  const loadDocuments = async () => {
+    if (!user) {
+      setDocuments([]);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      let query = supabase
+        .from('documents')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (currentFolderId) {
+        query = query.eq('parent_folder_id', currentFolderId);
+      } else {
+        query = query.is('parent_folder_id', null);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+      setDocuments(data || []);
+    } catch (error: any) {
+      toast.error(`Failed to load documents: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createDocument = async (name: string, type: string) => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .insert([
+          {
+            user_id: user.id,
+            name,
+            type,
+            content: type === 'folder' ? null : '',
+            parent_folder_id: currentFolderId,
+            is_folder: type === 'folder',
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setDocuments((prev) => [data, ...prev]);
+      toast.success(`${type === 'folder' ? 'Folder' : 'Document'} created successfully`);
+      return data;
+    } catch (error: any) {
+      toast.error(`Failed to create ${type}: ${error.message}`);
+    }
+  };
+
+  const deleteDocument = async (id: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setDocuments((prev) => prev.filter((doc) => doc.id !== id));
+      toast.success('Document deleted successfully');
+    } catch (error: any) {
+      toast.error(`Failed to delete document: ${error.message}`);
+    }
+  };
+
+  const downloadFile = async (document: Document) => {
+    if (!document.file_path) return;
+
+    try {
+      const { data, error } = await supabase.storage
+        .from('documents')
+        .download(document.file_path);
+
+      if (error) throw error;
+
+      const url = URL.createObjectURL(data);
+      const a = window.document.createElement('a');
+      a.href = url;
+      a.download = document.name;
+      window.document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(url);
+      window.document.body.removeChild(a);
+    } catch (error: any) {
+      toast.error(`Failed to download file: ${error.message}`);
+    }
+  };
+
+  useEffect(() => {
+    loadDocuments();
+  }, [user, currentFolderId]);
+
+  return {
+    documents,
+    loading,
+    createDocument,
+    deleteDocument,
+    downloadFile,
+    refetch: loadDocuments,
+  };
+};
