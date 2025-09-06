@@ -33,6 +33,7 @@ export function GoogleDriveLayout() {
     }
   }, [user, loading]);
 
+
   const handleCreateDocument = async (name: string, type: string) => {
     await createDocument(name, type);
     refetch();

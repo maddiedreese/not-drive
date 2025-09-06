@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { 
   Home,
   Bell,
@@ -46,6 +46,7 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   const dispatchRefresh = () => window.dispatchEvent(new Event('documents:refresh'));
 
