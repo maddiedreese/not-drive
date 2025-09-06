@@ -50,7 +50,7 @@ export function Sidebar() {
 
       <div className="px-4 pb-4">
         {/* New Button */}
-        <Button className="w-full h-12 bg-white hover:bg-[#fafbfd] text-[#3c4043] border border-[#dadce0] rounded-3xl shadow-sm font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] hover:bg-[#f8f9fa]">
+        <Button className="w-full h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-2xl shadow-sm font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] justify-start pl-4">
           <Plus className="w-5 h-5 mr-3" />
           New
         </Button>
