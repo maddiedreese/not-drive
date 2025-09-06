@@ -600,7 +600,7 @@ export default function DocumentEditor() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-2 py-1 h-8 text-sm text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-300 rounded">
+              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-16">
                 {zoom}
                 <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
@@ -618,7 +618,7 @@ export default function DocumentEditor() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-2 py-1 h-8 text-sm text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-300 rounded">
+              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-24">
                 {textStyle}
                 <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
@@ -644,7 +644,7 @@ export default function DocumentEditor() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-2 py-1 h-8 text-sm text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-300 rounded">
+              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-16">
                 {fontFamily}
                 <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
@@ -658,11 +658,11 @@ export default function DocumentEditor() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex items-center border border-transparent hover:border-gray-300 rounded">
+          <div className="flex items-center bg-gray-50 border border-gray-300 rounded-full h-7 px-1">
             <Button 
               variant="ghost" 
               size="icon" 
-              className="w-6 h-6 hover:bg-gray-100"
+              className="w-5 h-5 hover:bg-gray-100 rounded-full"
               onClick={() => {
                 const newSize = Math.max(8, parseInt(fontSize) - 1);
                 setFontSize(newSize.toString());
@@ -670,11 +670,11 @@ export default function DocumentEditor() {
             >
               <Minus className="w-3 h-3" />
             </Button>
-            <span className="px-1 text-sm min-w-6 text-center">{fontSize}</span>
+            <span className="px-2 text-sm min-w-6 text-center">{fontSize}</span>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="w-6 h-6 hover:bg-gray-100"
+              className="w-5 h-5 hover:bg-gray-100 rounded-full"
               onClick={() => {
                 const newSize = Math.min(96, parseInt(fontSize) + 1);
                 setFontSize(newSize.toString());
@@ -689,7 +689,7 @@ export default function DocumentEditor() {
           <Button 
             variant="ghost" 
             size="icon" 
-            className={`w-8 h-8 hover:bg-gray-100 rounded ${isBold ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+            className={`w-7 h-7 hover:bg-gray-100 rounded ${isBold ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
             onClick={() => setIsBold(!isBold)}
           >
             <Bold className="w-4 h-4" />
@@ -697,7 +697,7 @@ export default function DocumentEditor() {
           <Button 
             variant="ghost" 
             size="icon" 
-            className={`w-8 h-8 hover:bg-gray-100 rounded ${isItalic ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+            className={`w-7 h-7 hover:bg-gray-100 rounded ${isItalic ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
             onClick={() => setIsItalic(!isItalic)}
           >
             <Italic className="w-4 h-4" />
@@ -705,7 +705,7 @@ export default function DocumentEditor() {
           <Button 
             variant="ghost" 
             size="icon" 
-            className={`w-8 h-8 hover:bg-gray-100 rounded ${isUnderline ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+            className={`w-7 h-7 hover:bg-gray-100 rounded ${isUnderline ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
             onClick={() => setIsUnderline(!isUnderline)}
           >
             <Underline className="w-4 h-4" />
@@ -713,7 +713,7 @@ export default function DocumentEditor() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
                 <div className="w-4 h-4 border-b-2 border-black"></div>
               </Button>
             </DropdownMenuTrigger>
@@ -739,7 +739,7 @@ export default function DocumentEditor() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
                 <PaintBucket className="w-4 h-4 text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
@@ -763,10 +763,10 @@ export default function DocumentEditor() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded" onClick={handleInsertLink}>
+          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded" onClick={handleInsertLink}>
             <Link className="w-4 h-4 text-gray-600" />
           </Button>
-          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded" onClick={handleInsertImage}>
+          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded" onClick={handleInsertImage}>
             <Image className="w-4 h-4 text-gray-600" />
           </Button>
 
@@ -774,7 +774,7 @@ export default function DocumentEditor() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
                 <AlignLeft className="w-4 h-4 text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
@@ -796,7 +796,7 @@ export default function DocumentEditor() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
                 <List className="w-4 h-4 text-gray-600" />
               </Button>
             </DropdownMenuTrigger>
@@ -810,10 +810,10 @@ export default function DocumentEditor() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
             <Outdent className="w-4 h-4 text-gray-600" />
           </Button>
-          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
             <Indent className="w-4 h-4 text-gray-600" />
           </Button>
 
@@ -821,7 +821,7 @@ export default function DocumentEditor() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-2 py-1 h-8 text-sm text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-300 rounded">
+              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-20">
                 {editingMode}
                 <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
@@ -852,21 +852,27 @@ export default function DocumentEditor() {
 {/* Ruler */}
         {showRuler && (
           <div className="px-4 py-1 bg-white border-b border-gray-200">
-            <div className="relative h-5 max-w-4xl mx-auto">
-              <div className="absolute inset-0 flex items-end">
-                {Array.from({ length: 17 }, (_, i) => (
-                  <div key={i} className="flex-1 relative">
-                    <div className="absolute bottom-0 left-0 w-px h-2 bg-gray-400"></div>
-                    {i % 2 === 0 && (
-                      <span className="absolute -bottom-3 left-0 text-xs text-gray-500 transform -translate-x-1/2">{i}</span>
-                    )}
-                    <div className="absolute bottom-0 left-1/2 w-px h-1 bg-gray-300"></div>
-                  </div>
-                ))}
-                {/* Left margin indicator */}
-                <div className="absolute bottom-0 left-16 w-0 h-0 border-l-2 border-r-2 border-b-3 border-l-transparent border-r-transparent border-b-[#4285f4]"></div>
-                {/* Right margin indicator */}
-                <div className="absolute bottom-0 right-16 w-0 h-0 border-l-2 border-r-2 border-b-3 border-l-transparent border-r-transparent border-b-[#4285f4]"></div>
+            <div className="relative h-6 flex justify-center">
+              <div className="relative w-[816px] h-full">
+                <div className="absolute inset-0 flex items-end">
+                  {Array.from({ length: 21 }, (_, i) => (
+                    <div key={i} className="flex-1 relative">
+                      <div className="absolute bottom-1 left-0 w-px h-2 bg-gray-400"></div>
+                      {i % 2 === 0 && i > 0 && (
+                        <span className="absolute bottom-3 left-0 text-xs text-gray-500 transform -translate-x-1/2">{Math.floor(i/2)}</span>
+                      )}
+                      {i % 2 === 1 && (
+                        <div className="absolute bottom-1 left-0 w-px h-1 bg-gray-300"></div>
+                      )}
+                    </div>
+                  ))}
+                  {/* Left margin indicator - blue triangle */}
+                  <div className="absolute bottom-0 left-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4] transform rotate-180"></div>
+                  {/* First line indent - blue rectangle */}
+                  <div className="absolute bottom-0 left-20 w-2 h-1 bg-[#4285f4]"></div>
+                  {/* Right margin indicator - blue triangle */}
+                  <div className="absolute bottom-0 right-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4] transform rotate-180"></div>
+                </div>
               </div>
             </div>
           </div>
