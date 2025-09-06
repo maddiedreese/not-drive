@@ -10,40 +10,47 @@ All colors MUST be HSL.
   :root {
     /* Google Drive Color System - Exact Match */
     --background: 0 0% 100%;
-    --foreground: 0 0% 20%;
+    --foreground: 213 27% 17%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 20%;
+    --card-foreground: 213 27% 17%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 20%;
+    --popover-foreground: 213 27% 17%;
 
-    /* Google Blue Primary - Exact Google Blue */
-    --primary: 217 89% 61%;
+    /* Google Blue Primary - Exact Google Blue #1a73e8 */
+    --primary: 220 84% 53%;
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 217 89% 57%;
+    --primary-hover: 220 84% 48%;
 
     /* Google Gray Secondary */
-    --secondary: 0 0% 97%;
-    --secondary-foreground: 0 0% 40%;
-    --secondary-hover: 0 0% 94%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 213 27% 17%;
+    --secondary-hover: 0 0% 93%;
 
     /* Muted backgrounds and text - Google Drive gray */
-    --muted: 0 0% 97%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 213 27% 50%;
 
     /* Accent colors */
-    --accent: 0 0% 97%;
-    --accent-foreground: 0 0% 20%;
+    --accent: 0 0% 95%;
+    --accent-foreground: 213 27% 17%;
 
     /* Destructive (delete/error) */
     --destructive: 4 90% 58%;
     --destructive-foreground: 0 0% 100%;
 
     /* Borders and inputs - Google Drive subtle borders */
-    --border: 0 0% 88%;
-    --input: 0 0% 88%;
-    --ring: 217 89% 61%;
+    --border: 0 0% 90%;
+    --input: 0 0% 95%;
+    --ring: 220 84% 53%;
+    
+    /* Google Drive specific colors */
+    --google-blue: 220 84% 53%;
+    --google-text: 213 27% 17%;
+    --google-text-secondary: 213 27% 50%;
+    --google-border: 0 0% 90%;
+    --google-hover: 0 0% 95%;
 
     --radius: 4px;
 

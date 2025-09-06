@@ -40,7 +40,7 @@ export function Sidebar() {
     <div className="w-64 border-r border-border bg-background flex flex-col">
       <div className="p-3">
         {/* New Button */}
-        <Button className="w-full h-12 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 rounded-full shadow-sm font-medium">
+        <Button className="w-full h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-3xl shadow-sm font-medium transition-all duration-200 hover:shadow-md">
           <Plus className="w-5 h-5 mr-2" />
           New
         </Button>
@@ -55,10 +55,10 @@ export function Sidebar() {
               key={item.label}
               variant="ghost"
               className={cn(
-                "w-full justify-start h-8 px-3 rounded-full text-sm font-normal",
+                "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors",
                 item.active 
-                  ? "bg-blue-50 text-blue-700 font-medium" 
-                  : "text-gray-700 hover:bg-gray-100",
+                  ? "bg-[#e8f0fe] text-[#1a73e8] font-medium" 
+                  : "text-[#3c4043] hover:bg-[#f1f3f4]",
               )}
             >
               <Icon className="w-5 h-5 mr-3 shrink-0" />

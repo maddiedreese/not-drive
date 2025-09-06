@@ -19,11 +19,17 @@ export function GoogleDriveLayout() {
       {/* Top Navigation Bar */}
       <header className="h-16 border-b border-border bg-background px-4 flex items-center gap-4">
         {/* Google Drive Logo */}
-        <div className="flex items-center gap-2 min-w-[200px]">
-          <div className="w-8 h-8 bg-primary rounded flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">G</span>
+        <div className="flex items-center gap-3 min-w-[200px]">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 via-green-400 to-yellow-400 rounded-lg flex items-center justify-center shadow-sm">
+            <div className="w-7 h-7 bg-white rounded-md flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-5 h-5">
+                <path fill="#4285f4" d="M10 2l3 12h9l-3-12z"/>
+                <path fill="#ea4335" d="M10 2L2 17l4 5h12l2-5z"/>
+                <path fill="#34a853" d="M22 14H2l8-12z"/>
+              </svg>
+            </div>
           </div>
-          <h1 className="text-xl font-normal text-foreground">Drive</h1>
+          <h1 className="text-[22px] text-[#5f6368] font-normal">Drive</h1>
         </div>
 
         {/* Search Bar */}
@@ -33,23 +39,23 @@ export function GoogleDriveLayout() {
             placeholder="Search in Drive"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-12 bg-muted/50 border-0 rounded-full focus:bg-background focus:ring-1 focus:ring-ring"
+            className="pl-10 h-12 bg-[#f1f3f4] border-0 rounded-full focus:bg-white focus:shadow-md focus:ring-0 transition-all duration-200"
           />
         </div>
 
         {/* Header Actions */}
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-muted">
+        <div className="flex items-center gap-1">
+          <Button variant="ghost" size="icon" className="w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <HelpCircle className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-muted">
+          <Button variant="ghost" size="icon" className="w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <Settings className="w-5 h-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="text-muted-foreground hover:bg-muted">
+          <Button variant="ghost" size="icon" className="w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <LayoutGrid className="w-5 h-5" />
           </Button>
-          <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-            <span className="text-primary-foreground text-sm font-medium">U</span>
+          <div className="w-8 h-8 bg-[#ea4335] rounded-full flex items-center justify-center ml-2 cursor-pointer">
+            <span className="text-white text-sm font-medium">U</span>
           </div>
         </div>
       </header>
