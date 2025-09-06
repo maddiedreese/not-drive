@@ -109,6 +109,8 @@ export default function DocumentEditor() {
   const [showSpellCheck, setShowSpellCheck] = useState(false);
   const [formatPainter, setFormatPainter] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [rulerWidth, setRulerWidth] = useState(0);
 
   // Handle undo/redo
   const handleUndo = () => {
@@ -377,6 +379,19 @@ export default function DocumentEditor() {
       loadDocument();
     }
   }, [documentId, user]);
+
+  // Sync ruler width with rendered page width (accounts for zoom and resize)
+  useEffect(() => {
+    const updateRuler = () => {
+      if (pageRef.current) {
+        const rect = pageRef.current.getBoundingClientRect();
+        setRulerWidth(Math.round(rect.width));
+      }
+    };
+    updateRuler();
+    window.addEventListener('resize', updateRuler);
+    return () => window.removeEventListener('resize', updateRuler);
+  }, [zoom]);
 
   const loadDocument = async () => {
     try {
@@ -956,9 +971,9 @@ export default function DocumentEditor() {
 {/* Ruler */}
         {showRuler && (
           <div className="w-full bg-white border-b border-gray-200">
-            <div className="flex justify-center">
-              <div className="relative w-[816px] h-6">
-                <div className="absolute inset-0 flex">
+              <div className="flex justify-center">
+                <div className="relative h-6" style={{ width: `${rulerWidth}px` }}>
+                  <div className="absolute inset-0 flex">
                   {Array.from({ length: 8 }, (_, i) => (
                     <div key={i} className="flex-1 relative">
                       <div className="absolute bottom-1 left-0 w-px h-3 bg-gray-400"></div>
@@ -968,11 +983,11 @@ export default function DocumentEditor() {
                     </div>
                   ))}
                   {/* Left margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 left-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]"></div>
+                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ left: `${Math.round(12 * (parseInt(zoom) / 100))}px` }}></div>
                   {/* First line indent - blue rectangle */}
-                  <div className="absolute bottom-0 left-20 w-2 h-1 bg-[#4285f4]"></div>
+                  <div className="absolute bottom-0 w-2 h-1 bg-[#4285f4]" style={{ left: `${Math.round(20 * (parseInt(zoom) / 100))}px` }}></div>
                   {/* Right margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 right-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]"></div>
+                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ right: `${Math.round(12 * (parseInt(zoom) / 100))}px` }}></div>
                 </div>
               </div>
             </div>
@@ -1025,6 +1040,7 @@ export default function DocumentEditor() {
         <div className="flex-1 bg-[#f8f9fa] overflow-y-auto">
           <div className="max-w-4xl mx-auto p-8">
             <div 
+              ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 min-h-[29.7cm] w-[21cm] mx-auto relative"
               style={{ 
                 transform: `scale(${parseInt(zoom) / 100})`,
