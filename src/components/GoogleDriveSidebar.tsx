@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { 
   Home,
   Bell,
@@ -12,11 +12,20 @@ import {
   Cloud,
   Settings,
   Plus,
-  ChevronRight
+  ChevronRight,
+  UploadCloud,
+  FileText,
+  Presentation,
+  Sheet,
+  FolderPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuth } from "./AuthProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 const sidebarItems = [
@@ -35,6 +44,67 @@ const sidebarItems = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const dispatchRefresh = () => window.dispatchEvent(new Event('documents:refresh'));
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || !user) return;
+
+    for (const file of Array.from(files)) {
+      try {
+        const fileName = `${user.id}/${Date.now()}-${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(fileName, file);
+        if (uploadError) throw uploadError;
+
+        const { error: dbError } = await supabase.from('documents').insert([
+          {
+            user_id: user.id,
+            name: file.name,
+            type: 'file',
+            file_path: uploadData.path,
+            file_size: file.size,
+            mime_type: file.type,
+            is_folder: false,
+          },
+        ]);
+        if (dbError) throw dbError;
+        toast.success(`${file.name} uploaded`);
+      } catch (e: any) {
+        toast.error(e.message || 'Upload failed');
+      }
+    }
+
+    dispatchRefresh();
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleCreate = async (name: string, type: 'folder' | 'document' | 'spreadsheet' | 'presentation') => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.from('documents').insert([
+        {
+          user_id: user.id,
+          name,
+          type,
+          is_folder: type === 'folder',
+        },
+      ]);
+      if (error) throw error;
+      toast.success(`${type === 'folder' ? 'Folder' : 'Document'} created`);
+      dispatchRefresh();
+    } catch (e: any) {
+      toast.error(e.message || 'Failed to create');
+    }
+  };
 
   return (
     <div className="w-64 bg-[#f8f9fa] flex flex-col min-h-screen">
@@ -44,10 +114,61 @@ export function Sidebar() {
 
       <div className="px-4 pb-4 flex justify-start">
         {/* New Button */}
-        <Button className="h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-2xl font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] justify-start px-6" style={{boxShadow: '2px 2px 6px rgba(0, 0, 0, 0.1)'}}>
-          <Plus className="w-5 h-5 mr-3" />
-          New
-        </Button>
+        {user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className="h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-2xl font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] justify-start px-6" style={{boxShadow: '2px 2px 6px rgba(0, 0, 0, 0.1)'}}>
+                <Plus className="w-5 h-5 mr-3" />
+                New
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-60 bg-white border border-gray-200 shadow-lg z-50 p-2">
+              <DropdownMenuItem onClick={() => handleCreate('New folder', 'folder')} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <FolderPlus className="w-5 h-5 text-gray-600" />
+                <span className="text-sm text-gray-700">New folder</span>
+                <span className="ml-auto text-xs text-gray-400">⌘ then F</span>
+              </DropdownMenuItem>
+              <div className="w-full h-px bg-gray-200 my-2" />
+              <DropdownMenuItem onClick={handleUploadClick} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <div className="w-5 h-5 flex items-center justify-center">
+                  <UploadCloud className="w-4 h-4 text-gray-600" />
+                </div>
+                <span className="text-sm text-gray-700">File upload</span>
+                <span className="ml-auto text-xs text-gray-400">⌘ then U</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.message('Folder upload not implemented yet')} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <Folder className="w-5 h-5 text-gray-600" />
+                <span className="text-sm text-gray-700">Folder upload</span>
+                <span className="ml-auto text-xs text-gray-400">⌘ then I</span>
+              </DropdownMenuItem>
+              <div className="w-full h-px bg-gray-200 my-2" />
+              <DropdownMenuItem onClick={() => handleCreate('Untitled document', 'document')} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
+                  <FileText className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-sm text-gray-700">Google Docs</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleCreate('Untitled spreadsheet', 'spreadsheet')} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
+                  <Sheet className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-sm text-gray-700">Google Sheets</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleCreate('Untitled presentation', 'presentation')} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <div className="w-5 h-5 bg-orange-500 rounded flex items-center justify-center">
+                  <Presentation className="w-3 h-3 text-white" />
+                </div>
+                <span className="text-sm text-gray-700">Google Slides</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <Button disabled className="h-12 bg-white text-[#3c4043] border border-[#dadce0] rounded-2xl justify-start px-6 opacity-60">
+            <Plus className="w-5 h-5 mr-3" />
+            New
+          </Button>
+        )}
+        <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} className="hidden" />
       </div>
 
       {/* Navigation Items */}

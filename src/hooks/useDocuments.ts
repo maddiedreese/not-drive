@@ -126,6 +126,12 @@ export const useDocuments = (currentFolderId?: string) => {
 
   useEffect(() => {
     loadDocuments();
+
+    const handler = () => loadDocuments();
+    window.addEventListener('documents:refresh', handler);
+    return () => {
+      window.removeEventListener('documents:refresh', handler);
+    };
   }, [user, currentFolderId]);
 
   return {
