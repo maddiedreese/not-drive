@@ -40,12 +40,6 @@ export function Sidebar() {
     <div className="w-64 bg-white flex flex-col h-full">
       {/* Logo */}
       <div className="p-4 pb-2">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 relative">
-            <img src="/lovable-uploads/4c411c67-6aa0-4cf3-a00e-58ad7c51bc1e.png" alt="Google Drive" className="w-10 h-10" />
-          </div>
-          <h1 className="text-[22px] text-[#5f6368] font-normal font-roboto">Drive</h1>
-        </div>
       </div>
 
       <div className="px-4 pb-4">
