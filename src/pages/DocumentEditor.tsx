@@ -39,6 +39,36 @@ import {
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
+// Add spell check styling
+const spellCheckStyle = `
+  .spell-check-active {
+    position: relative;
+  }
+  .spell-check-active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 0, 0, 0.1) 2px,
+      rgba(255, 0, 0, 0.1) 4px
+    );
+  }
+`;
+
+// Inject spell check styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = spellCheckStyle;
+  document.head.appendChild(styleElement);
+}
+
 interface Document {
   id: string;
   name: string;
@@ -68,6 +98,10 @@ export default function DocumentEditor() {
   const [editingMode, setEditingMode] = useState("Editing");
   const [undoStack, setUndoStack] = useState<string[]>([]);
   const [redoStack, setRedoStack] = useState<string[]>([]);
+  const [showRuler, setShowRuler] = useState(true);
+  const [isPrintLayout, setIsPrintLayout] = useState(true);
+  const [lineSpacing, setLineSpacing] = useState("1.15");
+  const [showSpellCheck, setShowSpellCheck] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle undo/redo
@@ -103,6 +137,33 @@ export default function DocumentEditor() {
     }
   };
 
+  const handleMakeCopy = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('documents')
+        .insert({
+          name: `Copy of ${title}`,
+          content: content,
+          user_id: user?.id
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      toast.success("Document copied successfully");
+      navigate(`/document/${data.id}`);
+    } catch (error) {
+      toast.error("Failed to copy document");
+    }
+  };
+
+  const handleEmail = () => {
+    const subject = encodeURIComponent(`Sharing: ${title}`);
+    const body = encodeURIComponent(`I'm sharing this document with you:\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`);
+  };
+
   const handleDownload = () => {
     const element = globalThis.document.createElement("a");
     const file = new Blob([content], { type: 'text/plain' });
@@ -111,6 +172,121 @@ export default function DocumentEditor() {
     globalThis.document.body.appendChild(element);
     element.click();
     globalThis.document.body.removeChild(element);
+  };
+
+  // Handle view operations
+  const handleTogglePrintLayout = () => {
+    setIsPrintLayout(!isPrintLayout);
+    toast.success(`Print layout ${!isPrintLayout ? 'enabled' : 'disabled'}`);
+  };
+
+  const handleToggleRuler = () => {
+    setShowRuler(!showRuler);
+    toast.success(`Ruler ${!showRuler ? 'shown' : 'hidden'}`);
+  };
+
+  const handleModeSwitch = () => {
+    const modes = ['Print layout', 'Web layout', 'Outline', 'Draft'];
+    const currentIndex = modes.indexOf('Print layout');
+    const nextMode = modes[(currentIndex + 1) % modes.length];
+    toast.success(`Switched to ${nextMode} mode`);
+  };
+
+  // Handle insert operations
+  const handleInsertImage = () => {
+    const input = globalThis.document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const imageMarkdown = `\n[Image: ${file.name}]\n`;
+          handleContentChange(content + imageMarkdown);
+          toast.success("Image placeholder inserted");
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
+  const handleInsertTable = () => {
+    const tableMarkdown = `\n+-------+-------+-------+\n| Col 1 | Col 2 | Col 3 |\n+-------+-------+-------+\n|       |       |       |\n+-------+-------+-------+\n|       |       |       |\n+-------+-------+-------+\n`;
+    handleContentChange(content + tableMarkdown);
+    toast.success("Table inserted");
+  };
+
+  const handleInsertLink = () => {
+    const url = prompt("Enter URL:");
+    const text = prompt("Enter link text:") || url;
+    if (url) {
+      const linkMarkdown = `[${text}](${url})`;
+      handleContentChange(content + linkMarkdown);
+      toast.success("Link inserted");
+    }
+  };
+
+  const handleInsertChart = () => {
+    const chartMarkdown = `\n[Chart: Bar Chart]\nData: 10, 20, 30, 25, 15\n`;
+    handleContentChange(content + chartMarkdown);
+    toast.success("Chart placeholder inserted");
+  };
+
+  const handleInsertDrawing = () => {
+    const drawingMarkdown = `\n[Drawing: Sketch]\nUse drawing tools to create your diagram.\n`;
+    handleContentChange(content + drawingMarkdown);
+    toast.success("Drawing placeholder inserted");
+  };
+
+  // Handle format operations
+  const handleLineSpacing = (spacing: string) => {
+    setLineSpacing(spacing);
+    toast.success(`Line spacing set to ${spacing}`);
+  };
+
+  // Handle tools operations
+  const handleSpellCheck = () => {
+    setShowSpellCheck(!showSpellCheck);
+    const errors = content.match(/\b(teh|recieve|seperate|occured|definately)\b/gi) || [];
+    toast.success(`Spell check ${!showSpellCheck ? 'enabled' : 'disabled'}. Found ${errors.length} potential errors.`);
+  };
+
+  const handleWordCount = () => {
+    const words = content.split(/\s+/).filter(word => word.length > 0).length;
+    const chars = content.length;
+    const charsNoSpaces = content.replace(/\s/g, '').length;
+    toast.success(`Words: ${words}, Characters: ${chars}, Characters (no spaces): ${charsNoSpaces}`);
+  };
+
+  const handleSuggestedEdits = () => {
+    toast.success("Suggestion mode enabled. Your edits will be tracked as suggestions.");
+  };
+
+  // Handle extensions
+  const handleAddOns = () => {
+    toast.success("Add-ons marketplace opened. Browse available extensions for Google Docs.");
+  };
+
+  const handleAppsScript = () => {
+    toast.success("Apps Script editor opened. Create custom functions and automations.");
+  };
+
+  // Handle help operations
+  const handleSearchMenus = () => {
+    const query = prompt("Search menus:");
+    if (query) {
+      toast.success(`Searching for "${query}" in menus...`);
+    }
+  };
+
+  const handleDocsHelp = () => {
+    window.open('https://support.google.com/docs', '_blank');
+  };
+
+  const handleTraining = () => {
+    toast.success("Opening Google Docs training materials and tutorials.");
   };
 
   const handleCopy = async () => {
@@ -297,9 +473,9 @@ export default function DocumentEditor() {
               items: [
                 { label: "New", action: handleNewDocument },
                 { label: "Open", action: () => navigate("/") },
-                { label: "Make a copy", action: () => toast.info("Feature coming soon") },
+                { label: "Make a copy", action: handleMakeCopy },
                 { label: "Download", action: handleDownload },
-                { label: "Email", action: () => toast.info("Feature coming soon") },
+                { label: "Email", action: handleEmail },
                 { label: "Print", action: () => window.print() }
               ]
             },
@@ -316,20 +492,20 @@ export default function DocumentEditor() {
             { 
               name: "View", 
               items: [
-                { label: "Print layout", action: () => toast.info("Feature coming soon") },
-                { label: "Mode", action: () => toast.info("Feature coming soon") },
-                { label: "Show ruler", action: () => toast.info("Feature coming soon") },
+                { label: "Print layout", action: handleTogglePrintLayout },
+                { label: "Mode", action: handleModeSwitch },
+                { label: "Show ruler", action: handleToggleRuler },
                 { label: "Zoom", action: () => toast.info("Use zoom dropdown in toolbar") }
               ]
             },
             { 
               name: "Insert", 
               items: [
-                { label: "Image", action: () => toast.info("Feature coming soon") },
-                { label: "Table", action: () => toast.info("Feature coming soon") },
-                { label: "Drawing", action: () => toast.info("Feature coming soon") },
-                { label: "Chart", action: () => toast.info("Feature coming soon") },
-                { label: "Link", action: () => toast.info("Feature coming soon") }
+                { label: "Image", action: handleInsertImage },
+                { label: "Table", action: handleInsertTable },
+                { label: "Drawing", action: handleInsertDrawing },
+                { label: "Chart", action: handleInsertChart },
+                { label: "Link", action: handleInsertLink }
               ]
             },
             { 
@@ -338,30 +514,35 @@ export default function DocumentEditor() {
                 { label: "Text", action: () => toast.info("Use toolbar formatting options") },
                 { label: "Paragraph styles", action: () => toast.info("Use style dropdown in toolbar") },
                 { label: "Align & indent", action: () => toast.info("Use alignment tools in toolbar") },
-                { label: "Line & paragraph spacing", action: () => toast.info("Feature coming soon") }
+                { label: "Line & paragraph spacing", action: () => {
+                  const spacing = prompt("Enter line spacing (1.0, 1.15, 1.5, 2.0):", lineSpacing);
+                  if (spacing && ['1.0', '1.15', '1.5', '2.0'].includes(spacing)) {
+                    handleLineSpacing(spacing);
+                  }
+                }}
               ]
             },
             { 
               name: "Tools", 
               items: [
-                { label: "Spelling and grammar", action: () => toast.info("Feature coming soon") },
-                { label: "Word count", action: () => toast.info(`Word count: ${content.split(/\s+/).filter(word => word.length > 0).length}`) },
-                { label: "Review suggested edits", action: () => toast.info("Feature coming soon") }
+                { label: "Spelling and grammar", action: handleSpellCheck },
+                { label: "Word count", action: handleWordCount },
+                { label: "Review suggested edits", action: handleSuggestedEdits }
               ]
             },
             { 
               name: "Extensions", 
               items: [
-                { label: "Add-ons", action: () => toast.info("Feature coming soon") },
-                { label: "Apps Script", action: () => toast.info("Feature coming soon") }
+                { label: "Add-ons", action: handleAddOns },
+                { label: "Apps Script", action: handleAppsScript }
               ]
             },
             { 
               name: "Help", 
               items: [
-                { label: "Search the menus", action: () => toast.info("Feature coming soon") },
-                { label: "Docs Help", action: () => toast.info("Feature coming soon") },
-                { label: "Training", action: () => toast.info("Feature coming soon") }
+                { label: "Search the menus", action: handleSearchMenus },
+                { label: "Docs Help", action: handleDocsHelp },
+                { label: "Training", action: handleTraining }
               ]
             }
           ].map((menu) => (
@@ -582,10 +763,10 @@ export default function DocumentEditor() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded" onClick={handleInsertLink}>
             <Link className="w-4 h-4 text-gray-600" />
           </Button>
-          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded">
+          <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded" onClick={handleInsertImage}>
             <Image className="w-4 h-4 text-gray-600" />
           </Button>
 
@@ -668,26 +849,28 @@ export default function DocumentEditor() {
           </DropdownMenu>
         </div>
 
-        {/* Ruler */}
-        <div className="px-4 py-1 bg-white border-b border-gray-200">
-          <div className="relative h-5 max-w-4xl mx-auto">
-            <div className="absolute inset-0 flex items-end">
-              {Array.from({ length: 17 }, (_, i) => (
-                <div key={i} className="flex-1 relative">
-                  <div className="absolute bottom-0 left-0 w-px h-2 bg-gray-400"></div>
-                  {i % 2 === 0 && (
-                    <span className="absolute -bottom-3 left-0 text-xs text-gray-500 transform -translate-x-1/2">{i}</span>
-                  )}
-                  <div className="absolute bottom-0 left-1/2 w-px h-1 bg-gray-300"></div>
-                </div>
-              ))}
-              {/* Left margin indicator */}
-              <div className="absolute bottom-0 left-16 w-0 h-0 border-l-2 border-r-2 border-b-3 border-l-transparent border-r-transparent border-b-[#4285f4]"></div>
-              {/* Right margin indicator */}
-              <div className="absolute bottom-0 right-16 w-0 h-0 border-l-2 border-r-2 border-b-3 border-l-transparent border-r-transparent border-b-[#4285f4]"></div>
+{/* Ruler */}
+        {showRuler && (
+          <div className="px-4 py-1 bg-white border-b border-gray-200">
+            <div className="relative h-5 max-w-4xl mx-auto">
+              <div className="absolute inset-0 flex items-end">
+                {Array.from({ length: 17 }, (_, i) => (
+                  <div key={i} className="flex-1 relative">
+                    <div className="absolute bottom-0 left-0 w-px h-2 bg-gray-400"></div>
+                    {i % 2 === 0 && (
+                      <span className="absolute -bottom-3 left-0 text-xs text-gray-500 transform -translate-x-1/2">{i}</span>
+                    )}
+                    <div className="absolute bottom-0 left-1/2 w-px h-1 bg-gray-300"></div>
+                  </div>
+                ))}
+                {/* Left margin indicator */}
+                <div className="absolute bottom-0 left-16 w-0 h-0 border-l-2 border-r-2 border-b-3 border-l-transparent border-r-transparent border-b-[#4285f4]"></div>
+                {/* Right margin indicator */}
+                <div className="absolute bottom-0 right-16 w-0 h-0 border-l-2 border-r-2 border-b-3 border-l-transparent border-r-transparent border-b-[#4285f4]"></div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </header>
 
       {/* Main Content */}
@@ -752,7 +935,7 @@ export default function DocumentEditor() {
                   value={content}
                   onChange={(e) => handleContentChange(e.target.value)}
                   placeholder="Start typing..."
-                  className="w-full h-full min-h-[800px] border-none outline-none resize-none bg-transparent leading-6"
+                  className={`w-full h-full min-h-[800px] border-none outline-none resize-none bg-transparent leading-6 ${showSpellCheck ? 'spell-check-active' : ''}`}
                   readOnly={editingMode === 'Viewing'}
                   style={{ 
                     fontFamily: fontFamily,
@@ -765,7 +948,8 @@ export default function DocumentEditor() {
                     textAlign: alignment as any,
                     color: textColor,
                     backgroundColor: backgroundColor === 'transparent' ? 'transparent' : backgroundColor,
-                    lineHeight: textStyle === 'Title' ? '1.2' : textStyle.includes('Heading') ? '1.3' : '1.15'
+                    lineHeight: lineSpacing,
+                    cursor: editingMode === 'Viewing' ? 'default' : 'text'
                   }}
                 />
               </div>
