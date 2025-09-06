@@ -22,7 +22,7 @@ export function GoogleDriveLayout() {
         {/* Google Drive Logo */}
         <div className="flex items-center gap-3 min-w-[200px]">
           <div className="w-10 h-10 relative">
-            <img src={googleDriveLogo} alt="Google Drive" className="w-10 h-10" />
+            <img src="/lovable-uploads/4c411c67-6aa0-4cf3-a00e-58ad7c51bc1e.png" alt="Google Drive" className="w-10 h-10" />
           </div>
           <h1 className="text-[22px] text-[#5f6368] font-normal font-roboto">Drive</h1>
         </div>
