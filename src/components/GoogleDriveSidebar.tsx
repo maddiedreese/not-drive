@@ -34,16 +34,28 @@ const sidebarItems = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const storageUsed = 2.1; // GB
-  const storageTotal = 15; // GB
-  const storagePercentage = (storageUsed / storageTotal) * 100;
 
   return (
-    <div className="w-64 border-r border-border bg-background flex flex-col">
-      <div className="p-3">
+    <div className="w-64 bg-white flex flex-col h-full">
+      {/* Logo */}
+      <div className="p-4 pb-2">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 relative">
+            <svg viewBox="0 0 48 48" className="w-10 h-10">
+              <path fill="#4285f4" d="M24 4l12 21H24z"/>
+              <path fill="#ea4335" d="M4 25l12-21 12 21z"/>
+              <path fill="#34a853" d="M4 25h32l-8 14H12z"/>
+              <path fill="#fbbc04" d="M24 4l8 14-8 7z"/>
+            </svg>
+          </div>
+          <h1 className="text-[22px] text-[#5f6368] font-normal">Drive</h1>
+        </div>
+      </div>
+
+      <div className="px-4 pb-4">
         {/* New Button */}
-        <Button className="w-full h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-3xl shadow-sm font-medium transition-all duration-200 hover:shadow-md">
-          <Plus className="w-5 h-5 mr-2" />
+        <Button className="w-full h-12 bg-white hover:bg-[#fafbfd] text-[#3c4043] border border-[#dadce0] rounded-3xl shadow-sm font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] hover:bg-[#f8f9fa]">
+          <Plus className="w-5 h-5 mr-3" />
           New
         </Button>
       </div>
