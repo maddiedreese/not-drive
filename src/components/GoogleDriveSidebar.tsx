@@ -85,42 +85,9 @@ export function Sidebar() {
           })}
         </div>
 
-        {/* Second Group - My Drive */}
-        <div className="space-y-0.5 mb-6">
-          {sidebarItems.slice(3, 4).map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.label} className="relative">
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
-                      ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
-                      : "text-[#3c4043] hover:bg-[#f1f3f4]",
-                  )}
-                >
-                  <Icon className="w-5 h-5 mr-3 shrink-0" />
-                  <span className="truncate flex-1 text-left">{item.label}</span>
-                  {item.hasExpander && (
-                    <ChevronRight className="w-4 h-4 ml-auto shrink-0" />
-                  )}
-                </Button>
-                {item.subtext && (
-                  <div className="text-xs text-[#5f6368] px-11 mt-0.5">
-                    {item.subtext}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Third Group - Shared drives */}
+        {/* Second Group - My Drive and Shared drives */}
         <div className="space-y-0.5 pb-6">
-          {sidebarItems.slice(4, 5).map((item) => {
+          {sidebarItems.slice(3, 5).map((item) => {
             const Icon = item.icon;
             return (
               <div key={item.label} className="relative">
@@ -151,9 +118,9 @@ export function Sidebar() {
           })}
         </div>
 
-        {/* Fourth Group - Shared with me */}
-        <div className="space-y-0.5 mb-6">
-          {sidebarItems.slice(5, 6).map((item) => {
+        {/* Third Group - Shared with me, Recent, Starred */}
+        <div className="space-y-0.5 pb-6">
+          {sidebarItems.slice(5, 8).map((item) => {
             const Icon = item.icon;
             return (
               <div key={item.label} className="relative">
@@ -184,75 +151,9 @@ export function Sidebar() {
           })}
         </div>
 
-        {/* Fifth Group - Recent, Starred */}
-        <div className="space-y-0.5 mb-6">
-          {sidebarItems.slice(6, 8).map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.label} className="relative">
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
-                      ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
-                      : "text-[#3c4043] hover:bg-[#f1f3f4]",
-                  )}
-                >
-                  <Icon className="w-5 h-5 mr-3 shrink-0" />
-                  <span className="truncate flex-1 text-left">{item.label}</span>
-                  {item.hasExpander && (
-                    <ChevronRight className="w-4 h-4 ml-auto shrink-0" />
-                  )}
-                </Button>
-                {item.subtext && (
-                  <div className="text-xs text-[#5f6368] px-11 mt-0.5">
-                    {item.subtext}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Sixth Group - Spam, Trash */}
-        <div className="space-y-0.5 mb-6">
-          {sidebarItems.slice(8, 10).map((item) => {
-            const Icon = item.icon;
-            return (
-              <div key={item.label} className="relative">
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
-                      ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
-                      : "text-[#3c4043] hover:bg-[#f1f3f4]",
-                  )}
-                >
-                  <Icon className="w-5 h-5 mr-3 shrink-0" />
-                  <span className="truncate flex-1 text-left">{item.label}</span>
-                  {item.hasExpander && (
-                    <ChevronRight className="w-4 h-4 ml-auto shrink-0" />
-                  )}
-                </Button>
-                {item.subtext && (
-                  <div className="text-xs text-[#5f6368] px-11 mt-0.5">
-                    {item.subtext}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Seventh Group - Storage */}
+        {/* Fourth Group - Spam, Trash, Storage */}
         <div className="space-y-0.5">
-          {sidebarItems.slice(10).map((item) => {
+          {sidebarItems.slice(8).map((item) => {
             const Icon = item.icon;
             return (
               <div key={item.label} className="relative">
