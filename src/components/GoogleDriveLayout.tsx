@@ -16,9 +16,9 @@ export function GoogleDriveLayout() {
   const [showMigrationBanner, setShowMigrationBanner] = useState(true);
 
   return (
-    <div className="min-h-screen flex flex-col w-full bg-background">
+    <div className="min-h-screen flex flex-col w-full bg-white">
       {/* Top Navigation Bar */}
-      <header className="h-16 border-b border-border bg-background px-4 flex items-center gap-4">
+      <header className="h-16 border-b border-[#e8eaed] bg-[#f8f9fa] px-4 flex items-center gap-4">
         {/* Google Drive Logo */}
         <div className="flex items-center gap-3 min-w-[200px]">
           <div className="w-10 h-10 relative">
@@ -60,9 +60,9 @@ export function GoogleDriveLayout() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col bg-white">
           {/* Toolbar */}
-          <div className="border-b border-border bg-background px-6 py-3">
+          <div className="border-b border-[#e8eaed] bg-white px-6 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
@@ -136,8 +136,8 @@ export function GoogleDriveLayout() {
           )}
 
           {/* File Content Area */}
-          <div className="flex-1 flex">
-            <div className="flex-1 p-6">
+          <div className="flex-1 flex bg-white">
+            <div className="flex-1 p-6 bg-white">
               <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} />
             </div>
             

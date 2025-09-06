@@ -37,7 +37,7 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="w-64 bg-white flex flex-col h-full">
+    <div className="w-64 bg-[#f8f9fa] flex flex-col h-full border-r border-[#e8eaed]">
       {/* Logo */}
       <div className="p-4 pb-2">
       </div>
