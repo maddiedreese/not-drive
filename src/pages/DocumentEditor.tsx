@@ -63,7 +63,101 @@ export default function DocumentEditor() {
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
+  const [textColor, setTextColor] = useState("#000000");
+  const [backgroundColor, setBackgroundColor] = useState("transparent");
+  const [editingMode, setEditingMode] = useState("Editing");
+  const [undoStack, setUndoStack] = useState<string[]>([]);
+  const [redoStack, setRedoStack] = useState<string[]>([]);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Handle undo/redo
+  const handleUndo = () => {
+    if (undoStack.length > 0) {
+      const previousContent = undoStack[undoStack.length - 1];
+      setRedoStack([...redoStack, content]);
+      setContent(previousContent);
+      setUndoStack(undoStack.slice(0, -1));
+    }
+  };
+
+  const handleRedo = () => {
+    if (redoStack.length > 0) {
+      const nextContent = redoStack[redoStack.length - 1];
+      setUndoStack([...undoStack, content]);
+      setContent(nextContent);
+      setRedoStack(redoStack.slice(0, -1));
+    }
+  };
+
+  // Add to undo stack when content changes
+  const handleContentChange = (newContent: string) => {
+    setUndoStack([...undoStack, content]);
+    setContent(newContent);
+    setRedoStack([]); // Clear redo stack when new changes are made
+  };
+
+  // Handle file operations
+  const handleNewDocument = () => {
+    if (window.confirm("Create a new document? Unsaved changes will be lost.")) {
+      navigate("/docs");
+    }
+  };
+
+  const handleDownload = () => {
+    const element = globalThis.document.createElement("a");
+    const file = new Blob([content], { type: 'text/plain' });
+    element.href = URL.createObjectURL(file);
+    element.download = `${title || 'document'}.txt`;
+    globalThis.document.body.appendChild(element);
+    element.click();
+    globalThis.document.body.removeChild(element);
+  };
+
+  const handleCopy = async () => {
+    if (textAreaRef.current) {
+      const start = textAreaRef.current.selectionStart;
+      const end = textAreaRef.current.selectionEnd;
+      const selectedText = content.substring(start, end);
+      if (selectedText) {
+        await navigator.clipboard.writeText(selectedText);
+        toast.success("Text copied to clipboard");
+      }
+    }
+  };
+
+  const handleCut = async () => {
+    if (textAreaRef.current) {
+      const start = textAreaRef.current.selectionStart;
+      const end = textAreaRef.current.selectionEnd;
+      const selectedText = content.substring(start, end);
+      if (selectedText) {
+        await navigator.clipboard.writeText(selectedText);
+        const newContent = content.substring(0, start) + content.substring(end);
+        handleContentChange(newContent);
+        toast.success("Text cut to clipboard");
+      }
+    }
+  };
+
+  const handlePaste = async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+      if (textAreaRef.current) {
+        const start = textAreaRef.current.selectionStart;
+        const end = textAreaRef.current.selectionEnd;
+        const newContent = content.substring(0, start) + clipboardText + content.substring(end);
+        handleContentChange(newContent);
+        // Set cursor position after pasted text
+        setTimeout(() => {
+          if (textAreaRef.current) {
+            textAreaRef.current.selectionStart = textAreaRef.current.selectionEnd = start + clipboardText.length;
+          }
+        }, 0);
+      }
+    } catch (err) {
+      toast.error("Failed to paste from clipboard");
+    }
+  };
 
   useEffect(() => {
     if (documentId && user) {
@@ -198,14 +292,78 @@ export default function DocumentEditor() {
         {/* Menu Bar */}
         <div className="flex items-center px-4 py-1 text-sm">
           {[
-            { name: "File", items: ["New", "Open", "Make a copy", "Download", "Email", "Print"] },
-            { name: "Edit", items: ["Undo", "Redo", "Cut", "Copy", "Paste"] },
-            { name: "View", items: ["Print layout", "Mode", "Show ruler", "Zoom"] },
-            { name: "Insert", items: ["Image", "Table", "Drawing", "Chart", "Link"] },
-            { name: "Format", items: ["Text", "Paragraph styles", "Align & indent", "Line & paragraph spacing"] },
-            { name: "Tools", items: ["Spelling and grammar", "Word count", "Review suggested edits"] },
-            { name: "Extensions", items: ["Add-ons", "Apps Script"] },
-            { name: "Help", items: ["Search the menus", "Docs Help", "Training"] }
+            { 
+              name: "File", 
+              items: [
+                { label: "New", action: handleNewDocument },
+                { label: "Open", action: () => navigate("/") },
+                { label: "Make a copy", action: () => toast.info("Feature coming soon") },
+                { label: "Download", action: handleDownload },
+                { label: "Email", action: () => toast.info("Feature coming soon") },
+                { label: "Print", action: () => window.print() }
+              ]
+            },
+            { 
+              name: "Edit", 
+              items: [
+                { label: "Undo", action: handleUndo },
+                { label: "Redo", action: handleRedo },
+                { label: "Cut", action: handleCut },
+                { label: "Copy", action: handleCopy },
+                { label: "Paste", action: handlePaste }
+              ]
+            },
+            { 
+              name: "View", 
+              items: [
+                { label: "Print layout", action: () => toast.info("Feature coming soon") },
+                { label: "Mode", action: () => toast.info("Feature coming soon") },
+                { label: "Show ruler", action: () => toast.info("Feature coming soon") },
+                { label: "Zoom", action: () => toast.info("Use zoom dropdown in toolbar") }
+              ]
+            },
+            { 
+              name: "Insert", 
+              items: [
+                { label: "Image", action: () => toast.info("Feature coming soon") },
+                { label: "Table", action: () => toast.info("Feature coming soon") },
+                { label: "Drawing", action: () => toast.info("Feature coming soon") },
+                { label: "Chart", action: () => toast.info("Feature coming soon") },
+                { label: "Link", action: () => toast.info("Feature coming soon") }
+              ]
+            },
+            { 
+              name: "Format", 
+              items: [
+                { label: "Text", action: () => toast.info("Use toolbar formatting options") },
+                { label: "Paragraph styles", action: () => toast.info("Use style dropdown in toolbar") },
+                { label: "Align & indent", action: () => toast.info("Use alignment tools in toolbar") },
+                { label: "Line & paragraph spacing", action: () => toast.info("Feature coming soon") }
+              ]
+            },
+            { 
+              name: "Tools", 
+              items: [
+                { label: "Spelling and grammar", action: () => toast.info("Feature coming soon") },
+                { label: "Word count", action: () => toast.info(`Word count: ${content.split(/\s+/).filter(word => word.length > 0).length}`) },
+                { label: "Review suggested edits", action: () => toast.info("Feature coming soon") }
+              ]
+            },
+            { 
+              name: "Extensions", 
+              items: [
+                { label: "Add-ons", action: () => toast.info("Feature coming soon") },
+                { label: "Apps Script", action: () => toast.info("Feature coming soon") }
+              ]
+            },
+            { 
+              name: "Help", 
+              items: [
+                { label: "Search the menus", action: () => toast.info("Feature coming soon") },
+                { label: "Docs Help", action: () => toast.info("Feature coming soon") },
+                { label: "Training", action: () => toast.info("Feature coming soon") }
+              ]
+            }
           ].map((menu) => (
             <DropdownMenu key={menu.name}>
               <DropdownMenuTrigger asChild>
@@ -215,8 +373,12 @@ export default function DocumentEditor() {
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg min-w-48 z-50">
                 {menu.items.map((item, index) => (
-                  <DropdownMenuItem key={index} className="text-sm py-2 px-4 hover:bg-gray-50">
-                    {item}
+                  <DropdownMenuItem 
+                    key={index} 
+                    className="text-sm py-2 px-4 hover:bg-gray-50 cursor-pointer"
+                    onClick={item.action}
+                  >
+                    {item.label}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
@@ -230,7 +392,8 @@ export default function DocumentEditor() {
             variant="ghost" 
             size="icon" 
             className="w-8 h-8 hover:bg-gray-100 rounded"
-            onClick={() => {/* TODO: Undo functionality */}}
+            onClick={handleUndo}
+            disabled={undoStack.length === 0}
           >
             <Undo className="w-4 h-4 text-gray-600" />
           </Button>
@@ -238,7 +401,8 @@ export default function DocumentEditor() {
             variant="ghost" 
             size="icon" 
             className="w-8 h-8 hover:bg-gray-100 rounded"
-            onClick={() => {/* TODO: Redo functionality */}}
+            onClick={handleRedo}
+            disabled={redoStack.length === 0}
           >
             <Redo className="w-4 h-4 text-gray-600" />
           </Button>
@@ -280,7 +444,17 @@ export default function DocumentEditor() {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
               {["Normal text", "Title", "Subtitle", "Heading 1", "Heading 2", "Heading 3"].map((style) => (
-                <DropdownMenuItem key={style} onClick={() => setTextStyle(style)} className="text-sm py-1 px-3 hover:bg-gray-50">
+                <DropdownMenuItem 
+                  key={style} 
+                  onClick={() => setTextStyle(style)} 
+                  className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+                  style={{ 
+                    fontSize: style === 'Title' ? '20px' : style === 'Subtitle' ? '16px' : 
+                             style === 'Heading 1' ? '18px' : style === 'Heading 2' ? '16px' : 
+                             style === 'Heading 3' ? '14px' : '11px',
+                    fontWeight: style.includes('Heading') || style === 'Title' ? 'bold' : 'normal'
+                  }}
+                >
                   {style}
                 </DropdownMenuItem>
               ))}
@@ -371,7 +545,10 @@ export default function DocumentEditor() {
                       key={color} 
                       className="w-4 h-4 cursor-pointer border border-gray-300 hover:border-gray-400" 
                       style={{ backgroundColor: color }}
-                      onClick={() => {/* TODO: Apply text color */}}
+                      onClick={() => {
+                        setTextColor(color);
+                        toast.success(`Text color changed to ${color}`);
+                      }}
                     />
                   ))}
                 </div>
@@ -394,7 +571,10 @@ export default function DocumentEditor() {
                       key={color} 
                       className="w-4 h-4 cursor-pointer border border-gray-300 hover:border-gray-400" 
                       style={{ backgroundColor: color === 'transparent' ? 'transparent' : color }}
-                      onClick={() => {/* TODO: Apply highlight color */}}
+                      onClick={() => {
+                        setBackgroundColor(color);
+                        toast.success(`Highlight color changed to ${color === 'transparent' ? 'none' : color}`);
+                      }}
                     />
                   ))}
                 </div>
@@ -461,14 +641,29 @@ export default function DocumentEditor() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="px-2 py-1 h-8 text-sm text-gray-700 hover:bg-gray-100 border border-transparent hover:border-gray-300 rounded">
-                Editing
+                {editingMode}
                 <ChevronDown className="w-3 h-3 ml-1" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">Editing</DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">Suggesting</DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">Viewing</DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setEditingMode("Editing")} 
+                className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+              >
+                Editing
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setEditingMode("Suggesting")} 
+                className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+              >
+                Suggesting
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setEditingMode("Viewing")} 
+                className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+              >
+                Viewing
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -555,17 +750,21 @@ export default function DocumentEditor() {
                 <textarea
                   ref={textAreaRef}
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
+                  onChange={(e) => handleContentChange(e.target.value)}
                   placeholder="Start typing..."
                   className="w-full h-full min-h-[800px] border-none outline-none resize-none bg-transparent leading-6"
+                  readOnly={editingMode === 'Viewing'}
                   style={{ 
                     fontFamily: fontFamily,
-                    fontSize: `${fontSize}pt`,
-                    fontWeight: isBold ? 'bold' : 'normal',
+                    fontSize: textStyle === 'Title' ? '28pt' : textStyle === 'Subtitle' ? '18pt' : 
+                             textStyle === 'Heading 1' ? '20pt' : textStyle === 'Heading 2' ? '16pt' : 
+                             textStyle === 'Heading 3' ? '14pt' : `${fontSize}pt`,
+                    fontWeight: isBold || textStyle.includes('Heading') || textStyle === 'Title' ? 'bold' : 'normal',
                     fontStyle: isItalic ? 'italic' : 'normal',
                     textDecoration: isUnderline ? 'underline' : 'none',
                     textAlign: alignment as any,
-                    color: '#000',
+                    color: textColor,
+                    backgroundColor: backgroundColor === 'transparent' ? 'transparent' : backgroundColor,
                     lineHeight: textStyle === 'Title' ? '1.2' : textStyle.includes('Heading') ? '1.3' : '1.15'
                   }}
                 />
