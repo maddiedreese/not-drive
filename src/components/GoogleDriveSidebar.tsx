@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { 
   Home,
-  Activity,
-  Briefcase,
-  HardDrive, 
-  Users, 
+  Bell,
+  Users,
+  Folder, 
+  UsersRound, 
   Clock, 
   Star, 
-  AlertOctagon,
+  Info,
   Trash2, 
   Cloud,
   Settings,
-  Plus
+  Plus,
+  ChevronRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -19,15 +20,16 @@ import { cn } from "@/lib/utils";
 
 const sidebarItems = [
   { label: "Home", icon: Home, active: true },
-  { label: "Activity", icon: Activity },
-  { label: "Workspaces", icon: Briefcase },
-  { label: "My Drive", icon: HardDrive, hasExpander: true },
-  { label: "Shared drives", icon: Users, hasExpander: true },
-  { label: "Shared with me", icon: Users },
+  { label: "Activity", icon: Bell },
+  { label: "Workspaces", icon: Users },
+  { label: "My Drive", icon: Folder, hasExpander: true },
+  { label: "Shared drives", icon: UsersRound, hasExpander: true },
+  { label: "Shared with me", icon: UsersRound, highlighted: true },
   { label: "Recent", icon: Clock },
   { label: "Starred", icon: Star },
-  { label: "Spam", icon: AlertOctagon },
-  { label: "Trash", icon: Trash2 }
+  { label: "Spam", icon: Info },
+  { label: "Trash", icon: Trash2 },
+  { label: "Storage", icon: Cloud, subtext: "0 bytes used" }
 ];
 
 export function Sidebar() {
@@ -47,45 +49,52 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Items */}
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 px-3 space-y-0.5">
         {sidebarItems.map((item) => {
           const Icon = item.icon;
           return (
-            <Button
-              key={item.label}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors",
-                item.active 
-                  ? "bg-[#e8f0fe] text-[#1a73e8] font-medium" 
-                  : "text-[#3c4043] hover:bg-[#f1f3f4]",
+            <div key={item.label} className="relative">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
+                  item.active 
+                    ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
+                    : item.highlighted
+                    ? "bg-[#f1f3f4] text-[#3c4043]"
+                    : "text-[#3c4043] hover:bg-[#f1f3f4]",
+                )}
+              >
+                <Icon className="w-5 h-5 mr-3 shrink-0" />
+                <span className="truncate flex-1 text-left">{item.label}</span>
+                {item.hasExpander && (
+                  <ChevronRight className="w-4 h-4 ml-auto shrink-0" />
+                )}
+              </Button>
+              {item.subtext && (
+                <div className="text-xs text-[#5f6368] px-11 mt-0.5">
+                  {item.subtext}
+                </div>
               )}
-            >
-              <Icon className="w-5 h-5 mr-3 shrink-0" />
-              <span className="truncate">{item.label}</span>
-            </Button>
+            </div>
           );
         })}
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-3 border-t border-border space-y-3">
+      <div className="p-3 space-y-3">
         <Button
           variant="ghost"
-          className="w-full justify-start h-8 px-3 rounded text-sm text-gray-700 hover:bg-gray-100"
+          className="w-full justify-start h-8 px-3 rounded-full text-sm text-[#3c4043] hover:bg-[#f1f3f4] font-normal"
         >
           <Settings className="w-5 h-5 mr-3" />
           Admin console
         </Button>
         
         <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Cloud className="w-4 h-4" />
-            <span>Storage</span>
-          </div>
-          <Progress value={storagePercentage} className="h-1.5" />
-          <div className="text-xs text-gray-500">
-            0 bytes of shared {storageTotal} GB used
+          <Progress value={0} className="h-1.5" />
+          <div className="text-xs text-[#5f6368] px-3">
+            0 bytes of shared 30 GB used
           </div>
         </div>
       </div>
