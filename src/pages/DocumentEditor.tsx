@@ -606,80 +606,80 @@ export default function DocumentEditor() {
 
         {/* Toolbar */}
         <div className="w-full border-b border-gray-200">
-          <div className="flex items-center justify-center px-4 py-3">
-            <div className="flex items-center justify-center space-x-2 bg-gray-100 rounded-full px-8 py-2 w-full max-w-7xl">
+          <div className="flex items-center justify-center px-4 py-1.5">
+            <div className="flex items-center justify-center space-x-1 bg-gray-100 rounded-full px-6 py-1 w-full max-w-7xl">
               
               {/* Search */}
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="w-9 h-9 hover:bg-gray-200 rounded"
+                className="w-7 h-7 hover:bg-gray-200 rounded"
                 onClick={handleSearch}
               >
-                <Search className="w-5 h-5 text-gray-600" />
+                <Search className="w-4 h-4 text-gray-600" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="w-9 h-9 hover:bg-gray-200 rounded"
+                className="w-7 h-7 hover:bg-gray-200 rounded"
                 onClick={handleUndo}
                 disabled={undoStack.length === 0}
               >
-                <Undo className="w-5 h-5 text-gray-600" />
+                <Undo className="w-4 h-4 text-gray-600" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="w-9 h-9 hover:bg-gray-200 rounded"
+                className="w-7 h-7 hover:bg-gray-200 rounded"
                 onClick={handleRedo}
                 disabled={redoStack.length === 0}
               >
-                <Redo className="w-5 h-5 text-gray-600" />
+                <Redo className="w-4 h-4 text-gray-600" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="w-9 h-9 hover:bg-gray-200 rounded"
+                className="w-7 h-7 hover:bg-gray-200 rounded"
                 onClick={() => window.print()}
               >
-                <Printer className="w-5 h-5 text-gray-600" />
+                <Printer className="w-4 h-4 text-gray-600" />
               </Button>
               
               {/* Format Painter */}
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={`w-9 h-9 hover:bg-gray-200 rounded ${formatPainter ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+                className={`w-7 h-7 hover:bg-gray-200 rounded ${formatPainter ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
                 onClick={handleFormatPainter}
               >
-                <Paintbrush className="w-5 h-5" />
+                <Paintbrush className="w-4 h-4" />
               </Button>
               
-              <div className="w-px h-8 bg-gray-300 mx-2" />
+              <div className="w-px h-6 bg-gray-300 mx-1" />
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="px-4 py-2 h-8 text-sm text-gray-700 hover:bg-gray-200 rounded min-w-20">
+                  <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded min-w-16">
                     {zoom}
-                    <ChevronDown className="w-4 h-4 ml-2" />
+                    <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
                   {["50%", "75%", "90%", "100%", "125%", "150%", "200%"].map((zoomLevel) => (
-                    <DropdownMenuItem key={zoomLevel} onClick={() => setZoom(zoomLevel)} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    <DropdownMenuItem key={zoomLevel} onClick={() => setZoom(zoomLevel)} className="text-xs py-1 px-2 hover:bg-gray-50">
                       {zoomLevel}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <div className="w-px h-8 bg-gray-300 mx-2" />
+              <div className="w-px h-6 bg-gray-300 mx-1" />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="px-4 py-2 h-8 text-sm text-gray-700 hover:bg-gray-200 rounded min-w-32">
+                  <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded min-w-24">
                     {textStyle}
-                    <ChevronDown className="w-4 h-4 ml-2" />
+                    <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -703,31 +703,31 @@ export default function DocumentEditor() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="px-4 py-2 h-8 text-sm text-gray-700 hover:bg-gray-200 rounded min-w-24">
+                  <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded min-w-20">
                     {fontFamily}
-                    <ChevronDown className="w-4 h-4 ml-2" />
+                    <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
                   {["Arial", "Calibri", "Georgia", "Times New Roman", "Helvetica", "Comic Sans MS"].map((font) => (
-                    <DropdownMenuItem key={font} onClick={() => setFontFamily(font)} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    <DropdownMenuItem key={font} onClick={() => setFontFamily(font)} className="text-xs py-1 px-2 hover:bg-gray-50">
                       <span style={{ fontFamily: font }}>{font}</span>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <div className="flex items-center bg-gray-50 rounded px-2 py-1">
+              <div className="flex items-center bg-gray-50 rounded px-1 py-0.5">
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="w-7 h-7 hover:bg-gray-200 rounded"
+                  className="w-5 h-5 hover:bg-gray-200 rounded"
                   onClick={() => {
                     const newSize = Math.max(8, parseInt(fontSize) - 1);
                     setFontSize(newSize.toString());
                   }}
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-3 h-3" />
                 </Button>
                 <Input
                   value={fontSize}
@@ -737,52 +737,52 @@ export default function DocumentEditor() {
                       setFontSize(value);
                     }
                   }}
-                  className="w-8 h-7 text-center text-sm font-medium border-none bg-transparent px-1"
+                  className="w-6 h-5 text-center text-xs font-medium border-none bg-transparent px-0.5"
                 />
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="w-7 h-7 hover:bg-gray-200 rounded"
+                  className="w-5 h-5 hover:bg-gray-200 rounded"
                   onClick={() => {
                     const newSize = Math.min(96, parseInt(fontSize) + 1);
                     setFontSize(newSize.toString());
                   }}
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3 h-3" />
                 </Button>
               </div>
 
-              <div className="w-px h-8 bg-gray-300 mx-2" />
+              <div className="w-px h-6 bg-gray-300 mx-1" />
 
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={`w-9 h-9 hover:bg-gray-200 rounded ${isBold ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+                className={`w-7 h-7 hover:bg-gray-200 rounded ${isBold ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
                 onClick={() => setIsBold(!isBold)}
               >
-                <Bold className="w-5 h-5" />
+                <Bold className="w-4 h-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={`w-9 h-9 hover:bg-gray-200 rounded ${isItalic ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+                className={`w-7 h-7 hover:bg-gray-200 rounded ${isItalic ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
                 onClick={() => setIsItalic(!isItalic)}
               >
-                <Italic className="w-5 h-5" />
+                <Italic className="w-4 h-4" />
               </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className={`w-9 h-9 hover:bg-gray-200 rounded ${isUnderline ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+                className={`w-7 h-7 hover:bg-gray-200 rounded ${isUnderline ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
                 onClick={() => setIsUnderline(!isUnderline)}
               >
-                <Underline className="w-5 h-5" />
+                <Underline className="w-4 h-4" />
               </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                    <div className="w-5 h-5 border-b-2 border-black"></div>
+                  <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                    <div className="w-4 h-4 border-b-2 border-black"></div>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -807,8 +807,8 @@ export default function DocumentEditor() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                    <PaintBucket className="w-5 h-5 text-gray-600" />
+                  <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                    <PaintBucket className="w-4 h-4 text-gray-600" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -831,25 +831,25 @@ export default function DocumentEditor() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleInsertLink}>
-                <Link className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded" onClick={handleInsertLink}>
+                <Link className="w-4 h-4 text-gray-600" />
               </Button>
               
               {/* Add Comment */}
-              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleAddComment}>
-                <MessageSquarePlus className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded" onClick={handleAddComment}>
+                <MessageSquarePlus className="w-4 h-4 text-gray-600" />
               </Button>
               
-              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleInsertImage}>
-                <Image className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded" onClick={handleInsertImage}>
+                <Image className="w-4 h-4 text-gray-600" />
               </Button>
 
-              <div className="w-px h-8 bg-gray-300 mx-2" />
+              <div className="w-px h-6 bg-gray-300 mx-1" />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                    <AlignLeft className="w-5 h-5 text-gray-600" />
+                  <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                    <AlignLeft className="w-4 h-4 text-gray-600" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -871,8 +871,8 @@ export default function DocumentEditor() {
               {/* Line Spacing */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                    <LineSpacing className="w-5 h-5 text-gray-600" />
+                  <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                    <LineSpacing className="w-4 h-4 text-gray-600" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -893,8 +893,8 @@ export default function DocumentEditor() {
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                    <List className="w-5 h-5 text-gray-600" />
+                  <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                    <List className="w-4 h-4 text-gray-600" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
@@ -907,25 +907,25 @@ export default function DocumentEditor() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
-              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                <Outdent className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                <Outdent className="w-4 h-4 text-gray-600" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
-                <Indent className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                <Indent className="w-4 h-4 text-gray-600" />
               </Button>
               
               {/* Clear Formatting */}
-              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleClearFormatting}>
-                <RemoveFormatting className="w-5 h-5 text-gray-600" />
+              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded" onClick={handleClearFormatting}>
+                <RemoveFormatting className="w-4 h-4 text-gray-600" />
               </Button>
 
-              <div className="w-px h-8 bg-gray-300 mx-2" />
+              <div className="w-px h-6 bg-gray-300 mx-1" />
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="px-4 py-2 h-8 text-sm text-gray-700 hover:bg-gray-200 rounded min-w-24">
+                  <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded min-w-20">
                     {editingMode}
-                    <ChevronDown className="w-4 h-4 ml-2" />
+                    <ChevronDown className="w-3 h-3 ml-1" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
