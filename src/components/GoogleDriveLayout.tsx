@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus, FileText, Presentation, Sheet, Folder, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { CreateDocumentModal } from "./CreateDocumentModal";
 import { FileUpload } from "./FileUpload";
 import { useAuth } from "./AuthProvider";
 import { useDocuments } from "@/hooks/useDocuments";
+import { supabase } from "@/integrations/supabase/client";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 export function GoogleDriveLayout() {
@@ -24,6 +25,7 @@ export function GoogleDriveLayout() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user, signOut, loading } = useAuth();
   const { createDocument, refetch } = useDocuments();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -43,6 +45,54 @@ export function GoogleDriveLayout() {
   const handleSignOut = async () => {
     await signOut();
     setShowAuthModal(true);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || !user) return;
+
+    for (const file of Array.from(files)) {
+      try {
+        // Upload file to storage
+        const fileName = `${user.id}/${Date.now()}-${file.name}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('documents')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        // Save file metadata to database
+        const { error: dbError } = await supabase
+          .from('documents')
+          .insert([
+            {
+              user_id: user.id,
+              name: file.name,
+              type: 'file',
+              file_path: uploadData.path,
+              file_size: file.size,
+              mime_type: file.type,
+              is_folder: false,
+            },
+          ]);
+
+        if (dbError) throw dbError;
+      } catch (error: any) {
+        console.error(`Failed to upload ${file.name}:`, error.message);
+      }
+    }
+
+    refetch();
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   return (
@@ -137,9 +187,12 @@ export function GoogleDriveLayout() {
                     <DropdownMenuContent 
                       align="start" 
                       className="w-56 bg-white border border-gray-200 shadow-lg z-50 p-2"
+                      sideOffset={5}
                     >
                       <DropdownMenuItem 
-                        onClick={() => setShowCreateModal(true)}
+                        onClick={() => {
+                          handleCreateDocument("New folder", "folder");
+                        }}
                         className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
                       >
                         <FolderPlus className="w-5 h-5 text-gray-600" />
@@ -149,11 +202,14 @@ export function GoogleDriveLayout() {
                       
                       <div className="w-full h-px bg-gray-200 my-2"></div>
                       
-                      <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                      <DropdownMenuItem 
+                        onClick={handleUploadClick}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
+                      >
                         <div className="w-5 h-5 flex items-center justify-center">
                           <UploadCloud className="w-4 h-4 text-gray-600" />
                         </div>
-                        <FileUpload onFileUploaded={handleFileUploaded} />
+                        <span className="text-sm text-gray-700">File upload</span>
                         <span className="ml-auto text-xs text-gray-400">⌘ then U</span>
                       </DropdownMenuItem>
                       
@@ -167,7 +223,7 @@ export function GoogleDriveLayout() {
                       
                       <DropdownMenuItem 
                         onClick={() => {
-                          setShowCreateModal(true);
+                          handleCreateDocument("Untitled document", "document");
                         }}
                         className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
                       >
@@ -176,6 +232,30 @@ export function GoogleDriveLayout() {
                         </div>
                         <span className="text-sm text-gray-700">Google Docs</span>
                         <ChevronDown className="w-4 h-4 text-gray-400 ml-auto rotate-[-90deg]" />
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          handleCreateDocument("Untitled spreadsheet", "spreadsheet");
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
+                      >
+                        <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
+                          <Sheet className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-sm text-gray-700">Google Sheets</span>
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          handleCreateDocument("Untitled presentation", "presentation");
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
+                      >
+                        <div className="w-5 h-5 bg-orange-500 rounded flex items-center justify-center">
+                          <Presentation className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-sm text-gray-700">Google Slides</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -295,6 +375,15 @@ export function GoogleDriveLayout() {
           </div>
         </main>
       </div>
+
+      {/* Hidden file input for uploads */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        onChange={handleFileSelect}
+        className="hidden"
+      />
 
       {/* Modals */}
       <AuthModal 
