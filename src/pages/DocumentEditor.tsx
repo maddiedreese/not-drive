@@ -568,311 +568,308 @@ export default function DocumentEditor() {
         </div>
 
         {/* Toolbar */}
-        <div className="flex items-center px-4 py-2 border-b border-gray-200 space-x-0.5">
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-8 h-8 hover:bg-gray-100 rounded"
-            onClick={handleUndo}
-            disabled={undoStack.length === 0}
-          >
-            <Undo className="w-4 h-4 text-gray-600" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-8 h-8 hover:bg-gray-100 rounded"
-            onClick={handleRedo}
-            disabled={redoStack.length === 0}
-          >
-            <Redo className="w-4 h-4 text-gray-600" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="w-8 h-8 hover:bg-gray-100 rounded"
-            onClick={() => window.print()}
-          >
-            <Printer className="w-4 h-4 text-gray-600" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2" />
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-16">
-                {zoom}
-                <ChevronDown className="w-3 h-3 ml-1" />
+        <div className="flex items-center justify-center px-4 py-2 border-b border-gray-200">
+          <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-1">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="w-7 h-7 hover:bg-gray-200 rounded"
+              onClick={handleUndo}
+              disabled={undoStack.length === 0}
+            >
+              <Undo className="w-4 h-4 text-gray-600" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="w-7 h-7 hover:bg-gray-200 rounded"
+              onClick={handleRedo}
+              disabled={redoStack.length === 0}
+            >
+              <Redo className="w-4 h-4 text-gray-600" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="w-7 h-7 hover:bg-gray-200 rounded"
+              onClick={() => window.print()}
+            >
+              <Printer className="w-4 h-4 text-gray-600" />
+            </Button>
+            
+            <div className="w-px h-6 bg-gray-300 mx-1" />
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded">
+                  {zoom}
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                {["50%", "75%", "90%", "100%", "125%", "150%", "200%"].map((zoomLevel) => (
+                  <DropdownMenuItem key={zoomLevel} onClick={() => setZoom(zoomLevel)} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    {zoomLevel}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="w-px h-6 bg-gray-300 mx-1" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded">
+                  {textStyle}
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                {["Normal text", "Title", "Subtitle", "Heading 1", "Heading 2", "Heading 3"].map((style) => (
+                  <DropdownMenuItem 
+                    key={style} 
+                    onClick={() => setTextStyle(style)} 
+                    className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+                    style={{ 
+                      fontSize: style === 'Title' ? '20px' : style === 'Subtitle' ? '16px' : 
+                               style === 'Heading 1' ? '18px' : style === 'Heading 2' ? '16px' : 
+                               style === 'Heading 3' ? '14px' : '11px',
+                      fontWeight: style.includes('Heading') || style === 'Title' ? 'bold' : 'normal'
+                    }}
+                  >
+                    {style}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded">
+                  {fontFamily}
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                {["Arial", "Calibri", "Georgia", "Times New Roman", "Helvetica", "Comic Sans MS"].map((font) => (
+                  <DropdownMenuItem key={font} onClick={() => setFontFamily(font)} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    <span style={{ fontFamily: font }}>{font}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="flex items-center">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="w-5 h-5 hover:bg-gray-200 rounded"
+                onClick={() => {
+                  const newSize = Math.max(8, parseInt(fontSize) - 1);
+                  setFontSize(newSize.toString());
+                }}
+              >
+                <Minus className="w-3 h-3" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              {["50%", "75%", "90%", "100%", "125%", "150%", "200%"].map((zoomLevel) => (
-                <DropdownMenuItem key={zoomLevel} onClick={() => setZoom(zoomLevel)} className="text-sm py-1 px-3 hover:bg-gray-50">
-                  {zoomLevel}
+              <span className="px-1 text-xs min-w-6 text-center">{fontSize}</span>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="w-5 h-5 hover:bg-gray-200 rounded"
+                onClick={() => {
+                  const newSize = Math.min(96, parseInt(fontSize) + 1);
+                  setFontSize(newSize.toString());
+                }}
+              >
+                <Plus className="w-3 h-3" />
+              </Button>
+            </div>
+
+            <div className="w-px h-6 bg-gray-300 mx-1" />
+
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={`w-7 h-7 hover:bg-gray-200 rounded ${isBold ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+              onClick={() => setIsBold(!isBold)}
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={`w-7 h-7 hover:bg-gray-200 rounded ${isItalic ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+              onClick={() => setIsItalic(!isItalic)}
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className={`w-7 h-7 hover:bg-gray-200 rounded ${isUnderline ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+              onClick={() => setIsUnderline(!isUnderline)}
+            >
+              <Underline className="w-4 h-4" />
+            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                  <div className="w-4 h-4 border-b-2 border-black"></div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                <div className="p-2">
+                  <div className="grid grid-cols-10 gap-1 mb-2">
+                    {['#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff',
+                      '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff'].map((color) => (
+                      <div 
+                        key={color} 
+                        className="w-4 h-4 cursor-pointer border border-gray-300 hover:border-gray-400" 
+                        style={{ backgroundColor: color }}
+                        onClick={() => {
+                          setTextColor(color);
+                          toast.success(`Text color changed to ${color}`);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                  <PaintBucket className="w-4 h-4 text-gray-600" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                <div className="p-2">
+                  <div className="grid grid-cols-10 gap-1">
+                    {['transparent', '#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#ffffff',
+                      '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff'].map((color) => (
+                      <div 
+                        key={color} 
+                        className="w-4 h-4 cursor-pointer border border-gray-300 hover:border-gray-400" 
+                        style={{ backgroundColor: color === 'transparent' ? 'transparent' : color }}
+                        onClick={() => {
+                          setBackgroundColor(color);
+                          toast.success(`Highlight color changed to ${color === 'transparent' ? 'none' : color}`);
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded" onClick={handleInsertLink}>
+              <Link className="w-4 h-4 text-gray-600" />
+            </Button>
+            <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded" onClick={handleInsertImage}>
+              <Image className="w-4 h-4 text-gray-600" />
+            </Button>
+
+            <div className="w-px h-6 bg-gray-300 mx-1" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                  <AlignLeft className="w-4 h-4 text-gray-600" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                <DropdownMenuItem onClick={() => setAlignment('left')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                  <AlignLeft className="w-4 h-4 mr-2" />Left
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem onClick={() => setAlignment('center')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                  <AlignCenter className="w-4 h-4 mr-2" />Center
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setAlignment('right')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                  <AlignRight className="w-4 h-4 mr-2" />Right
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setAlignment('justify')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                  <AlignJustify className="w-4 h-4 mr-2" />Justify
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <div className="w-px h-6 bg-gray-300 mx-2" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+                  <List className="w-4 h-4 text-gray-600" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">
+                  <List className="w-4 h-4 mr-2" />Bulleted list
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">
+                  <ListOrdered className="w-4 h-4 mr-2" />Numbered list
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-24">
-                {textStyle}
-                <ChevronDown className="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              {["Normal text", "Title", "Subtitle", "Heading 1", "Heading 2", "Heading 3"].map((style) => (
+            <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+              <Outdent className="w-4 h-4 text-gray-600" />
+            </Button>
+            <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-200 rounded">
+              <Indent className="w-4 h-4 text-gray-600" />
+            </Button>
+
+            <div className="w-px h-6 bg-gray-300 mx-1" />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="px-2 py-1 h-6 text-xs text-gray-700 hover:bg-gray-200 rounded">
+                  {editingMode}
+                  <ChevronDown className="w-3 h-3 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
                 <DropdownMenuItem 
-                  key={style} 
-                  onClick={() => setTextStyle(style)} 
+                  onClick={() => setEditingMode("Editing")} 
                   className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
-                  style={{ 
-                    fontSize: style === 'Title' ? '20px' : style === 'Subtitle' ? '16px' : 
-                             style === 'Heading 1' ? '18px' : style === 'Heading 2' ? '16px' : 
-                             style === 'Heading 3' ? '14px' : '11px',
-                    fontWeight: style.includes('Heading') || style === 'Title' ? 'bold' : 'normal'
-                  }}
                 >
-                  {style}
+                  Editing
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-16">
-                {fontFamily}
-                <ChevronDown className="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              {["Arial", "Calibri", "Georgia", "Times New Roman", "Helvetica", "Comic Sans MS"].map((font) => (
-                <DropdownMenuItem key={font} onClick={() => setFontFamily(font)} className="text-sm py-1 px-3 hover:bg-gray-50">
-                  <span style={{ fontFamily: font }}>{font}</span>
+                <DropdownMenuItem 
+                  onClick={() => setEditingMode("Suggesting")} 
+                  className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+                >
+                  Suggesting
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <div className="flex items-center bg-gray-50 border border-gray-300 rounded-full h-7 px-1">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="w-5 h-5 hover:bg-gray-100 rounded-full"
-              onClick={() => {
-                const newSize = Math.max(8, parseInt(fontSize) - 1);
-                setFontSize(newSize.toString());
-              }}
-            >
-              <Minus className="w-3 h-3" />
-            </Button>
-            <span className="px-2 text-sm min-w-6 text-center">{fontSize}</span>
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="w-5 h-5 hover:bg-gray-100 rounded-full"
-              onClick={() => {
-                const newSize = Math.min(96, parseInt(fontSize) + 1);
-                setFontSize(newSize.toString());
-              }}
-            >
-              <Plus className="w-3 h-3" />
-            </Button>
+                <DropdownMenuItem 
+                  onClick={() => setEditingMode("Viewing")} 
+                  className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
+                >
+                  Viewing
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
-
-          <div className="w-px h-6 bg-gray-300 mx-2" />
-
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className={`w-7 h-7 hover:bg-gray-100 rounded ${isBold ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
-            onClick={() => setIsBold(!isBold)}
-          >
-            <Bold className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className={`w-7 h-7 hover:bg-gray-100 rounded ${isItalic ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
-            onClick={() => setIsItalic(!isItalic)}
-          >
-            <Italic className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className={`w-7 h-7 hover:bg-gray-100 rounded ${isUnderline ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
-            onClick={() => setIsUnderline(!isUnderline)}
-          >
-            <Underline className="w-4 h-4" />
-          </Button>
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
-                <div className="w-4 h-4 border-b-2 border-black"></div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <div className="p-2">
-                <div className="grid grid-cols-10 gap-1 mb-2">
-                  {['#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff',
-                    '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff'].map((color) => (
-                    <div 
-                      key={color} 
-                      className="w-4 h-4 cursor-pointer border border-gray-300 hover:border-gray-400" 
-                      style={{ backgroundColor: color }}
-                      onClick={() => {
-                        setTextColor(color);
-                        toast.success(`Text color changed to ${color}`);
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
-                <PaintBucket className="w-4 h-4 text-gray-600" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <div className="p-2">
-                <div className="grid grid-cols-10 gap-1">
-                  {['transparent', '#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#ffffff',
-                    '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff'].map((color) => (
-                    <div 
-                      key={color} 
-                      className="w-4 h-4 cursor-pointer border border-gray-300 hover:border-gray-400" 
-                      style={{ backgroundColor: color === 'transparent' ? 'transparent' : color }}
-                      onClick={() => {
-                        setBackgroundColor(color);
-                        toast.success(`Highlight color changed to ${color === 'transparent' ? 'none' : color}`);
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded" onClick={handleInsertLink}>
-            <Link className="w-4 h-4 text-gray-600" />
-          </Button>
-          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded" onClick={handleInsertImage}>
-            <Image className="w-4 h-4 text-gray-600" />
-          </Button>
-
-          <div className="w-px h-6 bg-gray-300 mx-2" />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
-                <AlignLeft className="w-4 h-4 text-gray-600" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => setAlignment('left')} className="text-sm py-1 px-3 hover:bg-gray-50">
-                <AlignLeft className="w-4 h-4 mr-2" />Left
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setAlignment('center')} className="text-sm py-1 px-3 hover:bg-gray-50">
-                <AlignCenter className="w-4 h-4 mr-2" />Center
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setAlignment('right')} className="text-sm py-1 px-3 hover:bg-gray-50">
-                <AlignRight className="w-4 h-4 mr-2" />Right
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setAlignment('justify')} className="text-sm py-1 px-3 hover:bg-gray-50">
-                <AlignJustify className="w-4 h-4 mr-2" />Justify
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
-                <List className="w-4 h-4 text-gray-600" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">
-                <List className="w-4 h-4 mr-2" />Bulleted list
-              </DropdownMenuItem>
-              <DropdownMenuItem className="text-sm py-1 px-3 hover:bg-gray-50">
-                <ListOrdered className="w-4 h-4 mr-2" />Numbered list
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
-            <Outdent className="w-4 h-4 text-gray-600" />
-          </Button>
-          <Button variant="ghost" size="icon" className="w-7 h-7 hover:bg-gray-100 rounded">
-            <Indent className="w-4 h-4 text-gray-600" />
-          </Button>
-
-          <div className="w-px h-6 bg-gray-300 mx-2" />
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="px-3 py-1 h-7 text-sm text-gray-700 hover:bg-gray-100 bg-gray-50 border border-gray-300 rounded-full min-w-20">
-                {editingMode}
-                <ChevronDown className="w-3 h-3 ml-1" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem 
-                onClick={() => setEditingMode("Editing")} 
-                className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
-              >
-                Editing
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setEditingMode("Suggesting")} 
-                className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
-              >
-                Suggesting
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setEditingMode("Viewing")} 
-                className="text-sm py-1 px-3 hover:bg-gray-50 cursor-pointer"
-              >
-                Viewing
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
 {/* Ruler */}
         {showRuler && (
-          <div className="px-4 py-1 bg-white border-b border-gray-200">
-            <div className="relative h-6 flex justify-center">
-              <div className="relative w-[816px] h-full">
-                <div className="absolute inset-0 flex items-end">
-                  {Array.from({ length: 21 }, (_, i) => (
-                    <div key={i} className="flex-1 relative">
-                      <div className="absolute bottom-1 left-0 w-px h-2 bg-gray-400"></div>
-                      {i % 2 === 0 && i > 0 && (
-                        <span className="absolute bottom-3 left-0 text-xs text-gray-500 transform -translate-x-1/2">{Math.floor(i/2)}</span>
-                      )}
-                      {i % 2 === 1 && (
-                        <div className="absolute bottom-1 left-0 w-px h-1 bg-gray-300"></div>
-                      )}
-                    </div>
-                  ))}
-                  {/* Left margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 left-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4] transform rotate-180"></div>
-                  {/* First line indent - blue rectangle */}
-                  <div className="absolute bottom-0 left-20 w-2 h-1 bg-[#4285f4]"></div>
-                  {/* Right margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 right-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4] transform rotate-180"></div>
-                </div>
+          <div className="flex justify-center px-4 py-1 bg-white border-b border-gray-200">
+            <div className="relative h-6 w-[816px]">
+              <div className="absolute inset-0 flex">
+                {Array.from({ length: 8 }, (_, i) => (
+                  <div key={i} className="flex-1 relative">
+                    <div className="absolute bottom-1 left-0 w-px h-3 bg-gray-400"></div>
+                    <span className="absolute bottom-4 left-0 text-xs text-gray-500 transform -translate-x-1/2">{i + 1}</span>
+                    {/* Half marks */}
+                    <div className="absolute bottom-1 left-1/2 w-px h-1 bg-gray-300"></div>
+                  </div>
+                ))}
+                {/* Left margin indicator - blue triangle */}
+                <div className="absolute bottom-0 left-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]"></div>
+                {/* First line indent - blue rectangle */}
+                <div className="absolute bottom-0 left-20 w-2 h-1 bg-[#4285f4]"></div>
+                {/* Right margin indicator - blue triangle */}
+                <div className="absolute bottom-0 right-16 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]"></div>
               </div>
             </div>
           </div>
