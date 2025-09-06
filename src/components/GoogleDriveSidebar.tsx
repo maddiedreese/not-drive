@@ -25,7 +25,7 @@ const sidebarItems = [
   { label: "Workspaces", icon: Users },
   { label: "My Drive", icon: Folder, hasExpander: true },
   { label: "Shared drives", icon: UsersRound, hasExpander: true },
-  { label: "Shared with me", icon: UsersRound, highlighted: true },
+  { label: "Shared with me", icon: UsersRound },
   { label: "Recent", icon: Clock },
   { label: "Starred", icon: Star },
   { label: "Spam", icon: Info },
@@ -64,7 +64,7 @@ export function Sidebar() {
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
                     item.active 
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
+                      : (item as any).highlighted
                       ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
@@ -97,7 +97,7 @@ export function Sidebar() {
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
                     item.active 
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
+                      : (item as any).highlighted
                       ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
@@ -130,7 +130,7 @@ export function Sidebar() {
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
                     item.active 
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
+                      : (item as any).highlighted
                       ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
@@ -163,7 +163,7 @@ export function Sidebar() {
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
                     item.active 
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : item.highlighted
+                      : (item as any).highlighted
                       ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
