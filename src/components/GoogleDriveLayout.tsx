@@ -55,9 +55,11 @@ export function GoogleDriveLayout() {
         </div>
       </header>
 
-      <div className="flex flex-1 w-full">
+      <div className="flex flex-1 w-full min-h-0">
         {/* Sidebar */}
-        <Sidebar />
+        <div className="h-full">
+          <Sidebar />
+        </div>
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col bg-white rounded-tl-2xl shadow-sm ml-1 mt-1">
