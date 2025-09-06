@@ -34,7 +34,7 @@ export function GoogleDriveLayout() {
             placeholder="Search in Drive"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 h-12 bg-[#f1f3f4] border-0 rounded-full focus:bg-white focus:shadow-md focus:ring-0 transition-all duration-200"
+            className="pl-10 h-12 bg-[#e8f0fe] border-0 rounded-full focus:bg-white focus:shadow-md focus:ring-0 transition-all duration-200"
           />
         </div>
 
