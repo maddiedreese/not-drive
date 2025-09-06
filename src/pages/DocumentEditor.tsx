@@ -35,7 +35,12 @@ import {
   Minus,
   PaintBucket,
   History,
-  Clock
+  Clock,
+  Paintbrush,
+  MessageSquarePlus,
+  MoreVertical as LineSpacing,
+  RemoveFormatting,
+  Type
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
@@ -102,6 +107,7 @@ export default function DocumentEditor() {
   const [isPrintLayout, setIsPrintLayout] = useState(true);
   const [lineSpacing, setLineSpacing] = useState("1.15");
   const [showSpellCheck, setShowSpellCheck] = useState(false);
+  const [formatPainter, setFormatPainter] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Handle undo/redo
@@ -271,6 +277,37 @@ export default function DocumentEditor() {
 
   const handleAppsScript = () => {
     toast.success("Apps Script editor opened. Create custom functions and automations.");
+  };
+
+  // Handle format operations
+  const handleFormatPainter = () => {
+    setFormatPainter(!formatPainter);
+    toast.success(`Format painter ${!formatPainter ? 'activated' : 'deactivated'}`);
+  };
+
+  const handleAddComment = () => {
+    const selectedText = window.getSelection()?.toString() || "selected text";
+    toast.success(`Comment added to: "${selectedText}"`);
+  };
+
+  const handleClearFormatting = () => {
+    setIsBold(false);
+    setIsItalic(false);
+    setIsUnderline(false);
+    setTextColor("#000000");
+    setBackgroundColor("transparent");
+    setFontFamily("Arial");
+    setFontSize("11");
+    setTextStyle("Normal text");
+    toast.success("Formatting cleared");
+  };
+
+  const handleSearch = () => {
+    const query = prompt("Search document:");
+    if (query) {
+      const matches = content.toLowerCase().split(query.toLowerCase()).length - 1;
+      toast.success(`Found ${matches} matches for "${query}"`);
+    }
   };
 
   // Handle help operations
@@ -571,6 +608,16 @@ export default function DocumentEditor() {
         <div className="w-full border-b border-gray-200">
           <div className="flex items-center justify-center px-4 py-3">
             <div className="flex items-center justify-center space-x-2 bg-gray-100 rounded-full px-8 py-2 w-full max-w-7xl">
+              
+              {/* Search */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="w-9 h-9 hover:bg-gray-200 rounded"
+                onClick={handleSearch}
+              >
+                <Search className="w-5 h-5 text-gray-600" />
+              </Button>
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -596,6 +643,16 @@ export default function DocumentEditor() {
                 onClick={() => window.print()}
               >
                 <Printer className="w-5 h-5 text-gray-600" />
+              </Button>
+              
+              {/* Format Painter */}
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`w-9 h-9 hover:bg-gray-200 rounded ${formatPainter ? 'bg-blue-100 text-blue-700' : 'text-gray-600'}`}
+                onClick={handleFormatPainter}
+              >
+                <Paintbrush className="w-5 h-5" />
               </Button>
               
               <div className="w-px h-8 bg-gray-300 mx-2" />
@@ -672,7 +729,16 @@ export default function DocumentEditor() {
                 >
                   <Minus className="w-4 h-4" />
                 </Button>
-                <span className="px-3 text-sm min-w-8 text-center font-medium">{fontSize}</span>
+                <Input
+                  value={fontSize}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (/^\d*$/.test(value) && parseInt(value) <= 96) {
+                      setFontSize(value);
+                    }
+                  }}
+                  className="w-8 h-7 text-center text-sm font-medium border-none bg-transparent px-1"
+                />
                 <Button 
                   variant="ghost" 
                   size="icon" 
@@ -768,6 +834,12 @@ export default function DocumentEditor() {
               <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleInsertLink}>
                 <Link className="w-5 h-5 text-gray-600" />
               </Button>
+              
+              {/* Add Comment */}
+              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleAddComment}>
+                <MessageSquarePlus className="w-5 h-5 text-gray-600" />
+              </Button>
+              
               <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleInsertImage}>
                 <Image className="w-5 h-5 text-gray-600" />
               </Button>
@@ -796,6 +868,29 @@ export default function DocumentEditor() {
                 </DropdownMenuContent>
               </DropdownMenu>
 
+              {/* Line Spacing */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
+                    <LineSpacing className="w-5 h-5 text-gray-600" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                  <DropdownMenuItem onClick={() => handleLineSpacing('1.0')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    Single
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLineSpacing('1.15')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    1.15
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLineSpacing('1.5')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    1.5
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleLineSpacing('2.0')} className="text-sm py-1 px-3 hover:bg-gray-50">
+                    Double
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
@@ -817,6 +912,11 @@ export default function DocumentEditor() {
               </Button>
               <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded">
                 <Indent className="w-5 h-5 text-gray-600" />
+              </Button>
+              
+              {/* Clear Formatting */}
+              <Button variant="ghost" size="icon" className="w-9 h-9 hover:bg-gray-200 rounded" onClick={handleClearFormatting}>
+                <RemoveFormatting className="w-5 h-5 text-gray-600" />
               </Button>
 
               <div className="w-px h-8 bg-gray-300 mx-2" />
