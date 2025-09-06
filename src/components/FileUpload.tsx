@@ -74,14 +74,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded, currentF
         onChange={handleFileSelect}
         className="hidden"
       />
-      <Button
+      <span
         onClick={handleUploadClick}
-        className="gap-2"
-        disabled={!user}
+        className="text-sm text-gray-700 flex-1 cursor-pointer"
       >
-        <Upload className="w-4 h-4" />
-        Upload
-      </Button>
+        File upload
+      </span>
     </>
   );
 };

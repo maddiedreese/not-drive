@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus } from "lucide-react";
+import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus, FileText, Presentation, Sheet, Folder, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -129,17 +129,53 @@ export function GoogleDriveLayout() {
                 {user && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="gap-2">
+                      <Button variant="outline" className="gap-2 bg-white border-gray-300 hover:bg-gray-50">
                         <Plus className="w-4 h-4" />
                         New
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuItem onClick={() => setShowCreateModal(true)}>
-                        Create Document
+                    <DropdownMenuContent 
+                      align="start" 
+                      className="w-56 bg-white border border-gray-200 shadow-lg z-50 p-2"
+                    >
+                      <DropdownMenuItem 
+                        onClick={() => setShowCreateModal(true)}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
+                      >
+                        <FolderPlus className="w-5 h-5 text-gray-600" />
+                        <span className="text-sm text-gray-700">New folder</span>
+                        <span className="ml-auto text-xs text-gray-400">⌘ then F</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      
+                      <div className="w-full h-px bg-gray-200 my-2"></div>
+                      
+                      <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <div className="w-5 h-5 flex items-center justify-center">
+                          <UploadCloud className="w-4 h-4 text-gray-600" />
+                        </div>
                         <FileUpload onFileUploaded={handleFileUploaded} />
+                        <span className="ml-auto text-xs text-gray-400">⌘ then U</span>
+                      </DropdownMenuItem>
+                      
+                      <DropdownMenuItem className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                        <Folder className="w-5 h-5 text-gray-600" />
+                        <span className="text-sm text-gray-700">Folder upload</span>
+                        <span className="ml-auto text-xs text-gray-400">⌘ then I</span>
+                      </DropdownMenuItem>
+                      
+                      <div className="w-full h-px bg-gray-200 my-2"></div>
+                      
+                      <DropdownMenuItem 
+                        onClick={() => {
+                          setShowCreateModal(true);
+                        }}
+                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
+                      >
+                        <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
+                          <FileText className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-sm text-gray-700">Google Docs</span>
+                        <ChevronDown className="w-4 h-4 text-gray-400 ml-auto rotate-[-90deg]" />
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
