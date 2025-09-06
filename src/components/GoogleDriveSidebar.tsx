@@ -42,9 +42,9 @@ export function Sidebar() {
       <div className="p-4 pb-2">
       </div>
 
-      <div className="px-4 pb-4">
+      <div className="px-4 pb-4 flex justify-start">
         {/* New Button */}
-        <Button className="w-full h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-2xl shadow-sm font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] justify-start pl-4">
+        <Button className="h-12 bg-white hover:bg-[#f8f9fa] text-[#3c4043] border border-[#dadce0] rounded-2xl shadow-sm font-medium transition-all duration-200 hover:shadow-md hover:border-[#d2e3fc] justify-start px-6">
           <Plus className="w-5 h-5 mr-3" />
           New
         </Button>
