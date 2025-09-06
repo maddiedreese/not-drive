@@ -18,7 +18,7 @@ export function GoogleDriveLayout() {
   return (
     <div className="min-h-screen flex flex-col w-full bg-white">
       {/* Top Navigation Bar */}
-      <header className="h-16 border-b border-[#e8eaed] bg-[#f8f9fa] px-4 flex items-center gap-4">
+      <header className="h-16 bg-[#f8f9fa] px-4 flex items-center gap-4">
         {/* Google Drive Logo */}
         <div className="flex items-center gap-3 min-w-[200px]">
           <div className="w-10 h-10 relative">
@@ -60,9 +60,9 @@ export function GoogleDriveLayout() {
         <Sidebar />
 
         {/* Main Content */}
-        <main className="flex-1 flex flex-col bg-white">
+        <main className="flex-1 flex flex-col bg-white rounded-tl-2xl shadow-sm ml-1 mt-1">
           {/* Toolbar */}
-          <div className="border-b border-[#e8eaed] bg-white px-6 py-3">
+          <div className="bg-white px-6 py-3 rounded-tl-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
