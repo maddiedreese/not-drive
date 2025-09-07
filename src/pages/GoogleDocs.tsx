@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Search, MoreVertical, Menu, Grid3X3 } from "lucide-react";
+import { Search, MoreVertical, Menu, Grid3X3, Palette } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 const templates = [
@@ -64,6 +64,7 @@ export default function GoogleDocs() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
+  const [crazyMode, setCrazyMode] = useState(false);
 
   const handleCreateDocument = async (template: typeof templates[0]) => {
     if (!user) {
@@ -99,7 +100,7 @@ export default function GoogleDocs() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className={`min-h-screen bg-white ${crazyMode ? 'invert' : ''}`}>
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between px-4 py-3">
@@ -125,6 +126,15 @@ export default function GoogleDocs() {
           </div>
 
           <div className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setCrazyMode(!crazyMode)}
+              className={crazyMode ? "bg-purple-100 text-purple-600" : ""}
+            >
+              <Palette className="w-5 h-5" />
+            </Button>
+            
             <Button variant="ghost" size="icon">
               <Grid3X3 className="w-5 h-5" />
             </Button>
