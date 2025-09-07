@@ -110,7 +110,9 @@ export default function DocumentEditor() {
   const [formatPainter, setFormatPainter] = useState(false);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [rulerWidth, setRulerWidth] = useState(0);
+  const [margins, setMargins] = useState({ left: 0, right: 0 });
 
   // Handle undo/redo
   const handleUndo = () => {
@@ -386,6 +388,12 @@ export default function DocumentEditor() {
       if (pageRef.current) {
         const rect = pageRef.current.getBoundingClientRect();
         setRulerWidth(Math.round(rect.width));
+        if (contentRef.current) {
+          const contentRect = contentRef.current.getBoundingClientRect();
+          const left = Math.max(0, Math.round(contentRect.left - rect.left));
+          const right = Math.max(0, Math.round(rect.right - contentRect.right));
+          setMargins({ left, right });
+        }
       }
     };
     updateRuler();
@@ -983,11 +991,11 @@ export default function DocumentEditor() {
                     </div>
                   ))}
                   {/* Left margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ left: `${Math.round(12 * (parseInt(zoom) / 100))}px` }}></div>
+                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ left: `${margins.left}px` }}></div>
                   {/* First line indent - blue rectangle */}
-                  <div className="absolute bottom-0 w-2 h-1 bg-[#4285f4]" style={{ left: `${Math.round(20 * (parseInt(zoom) / 100))}px` }}></div>
+                  <div className="absolute bottom-0 w-2 h-1 bg-[#4285f4]" style={{ left: `${margins.left + 24}px` }}></div>
                   {/* Right margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ right: `${Math.round(12 * (parseInt(zoom) / 100))}px` }}></div>
+                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ right: `${margins.right}px` }}></div>
                 </div>
               </div>
             </div>
@@ -1048,7 +1056,7 @@ export default function DocumentEditor() {
                 marginBottom: `${(1 - parseInt(zoom) / 100) * 800}px`
               }}
             >
-              <div className="p-16 pt-24 h-full">
+              <div ref={contentRef} className="p-16 pt-24 h-full">
                 <div className="absolute top-0 left-0 w-full h-1 bg-blue-400 opacity-0 hover:opacity-100 transition-opacity cursor-row-resize"></div>
                 <div className="w-1 h-full border-l border-gray-200 absolute top-0 left-12"></div>
                 <div className="w-1 h-full border-l border-gray-200 absolute top-0 right-12"></div>
