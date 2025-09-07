@@ -1069,8 +1069,9 @@ export default function DocumentEditor() {
           <div className="max-w-4xl mx-auto p-8">
             <div
               ref={pageRef}
-              className="bg-white shadow-sm border border-gray-300 min-h-[29.7cm] w-[21cm] mx-auto relative"
+              className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
               style={{ 
+                height: '738px', // Extended height to match 9 ruler marks (82px * 9 = 738px)
                 transform: `scale(${parseInt(zoom) / 100})`,
                 transformOrigin: 'top center',
                 marginBottom: `${(1 - parseInt(zoom) / 100) * 800}px`
