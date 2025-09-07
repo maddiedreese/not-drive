@@ -1009,18 +1009,19 @@ export default function DocumentEditor() {
       {/* Main Content */}
       <div className="flex h-screen pt-32">
         {/* Vertical Ruler Sidebar */}
-        <div className="w-6 bg-white border-r border-gray-300 relative overflow-hidden">
-          {/* Vertical ruler aligned with document top */}
-          <div className="absolute left-0 top-0 w-full h-full">
-            {Array.from({ length: 50 }, (_, i) => (
-              <div key={i} className="flex items-center h-6 relative">
+        <div className="w-6 bg-white border-r border-gray-300 relative">
+          {/* Spacer to align with document start */}
+          <div className="h-8"></div>
+          {/* Vertical ruler that scrolls with document */}
+          <div className="relative">
+            {Array.from({ length: 10 }, (_, i) => (
+              <div key={i} className="relative" style={{ height: '73.8px' }}>
                 <div className="absolute left-1 w-3 h-px bg-gray-400"></div>
-                {i % 5 === 0 && (
-                  <span className="absolute left-5 text-xs text-gray-500 transform -rotate-90 origin-left">{i + 1}</span>
-                )}
-                {i % 5 !== 0 && (
-                  <div className="absolute left-1 w-1 h-px bg-gray-300"></div>
-                )}
+                <span className="absolute left-5 text-xs text-gray-500 transform -rotate-90 origin-left whitespace-nowrap">{i + 1}</span>
+                {/* Quarter marks */}
+                <div className="absolute left-1 w-1 h-px bg-gray-300" style={{ top: '18.45px' }}></div>
+                <div className="absolute left-1 w-2 h-px bg-gray-300" style={{ top: '36.9px' }}></div>
+                <div className="absolute left-1 w-1 h-px bg-gray-300" style={{ top: '55.35px' }}></div>
               </div>
             ))}
           </div>
