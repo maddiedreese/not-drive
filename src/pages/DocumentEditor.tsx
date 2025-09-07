@@ -565,105 +565,131 @@ export default function DocumentEditor() {
         </div>
 
         {/* Menu Bar */}
-        <div className="flex items-center px-4 py-1 text-sm">
-          {[
-            { 
-              name: "File", 
-              items: [
-                { label: "New", action: handleNewDocument },
-                { label: "Open", action: () => navigate("/") },
-                { label: "Make a copy", action: handleMakeCopy },
-                { label: "Download", action: handleDownload },
-                { label: "Email", action: handleEmail },
-                { label: "Print", action: () => window.print() }
-              ]
-            },
-            { 
-              name: "Edit", 
-              items: [
-                { label: "Undo", action: handleUndo },
-                { label: "Redo", action: handleRedo },
-                { label: "Cut", action: handleCut },
-                { label: "Copy", action: handleCopy },
-                { label: "Paste", action: handlePaste }
-              ]
-            },
-            { 
-              name: "View", 
-              items: [
-                { label: "Print layout", action: handleTogglePrintLayout },
-                { label: "Mode", action: handleModeSwitch },
-                { label: "Show ruler", action: handleToggleRuler },
-                { label: "Zoom", action: () => toast.info("Use zoom dropdown in toolbar") }
-              ]
-            },
-            { 
-              name: "Insert", 
-              items: [
-                { label: "Image", action: handleInsertImage },
-                { label: "Table", action: handleInsertTable },
-                { label: "Drawing", action: handleInsertDrawing },
-                { label: "Chart", action: handleInsertChart },
-                { label: "Link", action: handleInsertLink }
-              ]
-            },
-            { 
-              name: "Format", 
-              items: [
-                { label: "Text", action: () => toast.info("Use toolbar formatting options") },
-                { label: "Paragraph styles", action: () => toast.info("Use style dropdown in toolbar") },
-                { label: "Align & indent", action: () => toast.info("Use alignment tools in toolbar") },
-                { label: "Line & paragraph spacing", action: () => {
-                  const spacing = prompt("Enter line spacing (1.0, 1.15, 1.5, 2.0):", lineSpacing);
-                  if (spacing && ['1.0', '1.15', '1.5', '2.0'].includes(spacing)) {
-                    handleLineSpacing(spacing);
-                  }
-                }}
-              ]
-            },
-            { 
-              name: "Tools", 
-              items: [
-                { label: "Spelling and grammar", action: handleSpellCheck },
-                { label: "Word count", action: handleWordCount },
-                { label: "Review suggested edits", action: handleSuggestedEdits }
-              ]
-            },
-            { 
-              name: "Extensions", 
-              items: [
-                { label: "Add-ons", action: handleAddOns },
-                { label: "Apps Script", action: handleAppsScript }
-              ]
-            },
-            { 
-              name: "Help", 
-              items: [
-                { label: "Search the menus", action: handleSearchMenus },
-                { label: "Docs Help", action: handleDocsHelp },
-                { label: "Training", action: handleTraining }
-              ]
-            }
-          ].map((menu) => (
-            <DropdownMenu key={menu.name}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="px-2 py-1 h-8 text-gray-700 hover:bg-gray-100 text-sm font-normal">
-                  {menu.name}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg min-w-48 z-50">
-                {menu.items.map((item, index) => (
-                  <DropdownMenuItem 
-                    key={index} 
-                    className="text-sm py-2 px-4 hover:bg-gray-50 cursor-pointer"
-                    onClick={item.action}
-                  >
-                    {item.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ))}
+        <div className="flex items-center justify-between px-4 py-1 text-sm">
+          <div className="flex items-center">
+            {[
+              { 
+                name: "File", 
+                items: [
+                  { label: "New", action: handleNewDocument },
+                  { label: "Open", action: () => navigate("/") },
+                  { label: "Make a copy", action: handleMakeCopy },
+                  { label: "Download", action: handleDownload },
+                  { label: "Email", action: handleEmail },
+                  { label: "Print", action: () => window.print() }
+                ]
+              },
+              { 
+                name: "Edit", 
+                items: [
+                  { label: "Undo", action: handleUndo },
+                  { label: "Redo", action: handleRedo },
+                  { label: "Cut", action: handleCut },
+                  { label: "Copy", action: handleCopy },
+                  { label: "Paste", action: handlePaste }
+                ]
+              },
+              { 
+                name: "View", 
+                items: [
+                  { label: "Print layout", action: handleTogglePrintLayout },
+                  { label: "Mode", action: handleModeSwitch },
+                  { label: "Show ruler", action: handleToggleRuler },
+                  { label: "Zoom", action: () => toast.info("Use zoom dropdown in toolbar") }
+                ]
+              },
+              { 
+                name: "Insert", 
+                items: [
+                  { label: "Image", action: handleInsertImage },
+                  { label: "Table", action: handleInsertTable },
+                  { label: "Drawing", action: handleInsertDrawing },
+                  { label: "Chart", action: handleInsertChart },
+                  { label: "Link", action: handleInsertLink }
+                ]
+              },
+              { 
+                name: "Format", 
+                items: [
+                  { label: "Text", action: () => toast.info("Use toolbar formatting options") },
+                  { label: "Paragraph styles", action: () => toast.info("Use style dropdown in toolbar") },
+                  { label: "Align & indent", action: () => toast.info("Use alignment tools in toolbar") },
+                  { label: "Line & paragraph spacing", action: () => {
+                    const spacing = prompt("Enter line spacing (1.0, 1.15, 1.5, 2.0):", lineSpacing);
+                    if (spacing && ['1.0', '1.15', '1.5', '2.0'].includes(spacing)) {
+                      handleLineSpacing(spacing);
+                    }
+                  }}
+                ]
+              },
+              { 
+                name: "Tools", 
+                items: [
+                  { label: "Spelling and grammar", action: handleSpellCheck },
+                  { label: "Word count", action: handleWordCount },
+                  { label: "Review suggested edits", action: handleSuggestedEdits }
+                ]
+              },
+              { 
+                name: "Extensions", 
+                items: [
+                  { label: "Add-ons", action: handleAddOns },
+                  { label: "Apps Script", action: handleAppsScript }
+                ]
+              }
+            ].map((menu) => (
+              <DropdownMenu key={menu.name}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="px-2 py-1 h-8 text-gray-700 hover:bg-gray-100 text-sm font-normal">
+                    {menu.name}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
+                  {menu.items.map((item, index) => (
+                    <DropdownMenuItem 
+                      key={index}
+                      className="text-sm py-2 px-3 hover:bg-gray-50 cursor-pointer"
+                      onClick={item.action}
+                    >
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ))}
+          </div>
+          
+          <div className="flex items-center pr-[82px]">
+            {[
+              { 
+                name: "Help", 
+                items: [
+                  { label: "Search the menus", action: handleSearchMenus },
+                  { label: "Docs Help", action: handleDocsHelp },
+                  { label: "Training", action: handleTraining }
+                ]
+              }
+            ].map((menu) => (
+              <DropdownMenu key={menu.name}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="px-2 py-1 h-8 text-gray-700 hover:bg-gray-100 text-sm font-normal">
+                    {menu.name}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg min-w-48 z-50">
+                  {menu.items.map((item, index) => (
+                    <DropdownMenuItem 
+                      key={index} 
+                      className="text-sm py-2 px-4 hover:bg-gray-50 cursor-pointer"
+                      onClick={item.action}
+                    >
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ))}
+          </div>
         </div>
 
         {/* Toolbar */}
