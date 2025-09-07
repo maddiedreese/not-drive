@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useCrazyMode } from "@/components/CrazyModeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   Star, 
   Folder, 
@@ -117,6 +118,11 @@ export default function DocumentEditor() {
   const [rulerWidth, setRulerWidth] = useState(0);
   const [margins, setMargins] = useState({ left: 0, right: 0 });
   const [rulerLeft, setRulerLeft] = useState(0);
+  const [showCrazyCaptcha, setShowCrazyCaptcha] = useState(false);
+  const [captchaQuestion, setCaptchaQuestion] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [userCaptchaAnswer, setUserCaptchaAnswer] = useState("");
+  const [pendingShareAction, setPendingShareAction] = useState<'copy' | 'email' | null>(null);
 
   // Handle undo/redo
   const handleUndo = () => {
@@ -173,6 +179,14 @@ export default function DocumentEditor() {
   };
 
   const handleEmail = () => {
+    if (crazyMode) {
+      startCrazyCaptcha('email');
+      return;
+    }
+    executeEmailShare();
+  };
+
+  const executeEmailShare = () => {
     const subject = encodeURIComponent(`Sharing: ${title}`);
     const body = encodeURIComponent(`I'm sharing this document with you:\n\n${content.substring(0, 500)}${content.length > 500 ? '...' : ''}`);
     window.open(`mailto:?subject=${subject}&body=${body}`);
@@ -332,6 +346,57 @@ export default function DocumentEditor() {
 
   const handleTraining = () => {
     toast.success("Opening Google Docs training materials and tutorials.");
+  };
+
+  const handleCopyLink = () => {
+    if (crazyMode) {
+      startCrazyCaptcha('copy');
+      return;
+    }
+    executeCopyLink();
+  };
+
+  const executeCopyLink = () => {
+    const shareUrl = `${window.location.origin}/document/${documentId}`;
+    navigator.clipboard.writeText(shareUrl);
+    toast.success("Document link copied to clipboard!");
+  };
+
+  const startCrazyCaptcha = (action: 'copy' | 'email') => {
+    const questions = [
+      { q: "What is 13 + 7?", a: "20" },
+      { q: "How many letters are in CRAZY?", a: "5" },
+      { q: "What color do you get mixing red and blue?", a: "purple" },
+      { q: "What's 8 × 2?", a: "16" },
+      { q: "What animal says 'moo'?", a: "cow" },
+      { q: "How many sides does a triangle have?", a: "3" }
+    ];
+    
+    const randomQuestion = questions[Math.floor(Math.random() * questions.length)];
+    setCaptchaQuestion(randomQuestion.q);
+    setCaptchaAnswer(randomQuestion.a.toLowerCase());
+    setUserCaptchaAnswer("");
+    setPendingShareAction(action);
+    setShowCrazyCaptcha(true);
+  };
+
+  const verifyCaptcha = () => {
+    if (userCaptchaAnswer.toLowerCase().trim() === captchaAnswer) {
+      setShowCrazyCaptcha(false);
+      
+      if (pendingShareAction === 'copy') {
+        executeCopyLink();
+      } else if (pendingShareAction === 'email') {
+        executeEmailShare();
+      }
+      
+      setPendingShareAction(null);
+      setUserCaptchaAnswer("");
+      toast.success("CAPTCHA verified! Access granted.");
+    } else {
+      toast.error("Wrong answer! Try again.");
+      setUserCaptchaAnswer("");
+    }
   };
 
   const handleCopy = async () => {
@@ -506,7 +571,7 @@ export default function DocumentEditor() {
               <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full">
                 <Folder className="w-4 h-4 text-gray-600" />
               </Button>
-              <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full">
+                <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={handleCopyLink}>
                 <Share2 className="w-4 h-4 text-gray-600" />
               </Button>
             </div>
@@ -556,11 +621,7 @@ export default function DocumentEditor() {
                 <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50 rounded-lg">
                   <DropdownMenuItem 
                     className="text-sm py-2 px-3 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => {
-                      const shareUrl = `${window.location.origin}/document/${documentId}`;
-                      navigator.clipboard.writeText(shareUrl);
-                      toast.success("Document link copied to clipboard!");
-                    }}
+                    onClick={handleCopyLink}
                   >
                     Copy link
                   </DropdownMenuItem>
@@ -1170,6 +1231,58 @@ export default function DocumentEditor() {
           </div>
         </div>
       </div>
+
+      {/* Crazy CAPTCHA Modal */}
+      {showCrazyCaptcha && (
+        <Dialog open={showCrazyCaptcha} onOpenChange={setShowCrazyCaptcha}>
+          <DialogContent className={`max-w-md ${crazyMode ? 'filter invert' : ''}`}>
+            <DialogHeader>
+              <DialogTitle className="text-center text-red-600 text-xl font-bold">
+                🤖 CRAZY CAPTCHA 🤖
+              </DialogTitle>
+            </DialogHeader>
+            <div className="text-center space-y-4">
+              <p className="text-lg font-medium text-purple-600">
+                Prove you're not a robot!
+              </p>
+              <div className="bg-gradient-to-r from-pink-200 to-yellow-200 p-4 rounded-lg border-4 border-dashed border-rainbow">
+                <p className="text-xl font-bold text-blue-800">
+                  {captchaQuestion}
+                </p>
+              </div>
+              <Input
+                value={userCaptchaAnswer}
+                onChange={(e) => setUserCaptchaAnswer(e.target.value)}
+                placeholder="Type your answer here..."
+                className="text-center text-lg font-bold border-2 border-green-400"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    verifyCaptcha();
+                  }
+                }}
+              />
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  onClick={verifyCaptcha}
+                  className="bg-rainbow bg-gradient-to-r from-red-500 to-blue-500 hover:from-blue-500 hover:to-red-500 text-white font-bold"
+                >
+                  ✨ VERIFY ✨
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCrazyCaptcha(false)}
+                  className="border-2 border-gray-600"
+                >
+                  Cancel
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500 italic">
+                Warning: Incorrect answers may result in spontaneous document transformation! 🎭
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
