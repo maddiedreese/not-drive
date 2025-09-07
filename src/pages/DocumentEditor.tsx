@@ -976,31 +976,6 @@ export default function DocumentEditor() {
           </div>
         </div>
 
-{/* Ruler */}
-        {showRuler && (
-          <div className="w-full bg-white border-b border-gray-200">
-              <div className="flex justify-center">
-                <div className="relative h-6" style={{ width: `${rulerWidth}px` }}>
-                  <div className="absolute inset-0 flex">
-                  {Array.from({ length: 8 }, (_, i) => (
-                    <div key={i} className="flex-1 relative">
-                      <div className="absolute bottom-1 left-0 w-px h-3 bg-gray-400"></div>
-                      <span className="absolute bottom-4 left-0 text-xs text-gray-500 transform -translate-x-1/2">{i + 1}</span>
-                      {/* Half marks */}
-                      <div className="absolute bottom-1 left-1/2 w-px h-1 bg-gray-300"></div>
-                    </div>
-                  ))}
-                  {/* Left margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ left: `${margins.left}px` }}></div>
-                  {/* First line indent - blue rectangle */}
-                  <div className="absolute bottom-0 w-2 h-1 bg-[#4285f4]" style={{ left: `${margins.left + 24}px` }}></div>
-                  {/* Right margin indicator - blue triangle */}
-                  <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ right: `${margins.right}px` }}></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </header>
 
       {/* Main Content */}
@@ -1047,6 +1022,28 @@ export default function DocumentEditor() {
         {/* Document Area */}
         <div className="flex-1 bg-[#f8f9fa] overflow-y-auto">
           <div className="max-w-4xl mx-auto p-8">
+            {showRuler && (
+              <div className="flex justify-center mb-2">
+                <div className="relative h-6" style={{ width: `${rulerWidth}px` }}>
+                  <div className="absolute inset-0 flex">
+                    {Array.from({ length: 8 }, (_, i) => (
+                      <div key={i} className="flex-1 relative">
+                        <div className="absolute bottom-1 left-0 w-px h-3 bg-gray-400"></div>
+                        <span className="absolute bottom-4 left-0 text-xs text-gray-500 transform -translate-x-1/2">{i + 1}</span>
+                        {/* Half marks */}
+                        <div className="absolute bottom-1 left-1/2 w-px h-1 bg-gray-300"></div>
+                      </div>
+                    ))}
+                    {/* Left margin indicator - blue triangle */}
+                    <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ left: `${margins.left}px` }}></div>
+                    {/* First line indent - blue rectangle */}
+                    <div className="absolute bottom-0 w-2 h-1 bg-[#4285f4]" style={{ left: `${margins.left + 24}px` }}></div>
+                    {/* Right margin indicator - blue triangle */}
+                    <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ right: `${margins.right}px` }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
             <div 
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 min-h-[29.7cm] w-[21cm] mx-auto relative"
