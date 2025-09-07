@@ -991,6 +991,9 @@ export default function DocumentEditor() {
                     <div className="absolute bottom-1 left-1/2 w-px h-1 bg-gray-300"></div>
                   </div>
                 ))}
+                {/* 9th marker at the very right */}
+                <div className="absolute bottom-1 right-0 w-px h-3 bg-gray-400"></div>
+                <span className="absolute bottom-4 right-0 text-xs text-gray-500 transform translate-x-1/2">9</span>
                 {/* Left margin indicator - blue triangle */}
                 <div className="absolute bottom-0 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-[#4285f4]" style={{ left: `${margins.left}px` }}></div>
                 {/* First line indent - blue rectangle */}
