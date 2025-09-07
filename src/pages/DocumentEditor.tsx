@@ -1026,7 +1026,7 @@ export default function DocumentEditor() {
         </div>
         
         {/* Left Sidebar - Fixed position */}
-        <div className="w-80 bg-[#f8f9fa] border-r border-gray-200 fixed top-32 bottom-0 left-6 overflow-y-auto">
+        <div className="w-80 bg-[#f8f9fa] fixed top-32 bottom-0 left-6 overflow-y-auto">
           <div className="p-4">
             <Button 
               variant="ghost" 
