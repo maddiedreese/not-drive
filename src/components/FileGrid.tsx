@@ -72,10 +72,11 @@ const isFileOld = (document: Document): boolean => {
 };
 
 export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }: FileGridProps) {
-  const { documents, loading, deleteDocument, downloadFile } = useDocuments(currentFolderId);
+  const { documents, loading, deleteDocument, downloadFile, createDocument } = useDocuments(currentFolderId);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
+  const [showNoFlash, setShowNoFlash] = useState(false);
   const navigate = useNavigate();
   const { crazyMode } = useCrazyMode();
 
@@ -90,6 +91,20 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   };
 
   const handleDelete = async (document: Document) => {
+    if (crazyMode) {
+      // In crazy mode, flash "NO" and duplicate the file instead
+      setShowNoFlash(true);
+      setTimeout(() => setShowNoFlash(false), 1000);
+      
+      // Duplicate the file 4 times to make 5 total copies
+      for (let i = 1; i <= 4; i++) {
+        await createDocument(`${document.name} (${i})`, document.type);
+      }
+      
+      toast.success("File emphasized by duplication!");
+      return;
+    }
+    
     if (confirm(`Are you sure you want to delete "${document.name}"?`)) {
       await deleteDocument(document.id);
     }
@@ -375,6 +390,14 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   if (viewMode === "grid") {
     return (
       <>
+        {showNoFlash && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 animate-fade-in">
+            <div className="text-white text-9xl font-bold animate-scale-in">
+              NO
+            </div>
+          </div>
+        )}
+        
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
           {filteredDocuments.map((document) => (
             <Card
@@ -489,7 +512,16 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   }
 
   return (
-    <div className="space-y-1">
+    <>
+      {showNoFlash && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 animate-fade-in">
+          <div className="text-white text-9xl font-bold animate-scale-in">
+            NO
+          </div>
+        </div>
+      )}
+      
+      <div className="space-y-1">
       {filteredDocuments.map((document) => (
         <div
           key={document.id}
@@ -524,5 +556,6 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
         </div>
       ))}
     </div>
+    </>
   );
 }
