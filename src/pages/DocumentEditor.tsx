@@ -483,7 +483,12 @@ export default function DocumentEditor() {
       <header className="bg-white fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center space-x-3">
-            <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Docs" className="w-10 h-10" />
+            <img 
+              src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" 
+              alt="Docs" 
+              className="w-10 h-10 cursor-pointer hover:bg-gray-100 rounded p-1" 
+              onClick={() => navigate("/docs")}
+            />
             
             <div className="flex items-center space-x-1">
               <Input
