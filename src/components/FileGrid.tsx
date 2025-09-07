@@ -26,6 +26,8 @@ import { useDocuments, Document } from "@/hooks/useDocuments";
 import { formatDistanceToNow } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useCrazyMode } from "./CrazyModeProvider";
+import { toast } from "sonner";
 
 interface FileGridProps {
   viewMode: "grid" | "list";
@@ -67,7 +69,9 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const { documents, loading, deleteDocument, downloadFile } = useDocuments(currentFolderId);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const [runId, setRunId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { crazyMode } = useCrazyMode();
 
   const filteredDocuments = documents.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -88,9 +92,58 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const handleFileClick = async (document: Document) => {
     if (document.is_folder) return;
     
-    // If it's a document type (Google Docs-like), navigate to the editor
+    // If it's a document type (Google Docs-like), handle crazy mode or navigate to editor
     if (document.type === 'document' || document.type === 'spreadsheet' || document.type === 'presentation') {
-      navigate(`/document/${document.id}`);
+      if (crazyMode) {
+        try {
+          toast.info("Processing document in crazy mode...");
+          
+          // Call Toolhouse API
+          const response = await fetch('https://agents.toolhouse.ai/9ee728c8-2841-4f6c-ab71-e0704c093395', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: document.content || `Transform this document: ${document.name}`
+            }),
+          });
+          
+          if (!response.ok) {
+            throw new Error(`API request failed: ${response.status}`);
+          }
+          
+          // Save the run ID from headers
+          const toolhouseRunId = response.headers.get('X-Toolhouse-Run-ID');
+          if (toolhouseRunId) {
+            setRunId(toolhouseRunId);
+          }
+          
+          const result = await response.text();
+          
+          // Update the document content with the API response
+          const { error } = await supabase
+            .from('documents')
+            .update({ content: result })
+            .eq('id', document.id);
+          
+          if (error) {
+            throw error;
+          }
+          
+          toast.success("Document transformed in crazy mode!");
+          
+          // Navigate to the editor to show the updated content
+          navigate(`/document/${document.id}`);
+        } catch (error: any) {
+          console.error('Crazy mode transformation failed:', error);
+          toast.error(`Failed to transform document: ${error.message}`);
+          // Fall back to normal navigation
+          navigate(`/document/${document.id}`);
+        }
+      } else {
+        navigate(`/document/${document.id}`);
+      }
       return;
     }
     
