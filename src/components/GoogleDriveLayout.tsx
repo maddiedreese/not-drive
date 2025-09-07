@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus, FileText, Presentation, Sheet, Folder, UploadCloud } from "lucide-react";
+import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus, FileText, Presentation, Sheet, Folder, UploadCloud, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -11,6 +11,7 @@ import { AuthModal } from "./AuthModal";
 import { CreateDocumentModal } from "./CreateDocumentModal";
 import { FileUpload } from "./FileUpload";
 import { useAuth } from "./AuthProvider";
+import { useCrazyMode } from "./CrazyModeProvider";
 import { useDocuments } from "@/hooks/useDocuments";
 import { supabase } from "@/integrations/supabase/client";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
@@ -27,6 +28,7 @@ export function GoogleDriveLayout() {
     signOut,
     loading
   } = useAuth();
+  const { crazyMode, toggleCrazyMode } = useCrazyMode();
   const {
     createDocument,
     refetch
@@ -88,7 +90,7 @@ export function GoogleDriveLayout() {
       fileInputRef.current.value = '';
     }
   };
-  return <div className="min-h-screen flex flex-col w-full bg-white">
+  return <div className={`min-h-screen flex flex-col w-full bg-white ${crazyMode ? 'invert' : ''}`}>
       {/* Top Navigation Bar */}
       <header className="h-16 bg-[#f8f9fa] px-4 flex items-center gap-4">
         {/* Google Drive Logo */}
@@ -110,6 +112,14 @@ export function GoogleDriveLayout() {
 
         {/* Header Actions */}
         <div className="flex items-center gap-1">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleCrazyMode}
+            className={`w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full ${crazyMode ? 'bg-purple-100 text-purple-600' : ''}`}
+          >
+            <Palette className="w-5 h-5" />
+          </Button>
           <Button variant="ghost" size="icon" className="w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <HelpCircle className="w-5 h-5" />
           </Button>

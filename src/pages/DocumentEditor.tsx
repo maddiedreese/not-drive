@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/AuthProvider";
+import { useCrazyMode } from "@/components/CrazyModeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { 
@@ -40,7 +41,8 @@ import {
   MessageSquarePlus,
   MoreVertical as LineSpacing,
   RemoveFormatting,
-  Type
+  Type,
+  Palette
 } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 
@@ -85,6 +87,7 @@ export default function DocumentEditor() {
   const { documentId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { crazyMode, toggleCrazyMode } = useCrazyMode();
   const [document, setDocument] = useState<Document | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -478,7 +481,7 @@ export default function DocumentEditor() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]" onKeyDown={handleKeyDown}>
+    <div className={`min-h-screen bg-[#f8f9fa] ${crazyMode ? 'invert' : ''}`} onKeyDown={handleKeyDown}>
       {/* Main Header - Fixed position */}
       <header className="bg-white fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center justify-between px-4 py-2">
@@ -510,6 +513,14 @@ export default function DocumentEditor() {
           </div>
 
           <div className="flex items-center space-x-2">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleCrazyMode}
+              className={`w-10 h-10 hover:bg-gray-100 rounded-full ${crazyMode ? 'bg-purple-100 text-purple-600' : 'text-gray-600'}`}
+            >
+              <Palette className="w-5 h-5" />
+            </Button>
             <Button variant="ghost" size="icon" className="w-10 h-10 hover:bg-gray-100 rounded-full">
               <History className="w-5 h-5 text-gray-600" />
             </Button>

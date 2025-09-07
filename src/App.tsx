@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/components/AuthProvider";
+import { CrazyModeProvider } from "@/components/CrazyModeProvider";
 import Index from "./pages/Index";
 import GoogleDocs from "./pages/GoogleDocs";
 import DocumentEditor from "./pages/DocumentEditor";
@@ -13,7 +14,8 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
+    <CrazyModeProvider>
+      <AuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -28,6 +30,7 @@ const App = () => (
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
+    </CrazyModeProvider>
   </QueryClientProvider>
 );
 

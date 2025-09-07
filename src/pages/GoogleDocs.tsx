@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/AuthProvider";
+import { useCrazyMode } from "@/components/CrazyModeProvider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -62,9 +63,9 @@ const templates = [
 
 export default function GoogleDocs() {
   const { user } = useAuth();
+  const { crazyMode, toggleCrazyMode } = useCrazyMode();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
-  const [crazyMode, setCrazyMode] = useState(false);
 
   const handleCreateDocument = async (template: typeof templates[0]) => {
     if (!user) {
@@ -129,7 +130,7 @@ export default function GoogleDocs() {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => setCrazyMode(!crazyMode)}
+              onClick={toggleCrazyMode}
               className={crazyMode ? "bg-purple-100 text-purple-600" : ""}
             >
               <Palette className="w-5 h-5" />
