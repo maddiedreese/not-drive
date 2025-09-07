@@ -25,6 +25,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { useDocuments, Document } from "@/hooks/useDocuments";
 import { formatDistanceToNow } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 interface FileGridProps {
   viewMode: "grid" | "list";
@@ -66,6 +67,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const { documents, loading, deleteDocument, downloadFile } = useDocuments(currentFolderId);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const filteredDocuments = documents.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -86,6 +88,13 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const handleFileClick = async (document: Document) => {
     if (document.is_folder) return;
     
+    // If it's a document type (Google Docs-like), navigate to the editor
+    if (document.type === 'document' || document.type === 'spreadsheet' || document.type === 'presentation') {
+      navigate(`/document/${document.id}`);
+      return;
+    }
+    
+    // For other file types, show the preview modal
     setSelectedFile(document);
     
     if (document.file_path) {
