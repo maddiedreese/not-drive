@@ -1044,7 +1044,7 @@ export default function DocumentEditor() {
               </Button>
             </div>
             
-            <div className="bg-[#c8e6c9] hover:bg-[#b8d6b9] transition-colors duration-200 rounded-full p-3 mb-4">
+            <div className="bg-[#c8e6f5] hover:bg-[#b8d6e5] transition-colors duration-200 rounded-full p-3 mb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <div className="w-5 h-5 text-[#2e7d32]">
