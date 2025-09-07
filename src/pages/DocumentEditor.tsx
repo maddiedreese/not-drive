@@ -1026,7 +1026,7 @@ export default function DocumentEditor() {
         </div>
         
         {/* Left Sidebar */}
-        <div className="w-80 bg-white border-r border-gray-200 fixed top-32 bottom-0 overflow-y-auto z-10">
+        <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
           <div className="p-4">
             <Button 
               variant="ghost" 
@@ -1065,7 +1065,7 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="flex-1 bg-[#f8f9fa] min-h-full" style={{ marginLeft: '320px' }}>
+        <div className="flex-1 bg-[#f8f9fa] min-h-full">
           <div className="max-w-4xl mx-auto min-h-full" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
