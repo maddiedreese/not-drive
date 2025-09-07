@@ -980,8 +980,8 @@ export default function DocumentEditor() {
 
         {/* Ruler */}
         {showRuler && (
-          <div className="w-full bg-white border-b border-gray-200">
-            <div className="relative h-6" style={{ width: `${rulerWidth}px`, marginLeft: `${rulerLeft}px` }}>
+          <div className="w-full bg-white border-b border-gray-200 flex justify-center">
+            <div className="relative h-6 w-[21cm]" style={{ transform: `scale(${parseInt(zoom) / 100})` }}>
               <div className="absolute inset-0 flex">
                 {Array.from({ length: 8 }, (_, i) => (
                   <div key={i} className="flex-1 relative">
@@ -1065,8 +1065,8 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="flex-1 bg-[#f8f9fa] min-h-full ml-80">
-          <div className="max-w-4xl mx-auto min-h-full" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
+        <div className="flex-1 bg-[#f8f9fa] min-h-full ml-80 flex justify-center">
+          <div className="w-full max-w-5xl" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
