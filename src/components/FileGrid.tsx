@@ -112,6 +112,27 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
     }
   };
 
+  const handleKillFile = async (document: Document) => {
+    try {
+      // Set the created_at to 2 days ago to make it appear old
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      
+      const { error } = await supabase
+        .from('documents')
+        .update({ created_at: twoDaysAgo.toISOString() })
+        .eq('id', document.id);
+      
+      if (error) throw error;
+      
+      toast.success("File killed successfully!");
+      // Refresh the documents list
+      window.dispatchEvent(new Event('documents:refresh'));
+    } catch (error: any) {
+      toast.error(`Failed to kill file: ${error.message}`);
+    }
+  };
+
   const handleFileClick = async (document: Document) => {
     if (document.is_folder) return;
     
@@ -277,6 +298,12 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
           <DropdownMenuItem onClick={() => handleRecoverFile(document)}>
             <Star className="w-4 h-4 mr-2" />
             Recover file
+          </DropdownMenuItem>
+        )}
+        {crazyMode && !isFileOld(document) && (
+          <DropdownMenuItem onClick={() => handleKillFile(document)} className="text-red-600">
+            <Trash2 className="w-4 h-4 mr-2" />
+            Kill file
           </DropdownMenuItem>
         )}
         {document.file_path && (
