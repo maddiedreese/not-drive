@@ -1047,7 +1047,7 @@ export default function DocumentEditor() {
             <div className="bg-[#c8e6f5] hover:bg-[#b8d6e5] transition-colors duration-200 rounded-full p-3 mb-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div className="w-5 h-5 text-[#2e7d32]">
+                  <div className="w-5 h-5 text-black">
                     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                       <polyline points="14,2 14,8 20,8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -1056,10 +1056,10 @@ export default function DocumentEditor() {
                       <polyline points="10,9 9,9 8,9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-[#2e7d32]">Tab 1</span>
+                  <span className="text-sm font-medium text-black">Tab 1</span>
                 </div>
                 <Button variant="ghost" size="icon" className="w-6 h-6 hover:bg-[#a8c6a9] rounded-full">
-                  <MoreVertical className="w-4 h-4 text-[#2e7d32]" />
+                  <MoreVertical className="w-4 h-4 text-black" />
                 </Button>
               </div>
             </div>
