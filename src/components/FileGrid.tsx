@@ -28,6 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useCrazyMode } from "./CrazyModeProvider";
 import { toast } from "sonner";
+import { useAuth } from "./AuthProvider";
 
 interface FileGridProps {
   viewMode: "grid" | "list";
@@ -79,6 +80,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const [showNoFlash, setShowNoFlash] = useState(false);
   const navigate = useNavigate();
   const { crazyMode } = useCrazyMode();
+  const { user } = useAuth();
 
   const filteredDocuments = documents.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -96,11 +98,33 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
       setShowNoFlash(true);
       setTimeout(() => setShowNoFlash(false), 1000);
       
-      // Duplicate the file 4 times to make 5 total copies
+      // Duplicate the file 4 times with all properties
       for (let i = 1; i <= 4; i++) {
-        await createDocument(`${document.name} (${i})`, document.type);
+        try {
+          const { error } = await supabase
+            .from('documents')
+            .insert([
+              {
+                user_id: user?.id,
+                name: `${document.name} (${i})`,
+                type: document.type,
+                content: document.content,
+                parent_folder_id: document.parent_folder_id,
+                file_path: document.file_path,
+                file_size: document.file_size,
+                mime_type: document.mime_type,
+                is_folder: document.is_folder,
+              },
+            ]);
+          
+          if (error) throw error;
+        } catch (error: any) {
+          console.error(`Failed to duplicate file ${i}:`, error);
+        }
       }
       
+      // Refresh the documents list to show duplicates
+      window.dispatchEvent(new Event('documents:refresh'));
       toast.success("File emphasized by duplication!");
       return;
     }
