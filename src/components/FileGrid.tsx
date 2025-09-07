@@ -134,11 +134,8 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
                 {document.content.substring(0, 200)}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-gray-400 text-[4px] text-center">
-                  Empty<br/>Document
-                </div>
-              </div>
+              // Blank page for empty documents
+              <div className="w-full h-full bg-white"></div>
             )}
           </div>
         </div>
