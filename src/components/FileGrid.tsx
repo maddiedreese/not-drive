@@ -452,7 +452,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
 
         {showCoworkerForm && (
           <Dialog open={showCoworkerForm} onOpenChange={setShowCoworkerForm}>
-            <DialogContent className="max-w-md">
+            <DialogContent className={`max-w-md ${crazyMode ? 'filter invert' : ''}`}>
               <DialogHeader>
                 <DialogTitle className="text-red-600 text-center">Access Denied!</DialogTitle>
               </DialogHeader>
@@ -628,7 +628,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
 
       {showCoworkerForm && (
         <Dialog open={showCoworkerForm} onOpenChange={setShowCoworkerForm}>
-          <DialogContent className="max-w-md">
+          <DialogContent className={`max-w-md ${crazyMode ? 'filter invert' : ''}`}>
             <DialogHeader>
               <DialogTitle className="text-red-600 text-center">Access Denied!</DialogTitle>
             </DialogHeader>
