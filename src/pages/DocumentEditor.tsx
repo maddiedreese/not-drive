@@ -1065,13 +1065,13 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="flex-1 bg-[#f8f9fa] overflow-y-auto">
+        <div className="flex-1 bg-[#f8f9fa]">
           <div className="max-w-4xl mx-auto p-8">
             <div
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
               style={{ 
-                height: '738px', // Extended height to match 9 ruler marks (82px * 9 = 738px)
+                height: '738px', // Height matches 9 ruler marks (82px * 9 = 738px)
                 transform: `scale(${parseInt(zoom) / 100})`,
                 transformOrigin: 'top center',
                 marginBottom: `${(1 - parseInt(zoom) / 100) * 800}px`
@@ -1087,7 +1087,7 @@ export default function DocumentEditor() {
                   value={content}
                   onChange={(e) => handleContentChange(e.target.value)}
                   placeholder="Start typing..."
-                  className={`w-full h-full min-h-[800px] border-none outline-none resize-none bg-transparent leading-6 ${showSpellCheck ? 'spell-check-active' : ''}`}
+                  className={`w-full h-full border-none outline-none resize-none bg-transparent leading-6 ${showSpellCheck ? 'spell-check-active' : ''}`}
                   readOnly={editingMode === 'Viewing'}
                   style={{ 
                     fontFamily: fontFamily,
