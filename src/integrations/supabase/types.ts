@@ -24,6 +24,8 @@ export type Database = {
           is_folder: boolean | null
           mime_type: string | null
           name: string
+          original_content: string | null
+          original_created_at: string | null
           parent_folder_id: string | null
           type: string
           updated_at: string
@@ -38,6 +40,8 @@ export type Database = {
           is_folder?: boolean | null
           mime_type?: string | null
           name: string
+          original_content?: string | null
+          original_created_at?: string | null
           parent_folder_id?: string | null
           type?: string
           updated_at?: string
@@ -52,6 +56,8 @@ export type Database = {
           is_folder?: boolean | null
           mime_type?: string | null
           name?: string
+          original_content?: string | null
+          original_created_at?: string | null
           parent_folder_id?: string | null
           type?: string
           updated_at?: string

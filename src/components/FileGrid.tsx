@@ -97,9 +97,23 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
 
   const handleRecoverFile = async (document: Document) => {
     try {
+      const updateData: any = {
+        updated_at: new Date().toISOString()
+      };
+      
+      // Restore original content and created_at if they exist
+      if (document.original_content !== null) {
+        updateData.content = document.original_content;
+        updateData.original_content = null;
+      }
+      if (document.original_created_at) {
+        updateData.created_at = document.original_created_at;
+        updateData.original_created_at = null;
+      }
+      
       const { error } = await supabase
         .from('documents')
-        .update({ updated_at: new Date().toISOString() })
+        .update(updateData)
         .eq('id', document.id);
       
       if (error) throw error;
@@ -115,12 +129,17 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const handleKillFile = async (document: Document) => {
     try {
       // Set the created_at to 2 days ago to make it appear old
+      // Store original state for recovery
       const twoDaysAgo = new Date();
       twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
       
       const { error } = await supabase
         .from('documents')
-        .update({ created_at: twoDaysAgo.toISOString() })
+        .update({ 
+          created_at: twoDaysAgo.toISOString(),
+          original_content: document.content,
+          original_created_at: document.created_at
+        })
         .eq('id', document.id);
       
       if (error) throw error;
@@ -132,6 +151,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
       toast.error(`Failed to kill file: ${error.message}`);
     }
   };
+
 
   const handleFileClick = async (document: Document) => {
     if (document.is_folder) return;

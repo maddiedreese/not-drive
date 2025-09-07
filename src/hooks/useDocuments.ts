@@ -15,6 +15,8 @@ export interface Document {
   is_folder: boolean;
   created_at: string;
   updated_at: string;
+  original_content?: string;
+  original_created_at?: string;
 }
 
 export const useDocuments = (currentFolderId?: string) => {
