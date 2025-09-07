@@ -124,6 +124,34 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
       }
     }, [document]);
 
+    // Document type preview (Google Docs-like)
+    if (document.type === 'document' || document.type === 'spreadsheet' || document.type === 'presentation') {
+      return (
+        <div className="w-16 h-16 rounded overflow-hidden bg-white border border-gray-200 flex flex-col">
+          <div className="bg-blue-500 h-2 w-full"></div>
+          <div className="flex-1 p-2 flex flex-col gap-1">
+            {document.content ? (
+              <>
+                <div className="h-1 bg-gray-300 rounded w-full"></div>
+                <div className="h-1 bg-gray-300 rounded w-3/4"></div>
+                <div className="h-1 bg-gray-300 rounded w-1/2"></div>
+                <div className="h-1 bg-gray-200 rounded w-full"></div>
+                <div className="h-1 bg-gray-200 rounded w-2/3"></div>
+              </>
+            ) : (
+              <>
+                <div className="h-1 bg-gray-200 rounded w-full"></div>
+                <div className="h-1 bg-gray-200 rounded w-3/4"></div>
+                <div className="h-1 bg-gray-200 rounded w-1/2"></div>
+                <div className="text-xs text-gray-400 text-center mt-1">Empty</div>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // Image preview
     if (document.mime_type?.startsWith('image/') && previewUrl) {
       return (
         <div className="w-16 h-16 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
@@ -143,6 +171,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
       );
     }
 
+    // Fallback to icon for other file types
     const IconComponent = getFileIcon(document);
     return (
       <div className="w-16 h-16 rounded bg-gray-100 flex items-center justify-center">
