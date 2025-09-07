@@ -1065,8 +1065,8 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="flex-1 bg-[#f8f9fa]">
-          <div className="max-w-4xl mx-auto" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
+        <div className="flex-1 bg-[#f8f9fa] min-h-screen">
+          <div className="max-w-4xl mx-auto h-full" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
