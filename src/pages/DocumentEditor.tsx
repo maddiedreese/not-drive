@@ -1010,8 +1010,8 @@ export default function DocumentEditor() {
       <div className="flex h-screen pt-32">
         {/* Vertical Ruler Sidebar */}
         <div className="w-6 bg-white border-r border-gray-300 relative">
-          {/* Vertical ruler that scrolls with document */}
-          <div className="relative pt-6">
+          {/* Vertical ruler that scrolls with document - starts aligned with document content */}
+          <div className="relative" style={{ paddingTop: '96px' }}>
             {Array.from({ length: 9 }, (_, i) => (
               <div key={i} className="relative" style={{ height: '82px' }}>
                 <div className="absolute left-1 w-3 h-px bg-gray-400"></div>
@@ -1066,7 +1066,7 @@ export default function DocumentEditor() {
 
         {/* Document Area */}
         <div className="flex-1 bg-[#f8f9fa]">
-          <div className="max-w-4xl mx-auto p-8">
+          <div className="max-w-4xl mx-auto" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
