@@ -512,19 +512,51 @@ export default function DocumentEditor() {
               <Search className="w-5 h-5 text-gray-600" />
             </Button>
             
-            <Button 
-              className="bg-[#c8e6f5] hover:bg-[#b8d6e5] text-black px-4 py-2 rounded-full font-medium text-sm flex items-center space-x-2"
-              onClick={saveDocument}
-              disabled={isSaving}
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 8C17.4 8 17 8.4 17 9v6c0 0.6 0.4 1 1 1s1-0.4 1-1V9c0-0.6-0.4-1-1-1z" fill="currentColor"/>
-                <path d="M6 10c-0.6 0-1 0.4-1 1v4c0 0.6 0.4 1 1 1s1-0.4 1-1v-4c0-0.6-0.4-1-1-1z" fill="currentColor"/>
-                <path d="M9 6c-1.1 0-2 0.9-2 2v8c0 1.1 0.9 2 2 2h6c1.1 0 2-0.9 2-2V8c0-1.1-0.9-2-2-2H9zm0 2h6v8H9V8z" fill="currentColor"/>
-              </svg>
-              <span>Share</span>
-              <ChevronDown className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center bg-[#c8e6f5] hover:bg-[#b8d6e5] rounded-full overflow-hidden">
+              <Button 
+                className="bg-transparent hover:bg-transparent text-black px-4 py-2 font-medium text-sm flex items-center space-x-2 rounded-none"
+                onClick={saveDocument}
+                disabled={isSaving}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 8C17.4 8 17 8.4 17 9v6c0 0.6 0.4 1 1 1s1-0.4 1-1V9c0-0.6-0.4-1-1-1z" fill="currentColor"/>
+                  <path d="M6 10c-0.6 0-1 0.4-1 1v4c0 0.6 0.4 1 1 1s1-0.4 1-1v-4c0-0.6-0.4-1-1-1z" fill="currentColor"/>
+                  <path d="M9 6c-1.1 0-2 0.9-2 2v8c0 1.1 0.9 2 2 2h6c1.1 0 2-0.9 2-2V8c0-1.1-0.9-2-2-2H9zm0 2h6v8H9V8z" fill="currentColor"/>
+                </svg>
+                <span>Share</span>
+              </Button>
+              
+              <div className="w-px h-6 bg-black/20"></div>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    className="bg-transparent hover:bg-transparent text-black px-3 py-2 rounded-none"
+                    variant="ghost"
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50 rounded-lg">
+                  <DropdownMenuItem 
+                    className="text-sm py-2 px-3 hover:bg-gray-50 cursor-pointer"
+                    onClick={() => {
+                      const shareUrl = `${window.location.origin}/document/${documentId}`;
+                      navigator.clipboard.writeText(shareUrl);
+                      toast.success("Document link copied to clipboard!");
+                    }}
+                  >
+                    Copy link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="text-sm py-2 px-3 hover:bg-gray-50 cursor-pointer"
+                    onClick={handleEmail}
+                  >
+                    Send via email
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
             <div className="w-8 h-8 bg-[#ea4335] rounded-full flex items-center justify-center text-white font-medium text-sm ml-2">
               {user?.email?.[0]?.toUpperCase() || "M"}
