@@ -65,6 +65,12 @@ const formatFileSize = (bytes?: number): string => {
   return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
 };
 
+const isFileOld = (document: Document): boolean => {
+  const oneDayAgo = new Date();
+  oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+  return new Date(document.created_at) < oneDayAgo;
+};
+
 export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }: FileGridProps) {
   const { documents, loading, deleteDocument, downloadFile } = useDocuments(currentFolderId);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
@@ -86,6 +92,23 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const handleDelete = async (document: Document) => {
     if (confirm(`Are you sure you want to delete "${document.name}"?`)) {
       await deleteDocument(document.id);
+    }
+  };
+
+  const handleRecoverFile = async (document: Document) => {
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', document.id);
+      
+      if (error) throw error;
+      
+      toast.success("File recovered successfully!");
+      // Refresh the documents list
+      window.dispatchEvent(new Event('documents:refresh'));
+    } catch (error: any) {
+      toast.error(`Failed to recover file: ${error.message}`);
     }
   };
 
@@ -177,6 +200,19 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
       }
     }, [document]);
 
+    // Show gravestone for old files in crazy mode
+    if (crazyMode && isFileOld(document)) {
+      return (
+        <div className="w-16 h-16 rounded overflow-hidden bg-gray-100 flex items-center justify-center">
+          <img 
+            src="/lovable-uploads/4337bb78-33e7-4f77-ba89-e9dcd82eff5d.png" 
+            alt="Dead file"
+            className="w-12 h-12 object-contain"
+          />
+        </div>
+      );
+    }
+
     // Document type preview - render actual content
     if (document.type === 'document' || document.type === 'spreadsheet' || document.type === 'presentation') {
       return (
@@ -237,6 +273,12 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        {crazyMode && isFileOld(document) && (
+          <DropdownMenuItem onClick={() => handleRecoverFile(document)}>
+            <Star className="w-4 h-4 mr-2" />
+            Recover file
+          </DropdownMenuItem>
+        )}
         {document.file_path && (
           <DropdownMenuItem onClick={() => handleDownload(document)}>
             <Download className="w-4 h-4 mr-2" />
@@ -299,7 +341,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
                 </div>
                 <div className="w-full">
                   <p className="text-sm font-medium truncate" title={document.name}>
-                    {document.name}
+                    {crazyMode && isFileOld(document) ? "DEAD FILE" : document.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {formatDistanceToNow(new Date(document.updated_at), { addSuffix: true })}
@@ -410,7 +452,9 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
           <div className="flex items-center flex-1 min-w-0">
             <FileIcon document={document} />
             <div className="ml-3 flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{document.name}</p>
+              <p className="text-sm font-medium truncate">
+                {crazyMode && isFileOld(document) ? "DEAD FILE" : document.name}
+              </p>
             </div>
           </div>
           
