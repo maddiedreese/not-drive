@@ -479,8 +479,8 @@ export default function DocumentEditor() {
 
   return (
     <div className="min-h-screen bg-[#f8f9fa]" onKeyDown={handleKeyDown}>
-      {/* Main Header */}
-      <header className="bg-white">
+      {/* Main Header - Fixed position */}
+      <header className="bg-white fixed top-0 left-0 right-0 z-10">
         <div className="flex items-center justify-between px-4 py-2">
           <div className="flex items-center space-x-3">
             <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Docs" className="w-10 h-10" />
@@ -1007,7 +1007,25 @@ export default function DocumentEditor() {
       </header>
 
       {/* Main Content */}
-      <div className="flex h-screen">
+      <div className="flex h-screen pt-32">
+        {/* Vertical Ruler Sidebar */}
+        <div className="w-6 bg-white border-r border-gray-300 relative overflow-hidden">
+          {/* Vertical ruler aligned with document top */}
+          <div className="absolute left-0 top-0 w-full h-full">
+            {Array.from({ length: 50 }, (_, i) => (
+              <div key={i} className="flex items-center h-6 relative">
+                <div className="absolute left-1 w-3 h-px bg-gray-400"></div>
+                {i % 5 === 0 && (
+                  <span className="absolute left-5 text-xs text-gray-500 transform -rotate-90 origin-left">{i + 1}</span>
+                )}
+                {i % 5 !== 0 && (
+                  <div className="absolute left-1 w-1 h-px bg-gray-300"></div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+        
         {/* Left Sidebar */}
         <div className="w-80 bg-white border-r border-gray-200 overflow-y-auto">
           <div className="p-4">
