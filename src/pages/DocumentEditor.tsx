@@ -1007,7 +1007,7 @@ export default function DocumentEditor() {
       </header>
 
       {/* Main Content */}
-      <div className="flex h-screen pt-32">
+      <div className="flex min-h-screen pt-32">
         {/* Vertical Ruler Sidebar */}
         <div className="w-6 bg-white border-r border-gray-300 relative">
           {/* Vertical ruler that scrolls with document - starts aligned with document content */}
@@ -1065,8 +1065,8 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="flex-1 bg-[#f8f9fa] min-h-screen">
-          <div className="max-w-4xl mx-auto h-full" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
+        <div className="flex-1 bg-[#f8f9fa] min-h-full">
+          <div className="max-w-4xl mx-auto min-h-full" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
