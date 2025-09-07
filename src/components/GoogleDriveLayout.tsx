@@ -14,7 +14,6 @@ import { useAuth } from "./AuthProvider";
 import { useDocuments } from "@/hooks/useDocuments";
 import { supabase } from "@/integrations/supabase/client";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
-
 export function GoogleDriveLayout() {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
@@ -23,81 +22,73 @@ export function GoogleDriveLayout() {
   const [showMigrationBanner, setShowMigrationBanner] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const { user, signOut, loading } = useAuth();
-  const { createDocument, refetch } = useDocuments();
+  const {
+    user,
+    signOut,
+    loading
+  } = useAuth();
+  const {
+    createDocument,
+    refetch
+  } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     if (!loading && !user) {
       setShowAuthModal(true);
     }
   }, [user, loading]);
-
-
   const handleCreateDocument = async (name: string, type: string) => {
     await createDocument(name, type);
     refetch();
   };
-
   const handleFileUploaded = () => {
     refetch();
   };
-
   const handleSignOut = async () => {
     await signOut();
     setShowAuthModal(true);
   };
-
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
-
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || !user) return;
-
     for (const file of Array.from(files)) {
       try {
         // Upload file to storage
         const fileName = `${user.id}/${Date.now()}-${file.name}`;
-        
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('documents')
-          .upload(fileName, file);
-
+        const {
+          data: uploadData,
+          error: uploadError
+        } = await supabase.storage.from('documents').upload(fileName, file);
         if (uploadError) throw uploadError;
 
         // Save file metadata to database
-        const { error: dbError } = await supabase
-          .from('documents')
-          .insert([
-            {
-              user_id: user.id,
-              name: file.name,
-              type: 'file',
-              file_path: uploadData.path,
-              file_size: file.size,
-              mime_type: file.type,
-              is_folder: false,
-            },
-          ]);
-
+        const {
+          error: dbError
+        } = await supabase.from('documents').insert([{
+          user_id: user.id,
+          name: file.name,
+          type: 'file',
+          file_path: uploadData.path,
+          file_size: file.size,
+          mime_type: file.type,
+          is_folder: false
+        }]);
         if (dbError) throw dbError;
       } catch (error: any) {
         console.error(`Failed to upload ${file.name}:`, error.message);
       }
     }
-
     refetch();
-    
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
-  return (
-    <div className="min-h-screen flex flex-col w-full bg-white">
+  return <div className="min-h-screen flex flex-col w-full bg-white">
       {/* Top Navigation Bar */}
       <header className="h-16 bg-[#f8f9fa] px-4 flex items-center gap-4">
         {/* Google Drive Logo */}
@@ -111,17 +102,8 @@ export function GoogleDriveLayout() {
         {/* Search Bar */}
         <div className="flex-1 max-w-2xl relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <Input
-            placeholder="Search in Drive"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-12 h-12 bg-[#e8f0fe] border-0 rounded-full focus:bg-white focus:shadow-md focus:ring-0 transition-all duration-200"
-          />
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full"
-          >
+          <Input placeholder="Search in Drive" value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="pl-10 pr-12 h-12 bg-[#e8f0fe] border-0 rounded-full focus:bg-white focus:shadow-md focus:ring-0 transition-all duration-200" />
+          <Button variant="ghost" size="icon" className="absolute right-2 top-1/2 transform -translate-y-1/2 w-8 h-8 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <Filter className="w-4 h-4" />
           </Button>
         </div>
@@ -137,8 +119,7 @@ export function GoogleDriveLayout() {
           <Button variant="ghost" size="icon" className="w-10 h-10 text-[#5f6368] hover:bg-[#f1f3f4] rounded-full">
             <LayoutGrid className="w-5 h-5" />
           </Button>
-          {user ? (
-            <DropdownMenu>
+          {user ? <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="w-8 h-8 bg-[#ea4335] rounded-full flex items-center justify-center ml-2 cursor-pointer">
                   <span className="text-white text-sm font-medium">
@@ -151,17 +132,9 @@ export function GoogleDriveLayout() {
                   Sign Out
                 </DropdownMenuItem>
               </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowAuthModal(true)}
-              className="ml-2"
-            >
+            </DropdownMenu> : <Button variant="outline" size="sm" onClick={() => setShowAuthModal(true)} className="ml-2">
               Sign In
-            </Button>
-          )}
+            </Button>}
         </div>
       </header>
 
@@ -177,25 +150,17 @@ export function GoogleDriveLayout() {
           <div className="bg-white px-6 py-3 rounded-tl-2xl">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                {user && (
-                  <DropdownMenu>
+                {user && <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button variant="outline" className="gap-2 bg-white border-gray-300 hover:bg-gray-50">
                         <Plus className="w-4 h-4" />
                         New
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent 
-                      align="start" 
-                      className="w-56 bg-white border border-gray-200 shadow-lg z-50 p-2"
-                      sideOffset={5}
-                    >
-                      <DropdownMenuItem 
-                        onClick={() => {
-                          handleCreateDocument("New folder", "folder");
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
+                    <DropdownMenuContent align="start" className="w-56 bg-white border border-gray-200 shadow-lg z-50 p-2" sideOffset={5}>
+                      <DropdownMenuItem onClick={() => {
+                    handleCreateDocument("New folder", "folder");
+                  }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <FolderPlus className="w-5 h-5 text-gray-600" />
                         <span className="text-sm text-gray-700">New folder</span>
                         <span className="ml-auto text-xs text-gray-400">⌘ then F</span>
@@ -203,10 +168,7 @@ export function GoogleDriveLayout() {
                       
                       <div className="w-full h-px bg-gray-200 my-2"></div>
                       
-                      <DropdownMenuItem 
-                        onClick={handleUploadClick}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
+                      <DropdownMenuItem onClick={handleUploadClick} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <div className="w-5 h-5 flex items-center justify-center">
                           <UploadCloud className="w-4 h-4 text-gray-600" />
                         </div>
@@ -222,12 +184,9 @@ export function GoogleDriveLayout() {
                       
                       <div className="w-full h-px bg-gray-200 my-2"></div>
                       
-                      <DropdownMenuItem 
-                        onClick={() => {
-                          handleCreateDocument("Untitled document", "document");
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
+                      <DropdownMenuItem onClick={() => {
+                    handleCreateDocument("Untitled document", "document");
+                  }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
                           <FileText className="w-3 h-3 text-white" />
                         </div>
@@ -235,50 +194,36 @@ export function GoogleDriveLayout() {
                         <ChevronDown className="w-4 h-4 text-gray-400 ml-auto rotate-[-90deg]" />
                       </DropdownMenuItem>
 
-                      <DropdownMenuItem 
-                        onClick={() => {
-                          handleCreateDocument("Untitled spreadsheet", "spreadsheet");
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
+                      <DropdownMenuItem onClick={() => {
+                    handleCreateDocument("Untitled spreadsheet", "spreadsheet");
+                  }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
                           <Sheet className="w-3 h-3 text-white" />
                         </div>
                         <span className="text-sm text-gray-700">Google Sheets</span>
                       </DropdownMenuItem>
 
-                      <DropdownMenuItem 
-                        onClick={() => {
-                          handleCreateDocument("Untitled presentation", "presentation");
-                        }}
-                        className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
+                      <DropdownMenuItem onClick={() => {
+                    handleCreateDocument("Untitled presentation", "presentation");
+                  }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <div className="w-5 h-5 bg-orange-500 rounded flex items-center justify-center">
                           <Presentation className="w-3 h-3 text-white" />
                         </div>
                         <span className="text-sm text-gray-700">Google Slides</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
+                  </DropdownMenu>}
                 <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
               </div>
               
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => setRightSidebarOpen(!rightSidebarOpen)}
-                  className={rightSidebarOpen ? "bg-gray-100" : ""}
-                >
+                <Button variant="ghost" size="icon" onClick={() => setRightSidebarOpen(!rightSidebarOpen)} className={rightSidebarOpen ? "bg-gray-100" : ""}>
                   <Info className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => setViewMode("list")}
-                        className={viewMode === "list" ? "bg-gray-100" : ""}>
+                <Button variant="ghost" size="icon" onClick={() => setViewMode("list")} className={viewMode === "list" ? "bg-gray-100" : ""}>
                   <List className="w-5 h-5" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={() => setViewMode("grid")} 
-                        className={viewMode === "grid" ? "bg-gray-100" : ""}>
+                <Button variant="ghost" size="icon" onClick={() => setViewMode("grid")} className={viewMode === "grid" ? "bg-gray-100" : ""}>
                   <Grid3X3 className="w-5 h-5" />
                 </Button>
               </div>
@@ -302,34 +247,7 @@ export function GoogleDriveLayout() {
           </div>
 
           {/* Migration Banner */}
-          {showMigrationBanner && (
-            <div className="bg-green-50 border-b border-green-200 px-6 py-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-green-100 rounded flex items-center justify-center">
-                    <div className="w-4 h-4 bg-green-500 rounded-sm"></div>
-                  </div>
-                  <div>
-                    <div className="font-medium text-green-900">Copy your organization's files from Microsoft OneDrive to Google Drive</div>
-                    <div className="text-sm text-green-700">All your important files, in one place</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button size="sm" className="bg-green-700 hover:bg-green-800 text-white">
-                    Migrate
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    onClick={() => setShowMigrationBanner(false)}
-                    className="w-8 h-8 text-green-700 hover:bg-green-100"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
+          {showMigrationBanner}
 
           {/* File Content Area */}
           <div className="flex-1 flex bg-white">
@@ -338,16 +256,10 @@ export function GoogleDriveLayout() {
             </div>
             
             {/* Right Sidebar */}
-            {rightSidebarOpen && (
-              <div className="w-80 border-l border-border bg-white flex flex-col">
+            {rightSidebarOpen && <div className="w-80 border-l border-border bg-white flex flex-col">
                 <div className="flex items-center justify-between p-4 border-b border-border">
                   <h3 className="font-medium">My Drive</h3>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setRightSidebarOpen(false)}
-                    className="w-8 h-8"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => setRightSidebarOpen(false)} className="w-8 h-8">
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
@@ -371,32 +283,17 @@ export function GoogleDriveLayout() {
                     <p className="text-gray-600">Select an item to see the details</p>
                   </div>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
         </main>
       </div>
 
       {/* Hidden file input for uploads */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        onChange={handleFileSelect}
-        className="hidden"
-      />
+      <input ref={fileInputRef} type="file" multiple onChange={handleFileSelect} className="hidden" />
 
       {/* Modals */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
+      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
       
-      <CreateDocumentModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreateDocument={handleCreateDocument}
-      />
-    </div>
-  );
+      <CreateDocumentModal isOpen={showCreateModal} onClose={() => setShowCreateModal(false)} onCreateDocument={handleCreateDocument} />
+    </div>;
 }
