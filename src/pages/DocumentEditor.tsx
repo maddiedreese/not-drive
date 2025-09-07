@@ -513,12 +513,17 @@ export default function DocumentEditor() {
             </Button>
             
             <Button 
-              className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-2 rounded-full font-medium text-sm"
+              className="bg-[#c8e6f5] hover:bg-[#b8d6e5] text-black px-4 py-2 rounded-full font-medium text-sm flex items-center space-x-2"
               onClick={saveDocument}
               disabled={isSaving}
             >
-              <Share2 className="w-4 h-4 mr-2" />
-              Share
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 8C17.4 8 17 8.4 17 9v6c0 0.6 0.4 1 1 1s1-0.4 1-1V9c0-0.6-0.4-1-1-1z" fill="currentColor"/>
+                <path d="M6 10c-0.6 0-1 0.4-1 1v4c0 0.6 0.4 1 1 1s1-0.4 1-1v-4c0-0.6-0.4-1-1-1z" fill="currentColor"/>
+                <path d="M9 6c-1.1 0-2 0.9-2 2v8c0 1.1 0.9 2 2 2h6c1.1 0 2-0.9 2-2V8c0-1.1-0.9-2-2-2H9zm0 2h6v8H9V8z" fill="currentColor"/>
+              </svg>
+              <span>Share</span>
+              <ChevronDown className="w-4 h-4" />
             </Button>
 
             <div className="w-8 h-8 bg-[#ea4335] rounded-full flex items-center justify-center text-white font-medium text-sm ml-2">
