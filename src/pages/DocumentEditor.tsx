@@ -565,7 +565,7 @@ export default function DocumentEditor() {
         </div>
 
         {/* Menu Bar */}
-        <div className="flex items-center px-4 py-1 text-sm">
+        <div className="flex items-center px-20 py-1 text-sm absolute top-[72px] left-0">
           {[
             { 
               name: "File", 
