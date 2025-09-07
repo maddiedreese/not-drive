@@ -565,8 +565,8 @@ export default function DocumentEditor() {
         </div>
 
         {/* Menu Bar */}
-        <div className="flex items-center justify-between px-4 py-1 text-sm">
-          <div className="flex items-center">
+        <div className="flex items-center px-4 py-1 text-sm">
+          <div className="flex items-center ml-[40px]">
             {[
               { 
                 name: "File", 
@@ -636,31 +636,7 @@ export default function DocumentEditor() {
                   { label: "Add-ons", action: handleAddOns },
                   { label: "Apps Script", action: handleAppsScript }
                 ]
-              }
-            ].map((menu) => (
-              <DropdownMenu key={menu.name}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="px-2 py-1 h-8 text-gray-700 hover:bg-gray-100 text-sm font-normal">
-                    {menu.name}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
-                  {menu.items.map((item, index) => (
-                    <DropdownMenuItem 
-                      key={index}
-                      className="text-sm py-2 px-3 hover:bg-gray-50 cursor-pointer"
-                      onClick={item.action}
-                    >
-                      {item.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ))}
-          </div>
-          
-          <div className="flex items-center pr-[82px]">
-            {[
+              },
               { 
                 name: "Help", 
                 items: [
@@ -676,11 +652,11 @@ export default function DocumentEditor() {
                     {menu.name}
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg min-w-48 z-50">
+                <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg z-50">
                   {menu.items.map((item, index) => (
                     <DropdownMenuItem 
-                      key={index} 
-                      className="text-sm py-2 px-4 hover:bg-gray-50 cursor-pointer"
+                      key={index}
+                      className="text-sm py-2 px-3 hover:bg-gray-50 cursor-pointer"
                       onClick={item.action}
                     >
                       {item.label}
