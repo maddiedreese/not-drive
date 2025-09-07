@@ -1007,9 +1007,9 @@ export default function DocumentEditor() {
       </header>
 
       {/* Main Content */}
-      <div className="flex min-h-screen pt-32">
+      <div className="relative min-h-screen pt-32">
         {/* Vertical Ruler Sidebar */}
-        <div className="w-6 bg-white border-r border-gray-300 relative">
+        <div className="w-6 bg-white border-r border-gray-300 fixed top-32 bottom-0 left-0">
           {/* Vertical ruler that scrolls with document - starts aligned with document content */}
           <div className="relative" style={{ paddingTop: '96px' }}>
             {Array.from({ length: 9 }, (_, i) => (
@@ -1065,7 +1065,7 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="flex-1 bg-[#f8f9fa] min-h-full ml-80 flex justify-center">
+        <div className="w-full bg-[#f8f9fa] min-h-full flex justify-center">
           <div className="w-full max-w-5xl" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
