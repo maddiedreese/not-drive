@@ -565,7 +565,7 @@ export default function DocumentEditor() {
         </div>
 
         {/* Menu Bar */}
-        <div className="flex items-center px-4 py-1 text-sm -mt-1">
+        <div className="flex items-center px-4 py-1 text-sm -mt-3">
           <div className="flex items-center ml-[40px]">
             {[
               { 
