@@ -22,6 +22,8 @@ import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Card } from "./ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { useDocuments, Document } from "@/hooks/useDocuments";
 import { formatDistanceToNow } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
@@ -78,6 +80,9 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
   const [showNoFlash, setShowNoFlash] = useState(false);
+  const [showLaugh, setShowLaugh] = useState(false);
+  const [showCoworkerForm, setShowCoworkerForm] = useState(false);
+  const [coworkerEmails, setCoworkerEmails] = useState<string>("");
   const navigate = useNavigate();
   const { crazyMode } = useCrazyMode();
   const { user } = useAuth();
@@ -85,6 +90,10 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const filteredDocuments = documents.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const isThirdFile = (index: number): boolean => {
+    return (index + 1) % 3 === 0;
+  };
 
   const handleDownload = async (document: Document) => {
     if (document.file_path) {
@@ -192,8 +201,19 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   };
 
 
-  const handleFileClick = async (document: Document) => {
+  const handleFileClick = async (document: Document, index?: number) => {
     if (document.is_folder) return;
+    
+    // Check if it's every third file in crazy mode
+    if (crazyMode && typeof index === 'number' && isThirdFile(index)) {
+      // Show laugh first
+      setShowLaugh(true);
+      setTimeout(() => {
+        setShowLaugh(false);
+        setShowCoworkerForm(true);
+      }, 2000);
+      return;
+    }
     
     // If it's a document type (Google Docs-like), handle crazy mode or navigate to editor
     if (document.type === 'document' || document.type === 'spreadsheet' || document.type === 'presentation') {
@@ -421,13 +441,66 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
             </div>
           </div>
         )}
+
+        {showLaugh && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-600 bg-opacity-90 animate-fade-in">
+            <div className="text-white text-8xl font-bold animate-scale-in">
+              HAHAHAHAHAHAHA
+            </div>
+          </div>
+        )}
+
+        {showCoworkerForm && (
+          <Dialog open={showCoworkerForm} onOpenChange={setShowCoworkerForm}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle className="text-red-600 text-center">Access Denied!</DialogTitle>
+              </DialogHeader>
+              <div className="text-center space-y-4">
+                <p className="text-lg font-medium">
+                  You're asking for access too late!
+                </p>
+                <p className="text-sm text-gray-600">
+                  Enter your coworkers' emails so they can laugh at you:
+                </p>
+                <Textarea
+                  placeholder="Enter coworker emails separated by commas..."
+                  value={coworkerEmails}
+                  onChange={(e) => setCoworkerEmails(e.target.value)}
+                  className="min-h-[100px]"
+                />
+                <div className="flex gap-2 justify-center">
+                  <Button 
+                    onClick={() => {
+                      toast.success("Your shame has been shared! 😂");
+                      setShowCoworkerForm(false);
+                      setCoworkerEmails("");
+                    }}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Share My Shame
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => {
+                      setShowCoworkerForm(false);
+                      setCoworkerEmails("");
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
         
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {filteredDocuments.map((document) => (
+          {filteredDocuments.map((document, index) => (
             <Card
               key={document.id}
               className="p-4 hover:shadow-md transition-shadow cursor-pointer group"
-              onClick={() => handleFileClick(document)}
+              onClick={() => handleFileClick(document, index)}
             >
               <div className="flex flex-col items-center text-center space-y-2">
                 <div className="relative">
@@ -544,14 +617,67 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
           </div>
         </div>
       )}
+
+      {showLaugh && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-red-600 bg-opacity-90 animate-fade-in">
+          <div className="text-white text-8xl font-bold animate-scale-in">
+            HAHAHAHAHAHAHA
+          </div>
+        </div>
+      )}
+
+      {showCoworkerForm && (
+        <Dialog open={showCoworkerForm} onOpenChange={setShowCoworkerForm}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-red-600 text-center">Access Denied!</DialogTitle>
+            </DialogHeader>
+            <div className="text-center space-y-4">
+              <p className="text-lg font-medium">
+                You're asking for access too late!
+              </p>
+              <p className="text-sm text-gray-600">
+                Enter your coworkers' emails so they can laugh at you:
+              </p>
+              <Textarea
+                placeholder="Enter coworker emails separated by commas..."
+                value={coworkerEmails}
+                onChange={(e) => setCoworkerEmails(e.target.value)}
+                className="min-h-[100px]"
+              />
+              <div className="flex gap-2 justify-center">
+                <Button 
+                  onClick={() => {
+                    toast.success("Your shame has been shared! 😂");
+                    setShowCoworkerForm(false);
+                    setCoworkerEmails("");
+                  }}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  Share My Shame
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowCoworkerForm(false);
+                    setCoworkerEmails("");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
       
       <div className="space-y-1">
-      {filteredDocuments.map((document) => (
-        <div
-          key={document.id}
-          className="flex items-center px-4 py-2 hover:bg-gray-50 rounded-lg group cursor-pointer"
-          onClick={() => handleFileClick(document)}
-        >
+        {filteredDocuments.map((document, index) => (
+          <div
+            key={document.id}
+            className="flex items-center px-4 py-2 hover:bg-gray-50 rounded-lg group cursor-pointer"
+            onClick={() => handleFileClick(document, index)}
+          >
           <div className="flex items-center flex-1 min-w-0">
             <FileIcon document={document} />
             <div className="ml-3 flex-1 min-w-0">
