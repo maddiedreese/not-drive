@@ -1007,7 +1007,7 @@ export default function DocumentEditor() {
       </header>
 
       {/* Main Content */}
-      <div className="relative min-h-screen pt-32">
+      <div className="relative min-h-screen pt-32 bg-[#f8f9fa]">
         {/* Vertical Ruler Sidebar */}
         <div className="w-6 bg-white border-r border-gray-300 fixed top-32 bottom-0 left-0">
           {/* Vertical ruler that scrolls with document - starts aligned with document content */}
@@ -1065,8 +1065,8 @@ export default function DocumentEditor() {
         </div>
 
         {/* Document Area */}
-        <div className="w-full bg-[#f8f9fa] min-h-full flex justify-center">
-          <div className="w-full max-w-5xl" style={{ paddingTop: '32px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
+        <div className="w-full min-h-full flex justify-center">
+          <div className="w-full max-w-5xl bg-[#f8f9fa]" style={{ paddingTop: '96px', paddingLeft: '32px', paddingRight: '32px', paddingBottom: '32px' }}>
             <div
               ref={pageRef}
               className="bg-white shadow-sm border border-gray-300 w-[21cm] mx-auto relative"
@@ -1077,7 +1077,7 @@ export default function DocumentEditor() {
                 marginBottom: `${(1 - parseInt(zoom) / 100) * 800}px`
               }}
             >
-              <div ref={contentRef} className="p-16 pt-24 h-full">
+              <div ref={contentRef} className="p-16 h-full">
                 <div className="absolute top-0 left-0 w-full h-1 bg-blue-400 opacity-0 hover:opacity-100 transition-opacity cursor-row-resize"></div>
                 <div className="w-1 h-full border-l border-gray-200 absolute top-0 left-12"></div>
                 <div className="w-1 h-full border-l border-gray-200 absolute top-0 right-12"></div>
