@@ -111,7 +111,7 @@ export default function GoogleDocs() {
             </Button>
             
             <div className="flex items-center space-x-2">
-              <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Docs" className="w-8 h-8" />
+              <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Docs" className="w-8 h-8 object-contain" />
               <span className="text-xl font-normal text-gray-700">Docs</span>
             </div>
           </div>
