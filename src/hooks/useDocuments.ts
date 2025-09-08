@@ -155,10 +155,23 @@ export const useDocuments = (currentFolderId?: string, includeDeleted = false) =
     };
     window.addEventListener('storage', storageHandler);
 
+    // Realtime subscription to backend changes
+    const channel = user
+      ? supabase
+          .channel('documents-changes')
+          .on(
+            'postgres_changes',
+            { event: '*', schema: 'public', table: 'documents', filter: `user_id=eq.${user.id}` },
+            () => loadDocuments()
+          )
+          .subscribe()
+      : null;
+
     return () => {
       window.removeEventListener('documents:refresh', handler);
       window.removeEventListener('storage', storageHandler);
       bc?.close();
+      if (channel) supabase.removeChannel(channel);
     };
   }, [user, currentFolderId, includeDeleted]);
 
