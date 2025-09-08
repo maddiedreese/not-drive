@@ -121,8 +121,16 @@ export function GoogleDriveLayout({
       
       if (error) throw error;
       
-      // Dispatch refresh event to update drive view
+      // Dispatch refresh event to update drive view (same-tab)
       window.dispatchEvent(new Event('documents:refresh'));
+
+      // Cross-tab refresh via BroadcastChannel + localStorage fallback
+      try {
+        const bc = new BroadcastChannel('documents');
+        bc.postMessage('refresh');
+        bc.close();
+      } catch {}
+      try { localStorage.setItem('documents:refresh-token', Date.now().toString()); } catch {}
       
       // Open in new tab for documents and spreadsheets
       if (type === 'document' && data) {

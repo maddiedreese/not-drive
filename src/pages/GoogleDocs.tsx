@@ -91,8 +91,16 @@ export default function GoogleDocs() {
 
       toast.success(`${documentName} created successfully`);
       
-      // Refresh the drive view
+      // Refresh the drive view (same-tab)
       window.dispatchEvent(new Event('documents:refresh'));
+      
+      // Cross-tab refresh via BroadcastChannel + localStorage fallback
+      try {
+        const bc = new BroadcastChannel('documents');
+        bc.postMessage('refresh');
+        bc.close();
+      } catch {}
+      try { localStorage.setItem('documents:refresh-token', Date.now().toString()); } catch {}
       
       // Open document editor in new tab
       window.open(`/document/${data.id}`, '_blank');

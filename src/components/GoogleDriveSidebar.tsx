@@ -148,11 +148,18 @@ export function Sidebar() {
       
       toast.success(`${type === 'folder' ? 'Folder' : type === 'spreadsheet' ? 'Spreadsheet' : 'Document'} created`);
       
-      // Navigate to editor for spreadsheets
+      // Notify all tabs to refresh views
+      try {
+        const bc = new BroadcastChannel('documents');
+        bc.postMessage('refresh');
+        bc.close();
+      } catch {}
+      try { localStorage.setItem('documents:refresh-token', Date.now().toString()); } catch {}
+      dispatchRefresh();
+      
+      // Open editors in a new tab when applicable
       if (type === 'spreadsheet' && data) {
-        window.location.href = `/spreadsheet/${data.id}`;
-      } else {
-        dispatchRefresh();
+        window.open(`/spreadsheet/${data.id}`, '_blank');
       }
     } catch (e: any) {
       toast.error(e.message || 'Failed to create');

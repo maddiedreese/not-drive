@@ -137,8 +137,28 @@ export const useDocuments = (currentFolderId?: string, includeDeleted = false) =
 
     const handler = () => loadDocuments();
     window.addEventListener('documents:refresh', handler);
+
+    // Cross-tab refresh via BroadcastChannel
+    let bc: BroadcastChannel | null = null;
+    if ('BroadcastChannel' in window) {
+      bc = new BroadcastChannel('documents');
+      bc.onmessage = (event) => {
+        if (event.data === 'refresh') loadDocuments();
+      };
+    }
+
+    // Fallback cross-tab refresh via localStorage events
+    const storageHandler = (e: StorageEvent) => {
+      if (e.key === 'documents:refresh-token') {
+        loadDocuments();
+      }
+    };
+    window.addEventListener('storage', storageHandler);
+
     return () => {
       window.removeEventListener('documents:refresh', handler);
+      window.removeEventListener('storage', storageHandler);
+      bc?.close();
     };
   }, [user, currentFolderId, includeDeleted]);
 
