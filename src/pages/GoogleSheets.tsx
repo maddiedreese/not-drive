@@ -454,7 +454,7 @@ const GoogleSheets = () => {
       <header className="border-b border-gray-200 bg-white">
         <div className="flex items-center px-6 py-3">
           <div className="flex items-center gap-2 flex-1">
-            <div className="w-10 h-10 bg-[#0f9d58] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 flex items-center justify-center">
               <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-8 h-8" />
             </div>
             <div className="flex flex-col">
