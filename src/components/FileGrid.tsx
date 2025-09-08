@@ -86,6 +86,8 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
   const [showLaugh, setShowLaugh] = useState(false);
   const [showCoworkerForm, setShowCoworkerForm] = useState(false);
   const [coworkerEmails, setCoworkerEmails] = useState<string>("");
+  const [renameDocument, setRenameDocument] = useState<Document | null>(null);
+  const [newName, setNewName] = useState("");
   const navigate = useNavigate();
   const { crazyMode } = useCrazyMode();
   const { user } = useAuth();
@@ -260,6 +262,61 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
       window.dispatchEvent(new Event('documents:refresh'));
     } catch (error: any) {
       toast.error(`Failed to kill file: ${error.message}`);
+    }
+  };
+
+  const handleRename = async (document: Document) => {
+    setRenameDocument(document);
+    setNewName(document.name);
+  };
+
+  const handleRenameSubmit = async () => {
+    if (!renameDocument || !newName.trim()) return;
+
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ name: newName.trim() })
+        .eq('id', renameDocument.id);
+
+      if (error) throw error;
+
+      // Refresh the documents list
+      window.dispatchEvent(new Event('documents:refresh'));
+      toast.success("File renamed successfully!");
+      setRenameDocument(null);
+      setNewName("");
+    } catch (error: any) {
+      toast.error(`Failed to rename file: ${error.message}`);
+    }
+  };
+
+  const handleShare = async (document: Document) => {
+    try {
+      let shareUrl = "";
+      
+      if (document.file_path) {
+        // For files with storage path, get the public URL
+        const { data } = supabase.storage
+          .from('documents')
+          .getPublicUrl(document.file_path);
+        shareUrl = data.publicUrl;
+      } else if (document.type === 'document') {
+        // For Google Docs-like documents, create a share link to the editor
+        shareUrl = `${window.location.origin}/document/${document.id}`;
+      } else if (document.type === 'spreadsheet') {
+        // For spreadsheets, create a share link to the editor
+        shareUrl = `${window.location.origin}/spreadsheet/${document.id}`;
+      } else {
+        // For other document types, create a generic share link
+        shareUrl = `${window.location.origin}/my-drive?file=${document.id}`;
+      }
+
+      // Copy to clipboard
+      await navigator.clipboard.writeText(shareUrl);
+      toast.success("Link copied to clipboard!");
+    } catch (error: any) {
+      toast.error("Failed to copy link to clipboard");
     }
   };
 
@@ -462,11 +519,11 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
         )}
         {!isTrash && (
           <>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleShare(document)}>
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleRename(document)}>
               <Edit3 className="w-4 h-4 mr-2" />
               Rename
             </DropdownMenuItem>
@@ -677,6 +734,36 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
             </DialogContent>
           </Dialog>
         )}
+
+        {renameDocument && (
+          <Dialog open={!!renameDocument} onOpenChange={() => setRenameDocument(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Rename</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <Input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  placeholder="Enter new name"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleRenameSubmit();
+                    }
+                  }}
+                />
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setRenameDocument(null)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleRenameSubmit} disabled={!newName.trim()}>
+                    Rename
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </>
     );
   }
@@ -737,6 +824,36 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
                   }}
                 >
                   Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {renameDocument && (
+        <Dialog open={!!renameDocument} onOpenChange={() => setRenameDocument(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Rename</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <Input
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                placeholder="Enter new name"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleRenameSubmit();
+                  }
+                }}
+              />
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setRenameDocument(null)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleRenameSubmit} disabled={!newName.trim()}>
+                  Rename
                 </Button>
               </div>
             </div>
