@@ -197,7 +197,10 @@ export default function GoogleDocs() {
               <Card 
                 key={template.id}
                 className="cursor-pointer hover:shadow-md transition-shadow bg-white border border-gray-200"
-                onClick={() => handleCreateDocument(template)}
+                onClick={() => {
+                  console.log('Template clicked:', template.id, template.title);
+                  handleCreateDocument(template);
+                }}
               >
                 <div className="aspect-[3/4] bg-gray-50 rounded-t-lg overflow-hidden">
                   {template.id === "blank" ? (

@@ -192,7 +192,10 @@ export function Sidebar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-60 bg-white border border-gray-200 shadow-lg z-50 p-2">
-              <DropdownMenuItem onClick={() => handleCreate('New folder', 'folder')} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+              <DropdownMenuItem onClick={() => {
+                console.log('Sidebar New folder clicked'); 
+                handleCreate('New folder', 'folder');
+              }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                 <FolderPlus className="w-5 h-5 text-gray-600" />
                 <span className="text-sm text-gray-700">New folder</span>
                 <span className="ml-auto text-xs text-gray-400">⌘ then F</span>

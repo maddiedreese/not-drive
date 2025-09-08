@@ -278,7 +278,8 @@ export function GoogleDriveLayout({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-56 bg-white border border-gray-200 shadow-lg z-50 p-2" sideOffset={5}>
-                      <DropdownMenuItem onClick={() => {
+                       <DropdownMenuItem onClick={() => {
+                    console.log('New folder button clicked');
                     handleCreateDocument("New folder", "folder");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <FolderPlus className="w-5 h-5 text-gray-600" />
@@ -304,14 +305,16 @@ export function GoogleDriveLayout({
                       
                       <div className="w-full h-px bg-gray-200 my-2"></div>
                       
-                      <DropdownMenuItem onClick={() => {
+                       <DropdownMenuItem onClick={() => {
+                    console.log('Google Docs button clicked');
                     handleCreateDocument("Untitled document", "document");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5 object-contain" />
-                        <span className="text-sm text-gray-700">Google Docs</span>
-                      </DropdownMenuItem>
+                         <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5 object-contain" />
+                         <span className="text-sm text-gray-700">Google Docs</span>
+                       </DropdownMenuItem>
 
-                      <DropdownMenuItem onClick={() => {
+                       <DropdownMenuItem onClick={() => {
+                    console.log('Google Sheets button clicked');
                     handleCreateDocument("Untitled spreadsheet", "spreadsheet");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-5 h-5" />
