@@ -31,7 +31,7 @@ import {
   ChevronDown,
   Grid3x3,
   Merge,
-  Share,
+  Share2,
   Star,
   Folder,
   MoreVertical
@@ -218,7 +218,8 @@ const GoogleSheets = () => {
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
+    const shareUrl = `${window.location.origin}/sheets`;
+    navigator.clipboard.writeText(shareUrl);
     toast.success("Share link copied to clipboard!");
   };
 
@@ -258,18 +259,17 @@ const GoogleSheets = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={handleStar}>
-              <Star className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={handleStar}>
+              <Star className="w-4 h-4 text-gray-600" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => toast.success("Move to folder")}>
-              <Folder className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={() => toast.success("Move to folder")}>
+              <Folder className="w-4 h-4 text-gray-600" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => toast.success("More options")}>
-              <MoreVertical className="w-4 h-4" />
+            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={handleShare}>
+              <Share2 className="w-4 h-4 text-gray-600" />
             </Button>
-            <Button className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6" onClick={handleShare}>
-              <Share className="w-4 h-4 mr-2" />
-              Share
+            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={() => toast.success("More options")}>
+              <MoreVertical className="w-4 h-4 text-gray-600" />
             </Button>
             <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
               M
