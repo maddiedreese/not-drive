@@ -490,23 +490,22 @@ export function FileGrid({
       );
     }
 
-    // Spreadsheet type preview - render entire first page
+     // Spreadsheet type preview - render entire first page
     if (document.type === 'spreadsheet') {
       const spreadsheetData = document.spreadsheet_data as any || {};
-      const hasData = Object.keys(spreadsheetData).length > 0;
       
-      // Show full spreadsheet view (12 columns x 20 rows)
-      const columns = Array.from({ length: 12 }, (_, i) => String.fromCharCode(65 + i)); // A-L
-      const rows = Array.from({ length: 20 }, (_, i) => i + 1); // 1-20
+      // Show spreadsheet view optimized for preview (8 columns x 12 rows)
+      const columns = Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)); // A-H
+      const rows = Array.from({ length: 12 }, (_, i) => i + 1); // 1-12
       
       return (
-        <div className="w-16 h-16 rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
-          <div className="w-full h-full relative text-[2px] leading-tight">
+        <div className="w-20 h-14 rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
+          <div className="w-full h-full relative text-[3px] leading-tight">
             {/* Column headers */}
             <div className="flex bg-gray-100 border-b border-gray-200">
-              <div className="w-2 h-1 border-r border-gray-200 flex-shrink-0"></div>
+              <div className="w-3 h-2 border-r border-gray-200 flex-shrink-0"></div>
               {columns.map(col => (
-                <div key={col} className="flex-1 min-w-0 h-1 border-r border-gray-200 flex items-center justify-center text-gray-600 font-medium">
+                <div key={col} className="flex-1 min-w-0 h-2 border-r border-gray-200 flex items-center justify-center text-gray-600 font-medium text-[2.5px]">
                   {col}
                 </div>
               ))}
@@ -515,9 +514,9 @@ export function FileGrid({
             {/* Rows */}
             <div className="flex-1 overflow-hidden">
               {rows.map(rowNum => (
-                <div key={rowNum} className="flex border-b border-gray-100" style={{ height: '0.75px' }}>
+                <div key={rowNum} className="flex border-b border-gray-100" style={{ height: '1px' }}>
                   {/* Row number */}
-                  <div className="w-2 bg-gray-50 border-r border-gray-200 flex items-center justify-center text-gray-500 text-[1.5px] flex-shrink-0">
+                  <div className="w-3 bg-gray-50 border-r border-gray-200 flex items-center justify-center text-gray-500 text-[2px] flex-shrink-0">
                     {rowNum}
                   </div>
                   
@@ -530,7 +529,7 @@ export function FileGrid({
                       <div
                         key={cellId}
                         className="flex-1 min-w-0 border-r border-gray-100 px-0.5 flex items-center text-gray-800"
-                        style={{ fontSize: '1.5px' }}
+                        style={{ fontSize: '2px' }}
                       >
                         {cellValue && (
                           <span className="truncate w-full">
