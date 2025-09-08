@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 const sidebarItems = [
-  { label: "Home", icon: Home },
+  { label: "Home", icon: Home, route: "/" },
   { label: "Activity", icon: Bell },
   { label: "Workspaces", icon: Users },
   { label: "My Drive", icon: Folder, hasExpander: true, route: "/" },
