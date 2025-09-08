@@ -1,9 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { useAuth } from "@/components/AuthProvider";
+import { useCrazyMode } from "@/components/CrazyModeProvider";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 import { 
   FileText, 
   Edit3, 
@@ -109,6 +114,59 @@ const GoogleSheets = () => {
   const [textColorOpen, setTextColorOpen] = useState(false);
   const [fillColorOpen, setFillColorOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Add auth and navigation
+  const { user } = useAuth();
+  const { crazyMode, toggleCrazyMode } = useCrazyMode();
+  const navigate = useNavigate();
+  const [isCreating, setIsCreating] = useState(false);
+
+  // Spreadsheet creation function
+  const handleCreateSpreadsheet = async (templateName: string = "Blank spreadsheet") => {
+    if (!user) {
+      toast.error("Please sign in to create spreadsheets");
+      return;
+    }
+
+    console.log('Creating spreadsheet:', templateName, 'user:', user.id);
+    setIsCreating(true);
+    try {
+      const { data, error } = await supabase.from('documents').insert([
+        {
+          user_id: user.id,
+          name: templateName,
+          type: 'spreadsheet',
+          is_folder: false,
+          content: "",
+        },
+      ]).select().single();
+
+      if (error) {
+        console.error('Spreadsheet insert error:', error);
+        throw error;
+      }
+
+      console.log('Spreadsheet created successfully:', data);
+      toast.success(`${templateName} created successfully`);
+      
+      // Refresh drive views
+      window.dispatchEvent(new Event('documents:refresh'));
+      try {
+        const bc = new BroadcastChannel('documents');
+        bc.postMessage('refresh');
+        bc.close();
+      } catch {}
+      try { localStorage.setItem('documents:refresh-token', Date.now().toString()); } catch {}
+      
+      // Navigate to the new spreadsheet
+      navigate(`/spreadsheet/${data.id}`);
+    } catch (error: any) {
+      console.error('Spreadsheet creation failed:', error);
+      toast.error(error.message || 'Failed to create spreadsheet');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   const rows = 50;
   const cols = 20;
@@ -464,6 +522,14 @@ const GoogleSheets = () => {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => handleCreateSpreadsheet()}
+              disabled={isCreating}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm"
+            >
+              {isCreating ? 'Creating...' : '+ New Spreadsheet'}
+            </Button>
+            
             <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={handleStar}>
               <Star className="w-4 h-4 text-gray-600" />
             </Button>
@@ -502,7 +568,10 @@ const GoogleSheets = () => {
               <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">File</button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleFileAction('new')}>
+              <DropdownMenuItem onClick={() => {
+                console.log('File menu New clicked');
+                handleCreateSpreadsheet('Untitled spreadsheet');
+              }}>
                 <FileText className="w-4 h-4 mr-2" />
                 New
               </DropdownMenuItem>
