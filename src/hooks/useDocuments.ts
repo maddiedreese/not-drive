@@ -18,6 +18,8 @@ export interface Document {
   original_content?: string;
   original_created_at?: string;
   deleted?: boolean;
+  spreadsheet_data?: any;
+  spreadsheet_formatting?: any;
 }
 
 export const useDocuments = (currentFolderId?: string, includeDeleted = false) => {

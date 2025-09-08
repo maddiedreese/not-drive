@@ -490,8 +490,88 @@ export function FileGrid({
       );
     }
 
+    // Spreadsheet type preview - render actual grid data
+    if (document.type === 'spreadsheet') {
+      const spreadsheetData = document.spreadsheet_data as any || {};
+      const hasData = Object.keys(spreadsheetData).length > 0;
+      
+      return (
+        <div className="w-16 h-16 rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
+          {hasData ? (
+            <div className="w-full h-full relative">
+              {/* Mini spreadsheet grid */}
+              <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 gap-0">
+                {Array.from({ length: 16 }, (_, i) => {
+                  const row = Math.floor(i / 4) + 1;
+                  const col = String.fromCharCode(65 + (i % 4)); // A, B, C, D
+                  const cellId = `${col}${row}`;
+                  const cellValue = spreadsheetData[cellId];
+                  
+                  return (
+                    <div
+                      key={cellId}
+                      className="border-r border-b border-gray-300 text-[1.5px] leading-none p-0.5 bg-white overflow-hidden"
+                      style={{ fontSize: '1.5px' }}
+                    >
+                      {cellValue ? (
+                        <span className="text-gray-700 font-mono">
+                          {String(cellValue).substring(0, 3)}
+                        </span>
+                      ) : null}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Column headers */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100 border-b border-gray-300 grid grid-cols-4">
+                {['A', 'B', 'C', 'D'].map(col => (
+                  <div key={col} className="text-[1px] text-center text-gray-500 border-r border-gray-300">
+                    {col}
+                  </div>
+                ))}
+              </div>
+              {/* Row numbers */}
+              <div className="absolute top-1 left-0 bottom-0 w-1 bg-gray-100 border-r border-gray-300 grid grid-rows-4">
+                {[1, 2, 3, 4].map(num => (
+                  <div key={num} className="text-[1px] text-center text-gray-500 border-b border-gray-300 flex items-center justify-center">
+                    {num}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            // Empty spreadsheet grid
+            <div className="w-full h-full relative bg-white">
+              <div className="absolute inset-0 grid grid-cols-4 grid-rows-4 gap-0">
+                {Array.from({ length: 16 }, (_, i) => (
+                  <div
+                    key={i}
+                    className="border-r border-b border-gray-300 bg-white"
+                  />
+                ))}
+              </div>
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100 border-b border-gray-300 grid grid-cols-4">
+                {['A', 'B', 'C', 'D'].map(col => (
+                  <div key={col} className="text-[1px] text-center text-gray-500 border-r border-gray-300">
+                    {col}
+                  </div>
+                ))}
+              </div>
+              <div className="absolute top-1 left-0 bottom-0 w-1 bg-gray-100 border-r border-gray-300 grid grid-rows-4">
+                {[1, 2, 3, 4].map(num => (
+                  <div key={num} className="text-[1px] text-center text-gray-500 border-b border-gray-300 flex items-center justify-center">
+                    {num}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
     // Document type preview - render actual content
-    if (document.type === 'document' || document.type === 'spreadsheet' || document.type === 'presentation') {
+    if (document.type === 'document' || document.type === 'presentation') {
       return (
         <div className="w-16 h-16 rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
           <div className="w-full h-full p-1 text-[2px] leading-tight overflow-hidden">
