@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { CrazyModeProvider } from "@/components/CrazyModeProvider";
 import Index from "./pages/Index";
 import GoogleDocs from "./pages/GoogleDocs";
+import SharedDrives from "./pages/SharedDrives";
 import DocumentEditor from "./pages/DocumentEditor";
 import NotFound from "./pages/NotFound";
 
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/docs" element={<GoogleDocs />} />
+            <Route path="/shared-drives" element={<SharedDrives />} />
             <Route path="/document/:documentId" element={<DocumentEditor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

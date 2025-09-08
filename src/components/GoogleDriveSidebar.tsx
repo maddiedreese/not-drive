@@ -34,7 +34,7 @@ const sidebarItems = [
   { label: "Activity", icon: Bell },
   { label: "Workspaces", icon: Users },
   { label: "My Drive", icon: Folder, hasExpander: true, route: "/" },
-  { label: "Shared drives", icon: UsersRound, hasExpander: true },
+  { label: "Shared drives", icon: UsersRound, hasExpander: true, route: "/shared-drives" },
   { label: "Shared with me", icon: UsersRound },
   { label: "Recent", icon: Clock },
   { label: "Starred", icon: Star },
@@ -52,7 +52,13 @@ export function Sidebar() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isActiveItem = (itemLabel: string) => {
-    return location.pathname === "/" && activeItem === itemLabel;
+    if (location.pathname === "/" && activeItem === itemLabel && (itemLabel === "Home" || itemLabel === "My Drive")) {
+      return true;
+    }
+    if (location.pathname === "/shared-drives" && activeItem === itemLabel && itemLabel === "Shared drives") {
+      return true;
+    }
+    return false;
   };
 
   const handleNavItemClick = (item: any) => {
@@ -61,6 +67,15 @@ export function Sidebar() {
       navigate(item.route);
     }
   };
+
+  // Update activeItem based on route changes
+  useEffect(() => {
+    if (location.pathname === "/" && !["Home", "My Drive"].includes(activeItem)) {
+      setActiveItem("Home");
+    } else if (location.pathname === "/shared-drives") {
+      setActiveItem("Shared drives");
+    }
+  }, [location.pathname]);
 
 
   const dispatchRefresh = () => window.dispatchEvent(new Event('documents:refresh'));

@@ -37,6 +37,7 @@ interface FileGridProps {
   searchQuery: string;
   currentPath: string[];
   currentFolderId?: string;
+  isSharedDrives?: boolean;
 }
 
 const getFileIcon = (document: Document) => {
@@ -74,7 +75,7 @@ const isFileOld = (document: Document): boolean => {
   return new Date(document.created_at) < oneDayAgo;
 };
 
-export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }: FileGridProps) {
+export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, isSharedDrives = false }: FileGridProps) {
   const { documents, loading, deleteDocument, downloadFile, createDocument } = useDocuments(currentFolderId);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -87,7 +88,10 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId }
   const { crazyMode } = useCrazyMode();
   const { user } = useAuth();
 
-  const filteredDocuments = documents.filter((doc) =>
+  // For shared drives, show empty state
+  const displayDocuments = isSharedDrives ? [] : documents;
+
+  const filteredDocuments = displayDocuments.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

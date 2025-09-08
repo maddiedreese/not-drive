@@ -15,7 +15,7 @@ import { useCrazyMode } from "./CrazyModeProvider";
 import { useDocuments } from "@/hooks/useDocuments";
 import { supabase } from "@/integrations/supabase/client";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
-export function GoogleDriveLayout() {
+export function GoogleDriveLayout({ isSharedDrives = false }: { isSharedDrives?: boolean }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPath, setCurrentPath] = useState(["My Drive"]);
@@ -262,7 +262,7 @@ export function GoogleDriveLayout() {
           {/* File Content Area */}
           <div className="flex-1 flex bg-white">
             <div className="flex-1 p-6 bg-white">
-              <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} />
+              <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} isSharedDrives={isSharedDrives} />
             </div>
             
             {/* Right Sidebar */}
