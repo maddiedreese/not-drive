@@ -499,11 +499,11 @@ export function FileGrid({
         <div className="w-16 h-16 rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
           {hasData ? (
             <div className="w-full h-full relative">
-              {/* Mini spreadsheet grid - 8x8 */}
-              <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-0">
-                {Array.from({ length: 64 }, (_, i) => {
-                  const row = Math.floor(i / 8) + 1;
-                  const col = String.fromCharCode(65 + (i % 8)); // A-H
+              {/* Mini spreadsheet grid - 4x8 */}
+              <div className="absolute inset-0 grid grid-cols-4 grid-rows-8 gap-0">
+                {Array.from({ length: 32 }, (_, i) => {
+                  const row = Math.floor(i / 4) + 1;
+                  const col = String.fromCharCode(65 + (i % 4)); // A-D
                   const cellId = `${col}${row}`;
                   const cellValue = spreadsheetData[cellId];
                   
@@ -552,10 +552,10 @@ export function FileGrid({
               </div>
             </div>
           ) : (
-            // Empty spreadsheet grid - 8x8
+            // Empty spreadsheet grid - 4x8
             <div className="w-full h-full relative bg-white">
-              <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-0">
-                {Array.from({ length: 64 }, (_, i) => (
+              <div className="absolute inset-0 grid grid-cols-4 grid-rows-8 gap-0">
+                {Array.from({ length: 32 }, (_, i) => (
                   <div
                     key={i}
                     className="border-r border-b border-gray-300 bg-white"
@@ -563,8 +563,8 @@ export function FileGrid({
                   />
                 ))}
               </div>
-              <div className="absolute top-0 left-0 right-0 bg-gray-100 border-b border-gray-300 grid grid-cols-8" style={{ height: '0.125rem' }}>
-                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(col => (
+              <div className="absolute top-0 left-0 right-0 bg-gray-100 border-b border-gray-300 grid grid-cols-4" style={{ height: '0.125rem' }}>
+                {['A', 'B', 'C', 'D'].map(col => (
                   <div 
                     key={col} 
                     className="text-[0.4px] text-center text-gray-500 border-r border-gray-300 flex items-center justify-center"
