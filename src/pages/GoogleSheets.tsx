@@ -280,16 +280,16 @@ const GoogleSheets = () => {
 
       {/* Menu Bar */}
       <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-6 text-sm">
-          <button className="text-gray-700 hover:text-gray-900">File</button>
-          <button className="text-gray-700 hover:text-gray-900">Edit</button>
-          <button className="text-gray-700 hover:text-gray-900">View</button>
-          <button className="text-gray-700 hover:text-gray-900">Insert</button>
-          <button className="text-gray-700 hover:text-gray-900">Format</button>
-          <button className="text-gray-700 hover:text-gray-900">Data</button>
-          <button className="text-gray-700 hover:text-gray-900">Tools</button>
-          <button className="text-gray-700 hover:text-gray-900">Extensions</button>
-          <button className="text-gray-700 hover:text-gray-900">Help</button>
+        <div className="flex items-center gap-6 text-sm bg-gray-100 rounded-full px-4 py-2 w-fit">
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">File</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Edit</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">View</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Insert</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Format</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Data</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Tools</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Extensions</button>
+          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Help</button>
         </div>
       </div>
 
