@@ -271,7 +271,18 @@ const GoogleSheets = () => {
             <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={() => toast.success("More options")}>
               <MoreVertical className="w-4 h-4 text-gray-600" />
             </Button>
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+            
+            <div className="flex items-center bg-[#c8e6f5] hover:bg-[#b8d6e5] rounded-full overflow-hidden ml-2">
+              <Button 
+                className="bg-transparent hover:bg-transparent text-black px-4 py-2 font-medium text-sm flex items-center space-x-2 rounded-none"
+                onClick={handleShare}
+              >
+                <Share2 className="w-4 h-4" />
+                <span>Share</span>
+              </Button>
+            </div>
+            
+            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm ml-2">
               M
             </div>
           </div>
