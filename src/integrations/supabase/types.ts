@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           content: string | null
           created_at: string
+          deleted: boolean
           file_path: string | null
           file_size: number | null
           id: string
@@ -34,6 +35,7 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
+          deleted?: boolean
           file_path?: string | null
           file_size?: number | null
           id?: string
@@ -50,6 +52,7 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
+          deleted?: boolean
           file_path?: string | null
           file_size?: number | null
           id?: string

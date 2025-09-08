@@ -39,6 +39,7 @@ interface FileGridProps {
   currentFolderId?: string;
   isSharedDrives?: boolean;
   isRecent?: boolean;
+  isTrash?: boolean;
 }
 
 const getFileIcon = (document: Document) => {
@@ -76,8 +77,8 @@ const isFileOld = (document: Document): boolean => {
   return new Date(document.created_at) < oneDayAgo;
 };
 
-export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, isSharedDrives = false, isRecent = false }: FileGridProps) {
-  const { documents, loading, deleteDocument, downloadFile, createDocument } = useDocuments(currentFolderId);
+export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, isSharedDrives = false, isRecent = false, isTrash = false }: FileGridProps) {
+  const { documents, loading, deleteDocument, downloadFile, createDocument } = useDocuments(currentFolderId, isTrash);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [runId, setRunId] = useState<string | null>(null);
@@ -89,9 +90,10 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
   const { crazyMode } = useCrazyMode();
   const { user } = useAuth();
 
-  // For shared drives, show empty state. For recent, sort by updated_at
+  // Filter documents based on the current view
   const displayDocuments = isSharedDrives ? [] : 
     isRecent ? [...documents].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()) : 
+    isTrash ? documents.filter(doc => doc.deleted === true) :
     documents;
 
   const filteredDocuments = displayDocuments.filter((doc) =>
@@ -145,8 +147,49 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
       return;
     }
     
-    if (confirm(`Are you sure you want to delete "${document.name}"?`)) {
-      await deleteDocument(document.id);
+    if (isTrash) {
+      // In trash, permanently delete the file
+      if (confirm(`Are you sure you want to permanently delete "${document.name}"? This action cannot be undone.`)) {
+        await deleteDocument(document.id);
+        toast.success("File permanently deleted!");
+      }
+    } else {
+      // In normal mode, move to trash (soft delete)
+      if (confirm(`Are you sure you want to move "${document.name}" to trash?`)) {
+        try {
+          const { error } = await supabase
+            .from('documents')
+            .update({ deleted: true })
+            .eq('id', document.id);
+          
+          if (error) throw error;
+          
+          // Refresh the documents list
+          window.dispatchEvent(new Event('documents:refresh'));
+          toast.success("File moved to trash!");
+        } catch (error: any) {
+          console.error('Failed to move file to trash:', error);
+          toast.error('Failed to move file to trash');
+        }
+      }
+    }
+  };
+
+  const handleRestore = async (document: Document) => {
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ deleted: false })
+        .eq('id', document.id);
+      
+      if (error) throw error;
+      
+      // Refresh the documents list
+      window.dispatchEvent(new Event('documents:refresh'));
+      toast.success("File restored successfully!");
+    } catch (error: any) {
+      console.error('Failed to restore file:', error);
+      toast.error('Failed to restore file');
     }
   };
 
@@ -380,6 +423,12 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        {isTrash && (
+          <DropdownMenuItem onClick={() => handleRestore(document)} className="text-green-600">
+            <Star className="w-4 h-4 mr-2" />
+            Restore
+          </DropdownMenuItem>
+        )}
         {crazyMode && isFileOld(document) && (
           <DropdownMenuItem onClick={() => handleRecoverFile(document)}>
             <Star className="w-4 h-4 mr-2" />
@@ -392,26 +441,30 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
             Kill file
           </DropdownMenuItem>
         )}
-        {document.file_path && (
+        {document.file_path && !isTrash && (
           <DropdownMenuItem onClick={() => handleDownload(document)}>
             <Download className="w-4 h-4 mr-2" />
             Download
           </DropdownMenuItem>
         )}
-        <DropdownMenuItem>
-          <Share2 className="w-4 h-4 mr-2" />
-          Share
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Edit3 className="w-4 h-4 mr-2" />
-          Rename
-        </DropdownMenuItem>
+        {!isTrash && (
+          <>
+            <DropdownMenuItem>
+              <Share2 className="w-4 h-4 mr-2" />
+              Share
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Edit3 className="w-4 h-4 mr-2" />
+              Rename
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuItem 
           className="text-red-600"
           onClick={() => handleDelete(document)}
         >
           <Trash2 className="w-4 h-4 mr-2" />
-          Delete
+          {isTrash ? "Delete Forever" : "Delete"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

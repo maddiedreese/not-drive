@@ -17,9 +17,10 @@ export interface Document {
   updated_at: string;
   original_content?: string;
   original_created_at?: string;
+  deleted?: boolean;
 }
 
-export const useDocuments = (currentFolderId?: string) => {
+export const useDocuments = (currentFolderId?: string, includeDeleted = false) => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
@@ -42,6 +43,11 @@ export const useDocuments = (currentFolderId?: string) => {
         query = query.eq('parent_folder_id', currentFolderId);
       } else {
         query = query.is('parent_folder_id', null);
+      }
+
+      // Filter by deleted status based on includeDeleted parameter
+      if (!includeDeleted) {
+        query = query.eq('deleted', false);
       }
 
       const { data, error } = await query;
@@ -134,7 +140,7 @@ export const useDocuments = (currentFolderId?: string) => {
     return () => {
       window.removeEventListener('documents:refresh', handler);
     };
-  }, [user, currentFolderId]);
+  }, [user, currentFolderId, includeDeleted]);
 
   return {
     documents,

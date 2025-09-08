@@ -15,12 +15,13 @@ import { useCrazyMode } from "./CrazyModeProvider";
 import { useDocuments } from "@/hooks/useDocuments";
 import { supabase } from "@/integrations/supabase/client";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
-export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false }: { isSharedDrives?: boolean; isRecent?: boolean }) {
+export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, isTrash = false }: { isSharedDrives?: boolean; isRecent?: boolean; isTrash?: boolean }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPath, setCurrentPath] = useState<string[]>(
     isSharedDrives ? ["Shared drives"] : 
     isRecent ? ["Recent"] : 
+    isTrash ? ["Trash"] :
     ["My Drive"]
   );
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
@@ -38,14 +39,15 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false }: 
     refetch
   } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  // Update currentPath when isSharedDrives or isRecent changes
+  // Update currentPath when isSharedDrives, isRecent, or isTrash changes
   useEffect(() => {
     setCurrentPath(
       isSharedDrives ? ["Shared drives"] : 
       isRecent ? ["Recent"] : 
+      isTrash ? ["Trash"] :
       ["My Drive"]
     );
-  }, [isSharedDrives, isRecent]);
+  }, [isSharedDrives, isRecent, isTrash]);
   const handleCreateDocument = async (name: string, type: string) => {
     await createDocument(name, type);
     refetch();
@@ -269,7 +271,7 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false }: 
           {/* File Content Area */}
           <div className="flex-1 flex bg-white">
             <div className="flex-1 p-6 bg-white">
-              <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} isSharedDrives={isSharedDrives} isRecent={isRecent} />
+              <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} isSharedDrives={isSharedDrives} isRecent={isRecent} isTrash={isTrash} />
             </div>
             
             {/* Right Sidebar */}

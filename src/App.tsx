@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import GoogleDocs from "./pages/GoogleDocs";
 import SharedDrives from "./pages/SharedDrives";
 import Recent from "./pages/Recent";
+import Trash from "./pages/Trash";
 import DocumentEditor from "./pages/DocumentEditor";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/docs" element={<GoogleDocs />} />
             <Route path="/shared-drives" element={<SharedDrives />} />
             <Route path="/recent" element={<Recent />} />
+            <Route path="/trash" element={<Trash />} />
             <Route path="/document/:documentId" element={<DocumentEditor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

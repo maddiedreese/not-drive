@@ -39,7 +39,7 @@ const sidebarItems = [
   { label: "Recent", icon: Clock, route: "/recent" },
   { label: "Starred", icon: Star },
   { label: "Spam", icon: Info },
-  { label: "Trash", icon: Trash2 },
+  { label: "Trash", icon: Trash2, route: "/trash" },
   { label: "Storage", icon: Cloud, subtext: "0 bytes used" }
 ];
 
@@ -61,6 +61,9 @@ export function Sidebar() {
     if (location.pathname === "/recent" && activeItem === itemLabel && itemLabel === "Recent") {
       return true;
     }
+    if (location.pathname === "/trash" && activeItem === itemLabel && itemLabel === "Trash") {
+      return true;
+    }
     return false;
   };
 
@@ -79,6 +82,8 @@ export function Sidebar() {
       setActiveItem("Shared drives");
     } else if (location.pathname === "/recent") {
       setActiveItem("Recent");
+    } else if (location.pathname === "/trash") {
+      setActiveItem("Trash");
     }
   }, [location.pathname]);
 
