@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { 
   Home,
   Bell,
@@ -29,10 +30,10 @@ import { toast } from "sonner";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
 
 const sidebarItems = [
-  { label: "Home", icon: Home, active: true },
+  { label: "Home", icon: Home },
   { label: "Activity", icon: Bell },
   { label: "Workspaces", icon: Users },
-  { label: "My Drive", icon: Folder, hasExpander: true },
+  { label: "My Drive", icon: Folder, hasExpander: true, route: "/" },
   { label: "Shared drives", icon: UsersRound, hasExpander: true },
   { label: "Shared with me", icon: UsersRound },
   { label: "Recent", icon: Clock },
@@ -45,7 +46,20 @@ const sidebarItems = [
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isActiveRoute = (route?: string) => {
+    if (route === "/" && location.pathname === "/") return true;
+    return false;
+  };
+
+  const handleNavItemClick = (item: any) => {
+    if (item.route) {
+      navigate(item.route);
+    }
+  };
 
 
   const dispatchRefresh = () => window.dispatchEvent(new Event('documents:refresh'));
@@ -168,12 +182,11 @@ export function Sidebar() {
               <div key={item.label} className="relative">
                 <Button
                   variant="ghost"
+                  onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
+                    isActiveRoute(item.route)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : (item as any).highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
                 >
@@ -201,12 +214,11 @@ export function Sidebar() {
               <div key={item.label} className="relative">
                 <Button
                   variant="ghost"
+                  onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
+                    isActiveRoute(item.route)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : (item as any).highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
                 >
@@ -234,12 +246,11 @@ export function Sidebar() {
               <div key={item.label} className="relative">
                 <Button
                   variant="ghost"
+                  onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
+                    isActiveRoute(item.route)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : (item as any).highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
                 >
@@ -267,12 +278,11 @@ export function Sidebar() {
               <div key={item.label} className="relative">
                 <Button
                   variant="ghost"
+                  onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    item.active 
+                    isActiveRoute(item.route)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
-                      : (item as any).highlighted
-                      ? "bg-[#f1f3f4] text-[#3c4043]"
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
                 >
