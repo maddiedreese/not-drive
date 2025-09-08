@@ -104,6 +104,19 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
     return (index + 1) % 3 === 0;
   };
 
+  const handleDocumentClick = (document: Document) => {
+    if (document.is_folder) {
+      // Handle folder navigation if needed
+      return;
+    }
+    
+    if (document.type === 'spreadsheet') {
+      navigate(`/spreadsheet/${document.id}`);
+    } else if (document.type === 'document') {
+      navigate(`/document/${document.id}`);
+    }
+  };
+
   const handleDownload = async (document: Document) => {
     if (document.file_path) {
       await downloadFile(document);

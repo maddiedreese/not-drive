@@ -136,17 +136,25 @@ export function Sidebar() {
   const handleCreate = async (name: string, type: 'folder' | 'document' | 'spreadsheet' | 'presentation') => {
     if (!user) return;
     try {
-      const { error } = await supabase.from('documents').insert([
+      const { data, error } = await supabase.from('documents').insert([
         {
           user_id: user.id,
           name,
           type,
           is_folder: type === 'folder',
         },
-      ]);
+      ]).select().single();
+      
       if (error) throw error;
-      toast.success(`${type === 'folder' ? 'Folder' : 'Document'} created`);
-      dispatchRefresh();
+      
+      toast.success(`${type === 'folder' ? 'Folder' : type === 'spreadsheet' ? 'Spreadsheet' : 'Document'} created`);
+      
+      // Navigate to editor for spreadsheets
+      if (type === 'spreadsheet' && data) {
+        window.location.href = `/spreadsheet/${data.id}`;
+      } else {
+        dispatchRefresh();
+      }
     } catch (e: any) {
       toast.error(e.message || 'Failed to create');
     }

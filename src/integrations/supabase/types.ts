@@ -28,6 +28,8 @@ export type Database = {
           original_content: string | null
           original_created_at: string | null
           parent_folder_id: string | null
+          spreadsheet_data: Json | null
+          spreadsheet_formatting: Json | null
           type: string
           updated_at: string
           user_id: string
@@ -45,6 +47,8 @@ export type Database = {
           original_content?: string | null
           original_created_at?: string | null
           parent_folder_id?: string | null
+          spreadsheet_data?: Json | null
+          spreadsheet_formatting?: Json | null
           type?: string
           updated_at?: string
           user_id: string
@@ -62,6 +66,8 @@ export type Database = {
           original_content?: string | null
           original_created_at?: string | null
           parent_folder_id?: string | null
+          spreadsheet_data?: Json | null
+          spreadsheet_formatting?: Json | null
           type?: string
           updated_at?: string
           user_id?: string

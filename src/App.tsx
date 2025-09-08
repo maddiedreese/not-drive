@@ -8,6 +8,7 @@ import { CrazyModeProvider } from "@/components/CrazyModeProvider";
 import Index from "./pages/Index";
 import GoogleDocs from "./pages/GoogleDocs";
 import GoogleSheets from "./pages/GoogleSheets";
+import SpreadsheetEditor from "./pages/SpreadsheetEditor";
 import MyDrive from "./pages/MyDrive";
 import SharedDrives from "./pages/SharedDrives";
 import Recent from "./pages/Recent";
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/docs" element={<GoogleDocs />} />
             <Route path="/sheets" element={<GoogleSheets />} />
+            <Route path="/spreadsheet/:documentId" element={<SpreadsheetEditor />} />
             <Route path="/my-drive" element={<MyDrive />} />
             <Route path="/shared-drives" element={<SharedDrives />} />
             <Route path="/recent" element={<Recent />} />
