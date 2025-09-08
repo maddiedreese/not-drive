@@ -554,7 +554,7 @@ export default function DocumentEditor() {
             <img 
               src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" 
               alt="Docs" 
-              className="w-10 h-10 cursor-pointer hover:bg-gray-100 rounded p-1" 
+              className="w-10 h-10 object-contain cursor-pointer hover:bg-gray-100 rounded p-1" 
               onClick={() => navigate("/docs")}
             />
             

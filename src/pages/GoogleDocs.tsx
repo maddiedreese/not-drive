@@ -182,7 +182,7 @@ export default function GoogleDocs() {
                       <img 
                         src={template.preview} 
                         alt={template.title}
-                        className="w-12 h-12"
+                        className="w-12 h-12 object-contain"
                       />
                     </div>
                   ) : (

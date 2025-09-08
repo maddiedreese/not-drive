@@ -196,7 +196,7 @@ export function Sidebar() {
               </DropdownMenuItem>
               <div className="w-full h-px bg-gray-200 my-2" />
               <DropdownMenuItem onClick={() => window.location.href = '/docs'} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5" />
+                <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5 object-contain" />
                 <span className="text-sm text-gray-700">Google Docs</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => window.location.href = '/sheets'} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
