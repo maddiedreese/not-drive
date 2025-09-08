@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 import { 
   FileText, 
   Edit3, 
@@ -47,6 +48,17 @@ const generateColumnLabel = (index: number): string => {
   return result;
 };
 
+// Cell formatting interface
+interface CellFormat {
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  textAlign?: 'left' | 'center' | 'right';
+  backgroundColor?: string;
+  textColor?: string;
+  fontSize?: string;
+}
+
 // Generate grid data
 const generateGrid = (rows: number, cols: number) => {
   const grid: { [key: string]: string } = {};
@@ -57,15 +69,37 @@ const generateGrid = (rows: number, cols: number) => {
   return grid;
 };
 
+// Generate initial formatting
+const generateFormatting = () => {
+  const formatting: { [key: string]: CellFormat } = {};
+  return formatting;
+};
+
 const GoogleSheets = () => {
   const [gridData, setGridData] = useState(() => generateGrid(50, 20));
+  const [cellFormatting, setCellFormatting] = useState(() => generateFormatting());
   const [selectedCell, setSelectedCell] = useState('A1');
   const [editingCell, setEditingCell] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
+  const [history, setHistory] = useState<Array<{ data: any; formatting: any }>>([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [zoom, setZoom] = useState(100);
+  const [fileName, setFileName] = useState('Untitled spreadsheet');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const rows = 50;
   const cols = 20;
+
+  // Save state to history
+  const saveToHistory = () => {
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push({ 
+      data: { ...gridData }, 
+      formatting: { ...cellFormatting } 
+    });
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
 
   useEffect(() => {
     if (editingCell && inputRef.current) {
@@ -98,6 +132,7 @@ const GoogleSheets = () => {
 
   const handleInputKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
+      saveToHistory();
       setEditingCell(null);
     }
     if (e.key === 'Escape') {
@@ -107,6 +142,95 @@ const GoogleSheets = () => {
       setEditingCell(null);
     }
   };
+
+  // Toolbar functionality
+  const handleUndo = () => {
+    if (historyIndex > 0) {
+      const previousState = history[historyIndex - 1];
+      setGridData(previousState.data);
+      setCellFormatting(previousState.formatting);
+      setHistoryIndex(historyIndex - 1);
+      toast.success("Undo successful");
+    }
+  };
+
+  const handleRedo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      setGridData(nextState.data);
+      setCellFormatting(nextState.formatting);
+      setHistoryIndex(historyIndex + 1);
+      toast.success("Redo successful");
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+    toast.success("Print dialog opened");
+  };
+
+  const handleZoomIn = () => {
+    const newZoom = Math.min(zoom + 25, 200);
+    setZoom(newZoom);
+    toast.success(`Zoom: ${newZoom}%`);
+  };
+
+  const handleZoomOut = () => {
+    const newZoom = Math.max(zoom - 25, 50);
+    setZoom(newZoom);
+    toast.success(`Zoom: ${newZoom}%`);
+  };
+
+  const toggleCellFormat = (formatType: keyof CellFormat, value?: any) => {
+    saveToHistory();
+    setCellFormatting(prev => ({
+      ...prev,
+      [selectedCell]: {
+        ...prev[selectedCell],
+        [formatType]: value !== undefined ? value : !prev[selectedCell]?.[formatType]
+      }
+    }));
+    toast.success(`${formatType} ${value !== undefined ? 'applied' : 'toggled'}`);
+  };
+
+  const handleFormatCurrency = () => {
+    const cellValue = gridData[selectedCell];
+    if (cellValue && !isNaN(Number(cellValue))) {
+      setGridData(prev => ({
+        ...prev,
+        [selectedCell]: `$${Number(cellValue).toFixed(2)}`
+      }));
+      saveToHistory();
+      toast.success("Currency format applied");
+    }
+  };
+
+  const handleFormatPercent = () => {
+    const cellValue = gridData[selectedCell];
+    if (cellValue && !isNaN(Number(cellValue))) {
+      setGridData(prev => ({
+        ...prev,
+        [selectedCell]: `${(Number(cellValue) * 100).toFixed(2)}%`
+      }));
+      saveToHistory();
+      toast.success("Percentage format applied");
+    }
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    toast.success("Share link copied to clipboard!");
+  };
+
+  const handleStar = () => {
+    toast.success("Spreadsheet starred!");
+  };
+
+  const getCurrentCellFormat = (): CellFormat => {
+    return cellFormatting[selectedCell] || {};
+  };
+
+  const currentFormat = getCurrentCellFormat();
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -125,20 +249,25 @@ const GoogleSheets = () => {
               </div>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-lg font-normal text-gray-700">Untitled spreadsheet</h1>
+              <input 
+                className="text-lg font-normal text-gray-700 bg-transparent border-none outline-none"
+                value={fileName}
+                onChange={(e) => setFileName(e.target.value)}
+                onBlur={() => toast.success("Spreadsheet renamed")}
+              />
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={handleStar}>
               <Star className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => toast.success("Move to folder")}>
               <Folder className="w-4 h-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => toast.success("More options")}>
               <MoreVertical className="w-4 h-4" />
             </Button>
-            <Button className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6">
+            <Button className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6" onClick={handleShare}>
               <Share className="w-4 h-4 mr-2" />
               Share
             </Button>
@@ -167,88 +296,136 @@ const GoogleSheets = () => {
       {/* Toolbar */}
       <div className="border-b border-gray-200 bg-white px-6 py-2">
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleUndo}
+            disabled={historyIndex <= 0}
+            title="Undo"
+          >
             <Undo className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleRedo}
+            disabled={historyIndex >= history.length - 1}
+            title="Redo"
+          >
             <Redo className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={handlePrint} title="Print">
             <Printer className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Paint format")} title="Paint format">
             <Palette className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" className="text-xs px-2">
-            100%
+          <Button variant="ghost" size="sm" className="text-xs px-2" title="Zoom">
+            {zoom}%
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={handleZoomOut} title="Zoom out">
             <ZoomOut className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={handleZoomIn} title="Zoom in">
             <ZoomIn className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={handleFormatCurrency} title="Format as currency">
             <DollarSign className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={handleFormatPercent} title="Format as percent">
             <Percent className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("More number formats")} title="More number formats">
             <Hash className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('bold')}
+            className={currentFormat.bold ? 'bg-gray-200' : ''}
+            title="Bold"
+          >
             <Bold className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('italic')}
+            className={currentFormat.italic ? 'bg-gray-200' : ''}
+            title="Italic"
+          >
             <Italic className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('underline')}
+            className={currentFormat.underline ? 'bg-gray-200' : ''}
+            title="Underline"
+          >
             <Underline className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('textColor', '#000000')} title="Text color">
             <div className="w-4 h-4 bg-black rounded-sm"></div>
           </Button>
-          <Button variant="ghost" size="sm">
-            <div className="w-4 h-4 border border-gray-400 rounded-sm"></div>
+          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('backgroundColor', '#ffff00')} title="Fill color">
+            <div className="w-4 h-4 border border-gray-400 rounded-sm bg-yellow-200"></div>
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Borders applied")} title="Borders">
             <Grid3x3 className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Merge cells")} title="Merge cells">
             <Merge className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('textAlign', 'left')}
+            className={currentFormat.textAlign === 'left' ? 'bg-gray-200' : ''}
+            title="Align left"
+          >
             <AlignLeft className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('textAlign', 'center')}
+            className={currentFormat.textAlign === 'center' ? 'bg-gray-200' : ''}
+            title="Align center"
+          >
             <AlignCenter className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('textAlign', 'right')}
+            className={currentFormat.textAlign === 'right' ? 'bg-gray-200' : ''}
+            title="Align right"
+          >
             <AlignRight className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("More options")} title="More options">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </div>
@@ -283,7 +460,7 @@ const GoogleSheets = () => {
       </div>
 
       {/* Spreadsheet Grid */}
-      <div className="flex-1 overflow-auto bg-white">
+      <div className="flex-1 overflow-auto bg-white" style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left' }}>
         <div className="inline-block min-w-full">
           <table className="border-collapse">
             <thead>
@@ -306,6 +483,7 @@ const GoogleSheets = () => {
                     const cellId = `${generateColumnLabel(col)}${row + 1}`;
                     const isSelected = selectedCell === cellId;
                     const isEditing = editingCell === cellId;
+                    const format = cellFormatting[cellId] || {};
                     return (
                       <td 
                         key={col}
@@ -313,6 +491,10 @@ const GoogleSheets = () => {
                           "min-w-[100px] h-6 border border-gray-300 cursor-cell relative",
                           isSelected && "ring-2 ring-blue-500 bg-blue-50"
                         )}
+                        style={{
+                          backgroundColor: format.backgroundColor || (isSelected ? '#e3f2fd' : 'transparent'),
+                          color: format.textColor || '#000',
+                        }}
                         onClick={() => handleCellClick(row, col)}
                         onDoubleClick={() => handleCellDoubleClick(row, col)}
                       >
@@ -326,7 +508,15 @@ const GoogleSheets = () => {
                             onKeyDown={handleInputKeyDown}
                           />
                         ) : (
-                          <div className="px-2 text-sm h-full flex items-center">
+                          <div 
+                            className="px-2 text-sm h-full flex items-center"
+                            style={{
+                              fontWeight: format.bold ? 'bold' : 'normal',
+                              fontStyle: format.italic ? 'italic' : 'normal',
+                              textDecoration: format.underline ? 'underline' : 'none',
+                              textAlign: format.textAlign || 'left',
+                            }}
+                          >
                             {gridData[cellId] || ''}
                           </div>
                         )}
