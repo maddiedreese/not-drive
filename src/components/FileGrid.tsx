@@ -494,9 +494,9 @@ export function FileGrid({
     if (document.type === 'spreadsheet') {
       const spreadsheetData = document.spreadsheet_data as any || {};
       
-      // Show spreadsheet view to fill entire preview area (8 columns x 24 rows)
+      // Show spreadsheet view to fill entire preview area (8 columns x 16 rows)
       const columns = Array.from({ length: 8 }, (_, i) => String.fromCharCode(65 + i)); // A-H
-      const rows = Array.from({ length: 24 }, (_, i) => i + 1); // 1-24
+      const rows = Array.from({ length: 16 }, (_, i) => i + 1); // 1-16
       
       return (
         <div className="w-full h-full rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
@@ -514,7 +514,7 @@ export function FileGrid({
             {/* Rows */}
             <div className="flex-1 overflow-hidden">
               {rows.map(rowNum => (
-                <div key={rowNum} className="flex border-b border-gray-100" style={{ height: 'calc((100% - 0.75rem) / 24)' }}>
+                <div key={rowNum} className="flex border-b border-gray-100" style={{ height: 'calc((100% - 0.75rem) / 16)' }}>
                   {/* Row number */}
                   <div className="w-4 bg-gray-50 border-r border-gray-200 flex items-center justify-center text-gray-500 text-[2.5px] flex-shrink-0">
                     {rowNum}
