@@ -73,10 +73,17 @@ export default function GoogleDocs() {
       return;
     }
 
+    console.log('Creating document with user:', user.id, 'template:', template);
     setIsCreating(true);
     try {
       const documentName = template.id === "blank" ? "Untitled document" : `${template.title} - ${new Date().toLocaleDateString()}`;
       
+      console.log('Inserting document:', { 
+        user_id: user.id, 
+        name: documentName, 
+        type: 'document' 
+      });
+
       const { data, error } = await supabase.from('documents').insert([
         {
           user_id: user.id,
@@ -87,8 +94,12 @@ export default function GoogleDocs() {
         },
       ]).select().single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
 
+      console.log('Document created successfully:', data);
       toast.success(`${documentName} created successfully`);
       
       // Refresh the drive view (same-tab)
@@ -105,6 +116,7 @@ export default function GoogleDocs() {
       // Open document editor in new tab
       window.open(`/document/${data.id}`, '_blank');
     } catch (error: any) {
+      console.error('Document creation failed:', error);
       toast.error(error.message || 'Failed to create document');
     } finally {
       setIsCreating(false);

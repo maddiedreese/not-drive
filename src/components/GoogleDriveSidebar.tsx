@@ -134,6 +134,9 @@ export function Sidebar() {
 
   const handleCreate = async (name: string, type: 'folder' | 'document' | 'spreadsheet') => {
     if (!user) return;
+    
+    console.log('Sidebar creating:', { name, type, user_id: user.id });
+    
     try {
       const { data, error } = await supabase.from('documents').insert([
         {
@@ -144,7 +147,12 @@ export function Sidebar() {
         },
       ]).select().single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Sidebar insert error:', error);
+        throw error;
+      }
+      
+      console.log('Sidebar document created:', data);
       
       toast.success(`${type === 'folder' ? 'Folder' : type === 'spreadsheet' ? 'Spreadsheet' : 'Document'} created`);
       
@@ -162,6 +170,7 @@ export function Sidebar() {
         window.open(`/spreadsheet/${data.id}`, '_blank');
       }
     } catch (e: any) {
+      console.error('Sidebar create failed:', e);
       toast.error(e.message || 'Failed to create');
     }
   };

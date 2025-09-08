@@ -108,6 +108,9 @@ export function GoogleDriveLayout({
   }, [currentFolderId, user, isSharedDrives, isRecent, isTrash]);
   const handleCreateDocument = async (name: string, type: 'folder' | 'document' | 'spreadsheet') => {
     if (!user) return;
+    
+    console.log('Creating document/folder:', { name, type, user_id: user.id, currentFolderId });
+    
     try {
       const { data, error } = await supabase.from('documents').insert([
         {
@@ -119,7 +122,12 @@ export function GoogleDriveLayout({
         },
       ]).select().single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Insert error:', error);
+        throw error;
+      }
+
+      console.log('Document/folder created successfully:', data);
       
       // Dispatch refresh event to update drive view (same-tab)
       window.dispatchEvent(new Event('documents:refresh'));

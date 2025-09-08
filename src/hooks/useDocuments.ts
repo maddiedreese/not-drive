@@ -27,10 +27,13 @@ export const useDocuments = (currentFolderId?: string, includeDeleted = false) =
 
   const loadDocuments = async () => {
     if (!user) {
+      console.log('No user, clearing documents');
       setDocuments([]);
       setLoading(false);
       return;
     }
+
+    console.log('Loading documents for user:', user.id, 'folder:', currentFolderId, 'includeDeleted:', includeDeleted);
 
     try {
       let query = supabase
@@ -52,9 +55,15 @@ export const useDocuments = (currentFolderId?: string, includeDeleted = false) =
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error loading documents:', error);
+        throw error;
+      }
+      
+      console.log('Documents loaded successfully:', data?.length, 'documents');
       setDocuments(data || []);
     } catch (error: any) {
+      console.error('Failed to load documents:', error);
       toast.error(`Failed to load documents: ${error.message}`);
     } finally {
       setLoading(false);
