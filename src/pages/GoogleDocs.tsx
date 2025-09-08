@@ -94,8 +94,8 @@ export default function GoogleDocs() {
       // Refresh the drive view
       window.dispatchEvent(new Event('documents:refresh'));
       
-      // Navigate to document editor
-      navigate(`/document/${data.id}`);
+      // Open document editor in new tab
+      window.open(`/document/${data.id}`, '_blank');
     } catch (error: any) {
       toast.error(error.message || 'Failed to create document');
     } finally {

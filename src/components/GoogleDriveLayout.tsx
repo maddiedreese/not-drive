@@ -124,11 +124,11 @@ export function GoogleDriveLayout({
       // Dispatch refresh event to update drive view
       window.dispatchEvent(new Event('documents:refresh'));
       
-      // Navigate to appropriate editor
+      // Open in new tab for documents and spreadsheets
       if (type === 'document' && data) {
-        navigate(`/document/${data.id}`);
+        window.open(`/document/${data.id}`, '_blank');
       } else if (type === 'spreadsheet' && data) {
-        navigate(`/spreadsheet/${data.id}`);
+        window.open(`/spreadsheet/${data.id}`, '_blank');
       } else {
         refetch();
       }
