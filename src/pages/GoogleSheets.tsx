@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { 
   FileText, 
@@ -35,7 +36,19 @@ import {
   Share2,
   Star,
   Folder,
-  MoreVertical
+  MoreVertical,
+  Download,
+  Save,
+  Copy,
+  Scissors,
+  Clipboard,
+  Search,
+  Filter,
+  SortAsc,
+  SortDesc,
+  Calculator,
+  Settings,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -240,6 +253,149 @@ const GoogleSheets = () => {
     toast.success("Spreadsheet starred!");
   };
 
+  // Menu functions
+  const handleFileAction = (action: string) => {
+    switch(action) {
+      case 'new':
+        window.location.href = '/sheets';
+        break;
+      case 'open':
+        toast.success("Opening file browser...");
+        break;
+      case 'import':
+        toast.success("Import dialog opened");
+        break;
+      case 'save':
+        toast.success("Spreadsheet saved!");
+        break;
+      case 'download':
+        toast.success("Downloading spreadsheet...");
+        break;
+      case 'print':
+        window.print();
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
+  const handleEditAction = (action: string) => {
+    switch(action) {
+      case 'undo':
+        handleUndo();
+        break;
+      case 'redo':
+        handleRedo();
+        break;
+      case 'cut':
+        navigator.clipboard.writeText(gridData[selectedCell] || '');
+        setGridData(prev => ({ ...prev, [selectedCell]: '' }));
+        toast.success("Cut to clipboard");
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(gridData[selectedCell] || '');
+        toast.success("Copied to clipboard");
+        break;
+      case 'paste':
+        navigator.clipboard.readText().then(text => {
+          setGridData(prev => ({ ...prev, [selectedCell]: text }));
+          toast.success("Pasted from clipboard");
+        });
+        break;
+      case 'find':
+        toast.success("Find & replace dialog opened");
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
+  const handleViewAction = (action: string) => {
+    switch(action) {
+      case 'freeze':
+        toast.success("Freeze options");
+        break;
+      case 'gridlines':
+        toast.success("Gridlines toggled");
+        break;
+      case 'formulas':
+        toast.success("Show formulas toggled");
+        break;
+      case 'zoom':
+        toast.success("Zoom options");
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
+  const handleInsertAction = (action: string) => {
+    switch(action) {
+      case 'rows':
+        toast.success("Rows inserted");
+        break;
+      case 'columns':
+        toast.success("Columns inserted");
+        break;
+      case 'cells':
+        toast.success("Cells inserted");
+        break;
+      case 'chart':
+        toast.success("Chart inserted");
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
+  const handleFormatAction = (action: string) => {
+    switch(action) {
+      case 'bold':
+        toggleCellFormat('bold');
+        break;
+      case 'italic':
+        toggleCellFormat('italic');
+        break;
+      case 'underline':
+        toggleCellFormat('underline');
+        break;
+      case 'borders':
+        toast.success("Borders applied");
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
+  const handleDataAction = (action: string) => {
+    switch(action) {
+      case 'sort':
+        toast.success("Sort options");
+        break;
+      case 'filter':
+        toast.success("Filter applied");
+        break;
+      case 'pivot':
+        toast.success("Pivot table created");
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
+  const handleToolsAction = (action: string) => {
+    switch(action) {
+      case 'spelling':
+        toast.success("Spell check started");
+        break;
+      case 'script':
+        toast.success("Script editor opened");
+        break;
+      default:
+        toast.success(`${action} action triggered`);
+    }
+  };
+
   const getCurrentCellFormat = (): CellFormat => {
     return cellFormatting[selectedCell] || {};
   };
@@ -350,16 +506,241 @@ const GoogleSheets = () => {
 
       {/* Menu Bar */}
       <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-6 text-sm">
-          <button className="text-gray-700 hover:text-gray-900">File</button>
-          <button className="text-gray-700 hover:text-gray-900">Edit</button>
-          <button className="text-gray-700 hover:text-gray-900">View</button>
-          <button className="text-gray-700 hover:text-gray-900">Insert</button>
-          <button className="text-gray-700 hover:text-gray-900">Format</button>
-          <button className="text-gray-700 hover:text-gray-900">Data</button>
-          <button className="text-gray-700 hover:text-gray-900">Tools</button>
-          <button className="text-gray-700 hover:text-gray-900">Extensions</button>
-          <button className="text-gray-700 hover:text-gray-900">Help</button>
+        <div className="flex items-center gap-1 text-sm">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">File</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleFileAction('new')}>
+                <FileText className="w-4 h-4 mr-2" />
+                New
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFileAction('open')}>
+                <Folder className="w-4 h-4 mr-2" />
+                Open
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFileAction('import')}>
+                <Download className="w-4 h-4 mr-2" />
+                Import
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleFileAction('save')}>
+                <Save className="w-4 h-4 mr-2" />
+                Save
+              </DropdownMenuItem>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent className="bg-white border border-gray-200 shadow-lg z-50">
+                  <DropdownMenuItem onClick={() => handleFileAction('download-xlsx')}>
+                    Microsoft Excel (.xlsx)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleFileAction('download-csv')}>
+                    Comma Separated Values (.csv)
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleFileAction('download-pdf')}>
+                    PDF Document (.pdf)
+                  </DropdownMenuItem>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleFileAction('print')}>
+                <Printer className="w-4 h-4 mr-2" />
+                Print
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Edit</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleEditAction('undo')}>
+                <Undo className="w-4 h-4 mr-2" />
+                Undo
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditAction('redo')}>
+                <Redo className="w-4 h-4 mr-2" />
+                Redo
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleEditAction('cut')}>
+                <Scissors className="w-4 h-4 mr-2" />
+                Cut
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditAction('copy')}>
+                <Copy className="w-4 h-4 mr-2" />
+                Copy
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEditAction('paste')}>
+                <Clipboard className="w-4 h-4 mr-2" />
+                Paste
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleEditAction('find')}>
+                <Search className="w-4 h-4 mr-2" />
+                Find and replace
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">View</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleViewAction('freeze')}>
+                Freeze
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewAction('gridlines')}>
+                Gridlines
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewAction('formulas')}>
+                Show formulas
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleZoomIn}>
+                <ZoomIn className="w-4 h-4 mr-2" />
+                Zoom in
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleZoomOut}>
+                <ZoomOut className="w-4 h-4 mr-2" />
+                Zoom out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Insert</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleInsertAction('rows')}>
+                Rows above
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('rows')}>
+                Rows below
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('columns')}>
+                Columns left
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('columns')}>
+                Columns right
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleInsertAction('cells')}>
+                Cells
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('chart')}>
+                Chart
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Format</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleFormatAction('bold')}>
+                <Bold className="w-4 h-4 mr-2" />
+                Bold
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFormatAction('italic')}>
+                <Italic className="w-4 h-4 mr-2" />
+                Italic
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFormatAction('underline')}>
+                <Underline className="w-4 h-4 mr-2" />
+                Underline
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleFormatCurrency}>
+                <DollarSign className="w-4 h-4 mr-2" />
+                Number format
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFormatAction('borders')}>
+                <Grid3x3 className="w-4 h-4 mr-2" />
+                Borders
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Data</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleDataAction('sort')}>
+                <SortAsc className="w-4 h-4 mr-2" />
+                Sort range
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleDataAction('filter')}>
+                <Filter className="w-4 h-4 mr-2" />
+                Create a filter
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleDataAction('pivot')}>
+                <Database className="w-4 h-4 mr-2" />
+                Pivot table
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Tools</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleToolsAction('spelling')}>
+                Spelling and grammar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleToolsAction('script')}>
+                <Calculator className="w-4 h-4 mr-2" />
+                Script editor
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Extensions</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => toast.success("Add-ons menu")}>
+                Add-ons
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success("Apps Script")}>
+                Apps Script
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Help</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => window.open('https://support.google.com/docs/topic/1382883', '_blank')}>
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Sheets Help
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success("Training materials opened")}>
+                Training
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success("Updates and news")}>
+                Updates
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => toast.success("Keyboard shortcuts shown")}>
+                Keyboard shortcuts
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
