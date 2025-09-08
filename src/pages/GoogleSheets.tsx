@@ -1,143 +1,79 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from "@/components/ui/dropdown-menu";
-import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 import { useAuth } from "@/components/AuthProvider";
 import { useCrazyMode } from "@/components/CrazyModeProvider";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { 
-  FileText, 
-  Edit3, 
-  Eye, 
-  Plus, 
-  Type, 
-  Database, 
-  Wrench, 
-  Puzzle, 
-  HelpCircle,
-  Undo,
-  Redo,
-  Printer,
-  Palette,
-  ZoomIn,
-  ZoomOut,
-  DollarSign,
-  Percent,
-  Hash,
-  Bold,
-  Italic,
-  Underline,
-  MoreHorizontal,
-  AlignLeft,
-  AlignCenter,
-  AlignRight,
-  ChevronDown,
-  Grid3x3,
-  Merge,
-  Share2,
-  Star,
-  Folder,
-  MoreVertical,
-  Download,
-  Save,
-  Copy,
-  Scissors,
-  Clipboard,
-  Search,
-  Filter,
-  SortAsc,
-  SortDesc,
-  Calculator,
-  Settings,
-  ChevronRight
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Search, MoreVertical, Menu, Grid3X3, Palette } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-// Generate column labels (A, B, C, ..., Z, AA, AB, etc.)
-const generateColumnLabel = (index: number): string => {
-  let result = '';
-  while (index >= 0) {
-    result = String.fromCharCode(65 + (index % 26)) + result;
-    index = Math.floor(index / 26) - 1;
+const spreadsheetTemplates = [
+  {
+    id: "blank",
+    title: "Blank spreadsheet",
+    preview: "/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png",
+    type: "spreadsheet"
+  },
+  {
+    id: "invoice",
+    title: "Invoice",
+    preview: "/placeholder-template.png",
+    type: "spreadsheet"
+  },
+  {
+    id: "timesheet",
+    title: "Weekly time sheet",
+    preview: "/placeholder-template.png",
+    type: "spreadsheet"
+  },
+  {
+    id: "expense",
+    title: "Expense report",
+    preview: "/placeholder-template.png",
+    type: "spreadsheet"
+  },
+  {
+    id: "gantt",
+    title: "Gantt chart",
+    subtitle: "by Smartsheet",
+    preview: "/placeholder-template.png",
+    type: "spreadsheet"
+  },
+  {
+    id: "financial",
+    title: "Annual financial data",
+    preview: "/placeholder-template.png",
+    type: "spreadsheet"
   }
-  return result;
-};
-
-// Common colors for the color picker
-const commonColors = [
-  '#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff',
-  '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff',
-  '#e6b8af', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#c9daf8', '#cfe2f3', '#d9d2e9', '#ead1dc',
-  '#dd7e6b', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#a4c2f4', '#9fc5e8', '#b4a7d6', '#d5a6bd',
-  '#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#6fc3df', '#8e7cc3', '#c27ba0',
-  '#a61c00', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3c78d8', '#3d85c6', '#674ea7', '#a64d79'
 ];
 
-// Cell formatting interface
-interface CellFormat {
-  bold?: boolean;
-  italic?: boolean;
-  underline?: boolean;
-  textAlign?: 'left' | 'center' | 'right';
-  backgroundColor?: string;
-  textColor?: string;
-  fontSize?: string;
-}
-
-// Generate grid data
-const generateGrid = (rows: number, cols: number) => {
-  const grid: { [key: string]: string } = {};
-  
-  return grid;
-};
-
-// Generate initial formatting
-const generateFormatting = () => {
-  const formatting: { [key: string]: CellFormat } = {};
-  return formatting;
-};
-
-const GoogleSheets = () => {
-  const [gridData, setGridData] = useState(() => generateGrid(50, 20));
-  const [cellFormatting, setCellFormatting] = useState(() => generateFormatting());
-  const [selectedCell, setSelectedCell] = useState('A1');
-  const [editingCell, setEditingCell] = useState<string | null>(null);
-  const [inputValue, setInputValue] = useState('');
-  const [history, setHistory] = useState<Array<{ data: any; formatting: any }>>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const [zoom, setZoom] = useState(100);
-  const [fileName, setFileName] = useState('Untitled spreadsheet');
-  const [textColorOpen, setTextColorOpen] = useState(false);
-  const [fillColorOpen, setFillColorOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  
-  // Add auth and navigation
+export default function GoogleSheets() {
   const { user } = useAuth();
   const { crazyMode, toggleCrazyMode } = useCrazyMode();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
 
-  // Spreadsheet creation function
-  const handleCreateSpreadsheet = async (templateName: string = "Blank spreadsheet") => {
+  const handleCreateSpreadsheet = async (template: typeof spreadsheetTemplates[0]) => {
     if (!user) {
       toast.error("Please sign in to create spreadsheets");
       return;
     }
 
-    console.log('Creating spreadsheet:', templateName, 'user:', user.id);
+    console.log('Creating spreadsheet from template:', template.id, template.title, 'user:', user.id);
     setIsCreating(true);
     try {
+      const spreadsheetName = template.id === "blank" ? "Untitled spreadsheet" : `${template.title} - ${new Date().toLocaleDateString()}`;
+      
       const { data, error } = await supabase.from('documents').insert([
         {
           user_id: user.id,
-          name: templateName,
+          name: spreadsheetName,
           type: 'spreadsheet',
           is_folder: false,
-          content: "",
+          content: template.id === "blank" ? "" : `Template: ${template.title}`,
         },
       ]).select().single();
 
@@ -147,10 +83,12 @@ const GoogleSheets = () => {
       }
 
       console.log('Spreadsheet created successfully:', data);
-      toast.success(`${templateName} created successfully`);
+      toast.success(`${spreadsheetName} created successfully`);
       
-      // Refresh drive views
+      // Refresh the drive view (same-tab)
       window.dispatchEvent(new Event('documents:refresh'));
+      
+      // Cross-tab refresh via BroadcastChannel + localStorage fallback
       try {
         const bc = new BroadcastChannel('documents');
         bc.postMessage('refresh');
@@ -158,7 +96,7 @@ const GoogleSheets = () => {
       } catch {}
       try { localStorage.setItem('documents:refresh-token', Date.now().toString()); } catch {}
       
-      // Navigate to the new spreadsheet
+      // Navigate to spreadsheet editor
       navigate(`/spreadsheet/${data.id}`);
     } catch (error: any) {
       console.error('Spreadsheet creation failed:', error);
@@ -168,936 +106,139 @@ const GoogleSheets = () => {
     }
   };
 
-  const rows = 50;
-  const cols = 20;
-
-  // Save state to history
-  const saveToHistory = () => {
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push({ 
-      data: { ...gridData }, 
-      formatting: { ...cellFormatting } 
-    });
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-  };
-
-  useEffect(() => {
-    if (editingCell && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [editingCell]);
-
-  const handleCellClick = (row: number, col: number) => {
-    const cellId = `${generateColumnLabel(col)}${row + 1}`;
-    setSelectedCell(cellId);
-    setEditingCell(null);
-  };
-
-  const handleCellDoubleClick = (row: number, col: number) => {
-    const cellId = `${generateColumnLabel(col)}${row + 1}`;
-    setEditingCell(cellId);
-    setInputValue(gridData[cellId] || '');
-  };
-
-  const handleInputChange = (value: string) => {
-    setInputValue(value);
-    if (editingCell) {
-      setGridData(prev => ({ ...prev, [editingCell]: value }));
-    }
-  };
-
-  const handleInputBlur = () => {
-    setEditingCell(null);
-  };
-
-  const handleInputKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      saveToHistory();
-      setEditingCell(null);
-    }
-    if (e.key === 'Escape') {
-      if (editingCell) {
-        setGridData(prev => ({ ...prev, [editingCell]: gridData[editingCell] || '' }));
-      }
-      setEditingCell(null);
-    }
-  };
-
-  // Toolbar functionality
-  const handleUndo = () => {
-    if (historyIndex > 0) {
-      const previousState = history[historyIndex - 1];
-      setGridData(previousState.data);
-      setCellFormatting(previousState.formatting);
-      setHistoryIndex(historyIndex - 1);
-      toast.success("Undo successful");
-    }
-  };
-
-  const handleRedo = () => {
-    if (historyIndex < history.length - 1) {
-      const nextState = history[historyIndex + 1];
-      setGridData(nextState.data);
-      setCellFormatting(nextState.formatting);
-      setHistoryIndex(historyIndex + 1);
-      toast.success("Redo successful");
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
-    toast.success("Print dialog opened");
-  };
-
-  const handleZoomIn = () => {
-    const newZoom = Math.min(zoom + 25, 200);
-    setZoom(newZoom);
-    toast.success(`Zoom: ${newZoom}%`);
-  };
-
-  const handleZoomOut = () => {
-    const newZoom = Math.max(zoom - 25, 50);
-    setZoom(newZoom);
-    toast.success(`Zoom: ${newZoom}%`);
-  };
-
-  const toggleCellFormat = (formatType: keyof CellFormat, value?: any) => {
-    saveToHistory();
-    setCellFormatting(prev => ({
-      ...prev,
-      [selectedCell]: {
-        ...prev[selectedCell],
-        [formatType]: value !== undefined ? value : !prev[selectedCell]?.[formatType]
-      }
-    }));
-    toast.success(`${formatType} ${value !== undefined ? 'applied' : 'toggled'}`);
-  };
-
-  const handleFormatCurrency = () => {
-    const cellValue = gridData[selectedCell];
-    if (cellValue && !isNaN(Number(cellValue))) {
-      setGridData(prev => ({
-        ...prev,
-        [selectedCell]: `$${Number(cellValue).toFixed(2)}`
-      }));
-      saveToHistory();
-      toast.success("Currency format applied");
-    }
-  };
-
-  const handleFormatPercent = () => {
-    const cellValue = gridData[selectedCell];
-    if (cellValue && !isNaN(Number(cellValue))) {
-      setGridData(prev => ({
-        ...prev,
-        [selectedCell]: `${(Number(cellValue) * 100).toFixed(2)}%`
-      }));
-      saveToHistory();
-      toast.success("Percentage format applied");
-    }
-  };
-
-  const handleShare = () => {
-    const shareUrl = `${window.location.origin}/sheets`;
-    navigator.clipboard.writeText(shareUrl);
-    toast.success("Share link copied to clipboard!");
-  };
-
-  const handleStar = () => {
-    toast.success("Spreadsheet starred!");
-  };
-
-  // Menu functions
-  const handleFileAction = (action: string) => {
-    switch(action) {
-      case 'new':
-        window.location.href = '/sheets';
-        break;
-      case 'open':
-        toast.success("Opening file browser...");
-        break;
-      case 'import':
-        toast.success("Import dialog opened");
-        break;
-      case 'save':
-        toast.success("Spreadsheet saved!");
-        break;
-      case 'download':
-        toast.success("Downloading spreadsheet...");
-        break;
-      case 'print':
-        window.print();
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const handleEditAction = (action: string) => {
-    switch(action) {
-      case 'undo':
-        handleUndo();
-        break;
-      case 'redo':
-        handleRedo();
-        break;
-      case 'cut':
-        navigator.clipboard.writeText(gridData[selectedCell] || '');
-        setGridData(prev => ({ ...prev, [selectedCell]: '' }));
-        toast.success("Cut to clipboard");
-        break;
-      case 'copy':
-        navigator.clipboard.writeText(gridData[selectedCell] || '');
-        toast.success("Copied to clipboard");
-        break;
-      case 'paste':
-        navigator.clipboard.readText().then(text => {
-          setGridData(prev => ({ ...prev, [selectedCell]: text }));
-          toast.success("Pasted from clipboard");
-        });
-        break;
-      case 'find':
-        toast.success("Find & replace dialog opened");
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const handleViewAction = (action: string) => {
-    switch(action) {
-      case 'freeze':
-        toast.success("Freeze options");
-        break;
-      case 'gridlines':
-        toast.success("Gridlines toggled");
-        break;
-      case 'formulas':
-        toast.success("Show formulas toggled");
-        break;
-      case 'zoom':
-        toast.success("Zoom options");
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const handleInsertAction = (action: string) => {
-    switch(action) {
-      case 'rows':
-        toast.success("Rows inserted");
-        break;
-      case 'columns':
-        toast.success("Columns inserted");
-        break;
-      case 'cells':
-        toast.success("Cells inserted");
-        break;
-      case 'chart':
-        toast.success("Chart inserted");
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const handleFormatAction = (action: string) => {
-    switch(action) {
-      case 'bold':
-        toggleCellFormat('bold');
-        break;
-      case 'italic':
-        toggleCellFormat('italic');
-        break;
-      case 'underline':
-        toggleCellFormat('underline');
-        break;
-      case 'borders':
-        toast.success("Borders applied");
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const handleDataAction = (action: string) => {
-    switch(action) {
-      case 'sort':
-        toast.success("Sort options");
-        break;
-      case 'filter':
-        toast.success("Filter applied");
-        break;
-      case 'pivot':
-        toast.success("Pivot table created");
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const handleToolsAction = (action: string) => {
-    switch(action) {
-      case 'spelling':
-        toast.success("Spell check started");
-        break;
-      case 'script':
-        toast.success("Script editor opened");
-        break;
-      default:
-        toast.success(`${action} action triggered`);
-    }
-  };
-
-  const getCurrentCellFormat = (): CellFormat => {
-    return cellFormatting[selectedCell] || {};
-  };
-
-  const handleColorSelect = (color: string, type: 'textColor' | 'backgroundColor') => {
-    saveToHistory();
-    setCellFormatting(prev => ({
-      ...prev,
-      [selectedCell]: {
-        ...prev[selectedCell],
-        [type]: color
-      }
-    }));
-    toast.success(`${type === 'textColor' ? 'Text' : 'Fill'} color applied`);
-    
-    // Close the color picker
-    if (type === 'textColor') {
-      setTextColorOpen(false);
-    } else {
-      setFillColorOpen(false);
-    }
-  };
-
-  const ColorPicker = ({ onColorSelect, type }: { onColorSelect: (color: string) => void, type: 'text' | 'fill' }) => (
-    <div className="w-64 p-4 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-      <div className="mb-3">
-        <h4 className="text-sm font-medium text-gray-700 mb-2">{type === 'text' ? 'Text color' : 'Fill color'}</h4>
-        <div className="grid grid-cols-10 gap-1">
-          {commonColors.map((color) => (
-            <button
-              key={color}
-              className="w-6 h-6 border border-gray-300 rounded hover:scale-110 transition-transform"
-              style={{ backgroundColor: color }}
-              onClick={() => onColorSelect(color)}
-              title={color}
-            />
-          ))}
-        </div>
-      </div>
-      {type === 'fill' && (
-        <button
-          className="w-full mt-2 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded border"
-          onClick={() => onColorSelect('transparent')}
-        >
-          No fill
-        </button>
-      )}
-    </div>
-  );
-
-  const currentFormat = getCurrentCellFormat();
-
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className={`min-h-screen bg-white ${crazyMode ? 'invert' : ''}`}>
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
-        <div className="flex items-center px-6 py-3">
-          <div className="flex items-center gap-2 flex-1">
-            <div className="w-10 h-10 flex items-center justify-center">
-              <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-8 h-8" />
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="icon">
+              <Menu className="w-5 h-5" />
+            </Button>
+            
+            <div className="flex items-center space-x-2">
+              <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Sheets" className="w-8 h-8 object-contain" />
+              <span className="text-xl font-normal text-gray-700">Sheets</span>
             </div>
-            <div className="flex flex-col">
-              <input 
-                className="text-lg font-normal text-gray-700 bg-transparent border-none outline-none"
-                value={fileName}
-                onChange={(e) => setFileName(e.target.value)}
-                onBlur={() => toast.success("Spreadsheet renamed")}
+          </div>
+
+          <div className="flex-1 max-w-2xl mx-8">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Input 
+                placeholder="Search" 
+                className="pl-10 bg-gray-100 border-0 rounded-lg h-12"
               />
             </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center space-x-2">
             <Button 
-              onClick={() => handleCreateSpreadsheet()}
-              disabled={isCreating}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-sm"
+              variant="ghost" 
+              size="icon"
+              onClick={toggleCrazyMode}
+              className={crazyMode ? "bg-purple-100 text-purple-600" : ""}
             >
-              {isCreating ? 'Creating...' : '+ New Spreadsheet'}
+              <Palette className="w-5 h-5" />
             </Button>
             
-            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={handleStar}>
-              <Star className="w-4 h-4 text-gray-600" />
-            </Button>
-            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={() => toast.success("Move to folder")}>
-              <Folder className="w-4 h-4 text-gray-600" />
-            </Button>
-            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={handleShare}>
-              <Share2 className="w-4 h-4 text-gray-600" />
-            </Button>
-            <Button variant="ghost" size="icon" className="w-8 h-8 hover:bg-gray-100 rounded-full" onClick={() => toast.success("More options")}>
-              <MoreVertical className="w-4 h-4 text-gray-600" />
+            <Button variant="ghost" size="icon">
+              <Grid3X3 className="w-5 h-5" />
             </Button>
             
-            <div className="flex items-center bg-[#c8e6f5] hover:bg-[#b8d6e5] rounded-full overflow-hidden ml-2">
-              <Button 
-                className="bg-transparent hover:bg-transparent text-black px-4 py-2 font-medium text-sm flex items-center space-x-2 rounded-none"
-                onClick={handleShare}
-              >
-                <Share2 className="w-4 h-4" />
-                <span>Share</span>
-              </Button>
-            </div>
-            
-            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium text-sm ml-2">
-              M
+            <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-medium">
+              {user?.email?.[0]?.toUpperCase() || "U"}
             </div>
           </div>
         </div>
       </header>
 
-      {/* Menu Bar */}
-      <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-1 text-sm">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">File</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => {
-                console.log('File menu New clicked');
-                handleCreateSpreadsheet('Untitled spreadsheet');
-              }}>
-                <FileText className="w-4 h-4 mr-2" />
-                New
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFileAction('open')}>
-                <Folder className="w-4 h-4 mr-2" />
-                Open
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFileAction('import')}>
-                <Download className="w-4 h-4 mr-2" />
-                Import
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleFileAction('save')}>
-                <Save className="w-4 h-4 mr-2" />
-                Save
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Download className="w-4 h-4 mr-2" />
-                  Download
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="bg-white border border-gray-200 shadow-lg z-50">
-                  <DropdownMenuItem onClick={() => handleFileAction('download-xlsx')}>
-                    Microsoft Excel (.xlsx)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleFileAction('download-csv')}>
-                    Comma Separated Values (.csv)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleFileAction('download-pdf')}>
-                    PDF Document (.pdf)
-                  </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleFileAction('print')}>
-                <Printer className="w-4 h-4 mr-2" />
-                Print
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      {/* Main Content */}
+      <main className="px-6 py-8 max-w-7xl mx-auto">
+        {/* Template Section */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-normal text-gray-700">Start a new spreadsheet</h2>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="text-blue-600 hover:bg-blue-50">
+                  Template gallery
+                  <MoreVertical className="w-4 h-4 ml-1" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>View all templates</DropdownMenuItem>
+                <DropdownMenuItem>Submit template</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Edit</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleEditAction('undo')}>
-                <Undo className="w-4 h-4 mr-2" />
-                Undo
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditAction('redo')}>
-                <Redo className="w-4 h-4 mr-2" />
-                Redo
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleEditAction('cut')}>
-                <Scissors className="w-4 h-4 mr-2" />
-                Cut
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditAction('copy')}>
-                <Copy className="w-4 h-4 mr-2" />
-                Copy
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleEditAction('paste')}>
-                <Clipboard className="w-4 h-4 mr-2" />
-                Paste
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleEditAction('find')}>
-                <Search className="w-4 h-4 mr-2" />
-                Find and replace
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">View</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleViewAction('freeze')}>
-                Freeze
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleViewAction('gridlines')}>
-                Gridlines
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleViewAction('formulas')}>
-                Show formulas
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleZoomIn}>
-                <ZoomIn className="w-4 h-4 mr-2" />
-                Zoom in
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleZoomOut}>
-                <ZoomOut className="w-4 h-4 mr-2" />
-                Zoom out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Insert</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleInsertAction('rows')}>
-                Rows above
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleInsertAction('rows')}>
-                Rows below
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleInsertAction('columns')}>
-                Columns left
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleInsertAction('columns')}>
-                Columns right
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleInsertAction('cells')}>
-                Cells
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleInsertAction('chart')}>
-                Chart
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Format</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleFormatAction('bold')}>
-                <Bold className="w-4 h-4 mr-2" />
-                Bold
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFormatAction('italic')}>
-                <Italic className="w-4 h-4 mr-2" />
-                Italic
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFormatAction('underline')}>
-                <Underline className="w-4 h-4 mr-2" />
-                Underline
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleFormatCurrency}>
-                <DollarSign className="w-4 h-4 mr-2" />
-                Number format
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleFormatAction('borders')}>
-                <Grid3x3 className="w-4 h-4 mr-2" />
-                Borders
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Data</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleDataAction('sort')}>
-                <SortAsc className="w-4 h-4 mr-2" />
-                Sort range
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleDataAction('filter')}>
-                <Filter className="w-4 h-4 mr-2" />
-                Create a filter
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleDataAction('pivot')}>
-                <Database className="w-4 h-4 mr-2" />
-                Pivot table
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Tools</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => handleToolsAction('spelling')}>
-                Spelling and grammar
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleToolsAction('script')}>
-                <Calculator className="w-4 h-4 mr-2" />
-                Script editor
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Extensions</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => toast.success("Add-ons menu")}>
-                Add-ons
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.success("Apps Script")}>
-                Apps Script
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Help</button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
-              <DropdownMenuItem onClick={() => window.open('https://support.google.com/docs/topic/1382883', '_blank')}>
-                <HelpCircle className="w-4 h-4 mr-2" />
-                Sheets Help
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.success("Training materials opened")}>
-                Training
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.success("Updates and news")}>
-                Updates
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => toast.success("Keyboard shortcuts shown")}>
-                Keyboard shortcuts
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Toolbar */}
-      <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-1 bg-gray-100 rounded-full px-4 py-2 w-fit">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleUndo}
-            disabled={historyIndex <= 0}
-            title="Undo"
-            className="hover:bg-gray-200"
-          >
-            <Undo className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleRedo}
-            disabled={historyIndex >= history.length - 1}
-            title="Redo"
-            className="hover:bg-gray-200"
-          >
-            <Redo className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handlePrint} title="Print" className="hover:bg-gray-200">
-            <Printer className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => toast.success("Paint format")} title="Paint format" className="hover:bg-gray-200">
-            <Palette className="w-4 h-4" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Button variant="ghost" size="sm" className="text-xs px-2 hover:bg-gray-200" title="Zoom">
-            {zoom}%
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleZoomOut} title="Zoom out" className="hover:bg-gray-200">
-            <ZoomOut className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleZoomIn} title="Zoom in" className="hover:bg-gray-200">
-            <ZoomIn className="w-4 h-4" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Button variant="ghost" size="sm" onClick={handleFormatCurrency} title="Format as currency" className="hover:bg-gray-200">
-            <DollarSign className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={handleFormatPercent} title="Format as percent" className="hover:bg-gray-200">
-            <Percent className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => toast.success("More number formats")} title="More number formats" className="hover:bg-gray-200">
-            <Hash className="w-4 h-4" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => toggleCellFormat('bold')}
-            className={cn("hover:bg-gray-200", currentFormat.bold && 'bg-gray-300')}
-            title="Bold"
-          >
-            <Bold className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => toggleCellFormat('italic')}
-            className={cn("hover:bg-gray-200", currentFormat.italic && 'bg-gray-300')}
-            title="Italic"
-          >
-            <Italic className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => toggleCellFormat('underline')}
-            className={cn("hover:bg-gray-200", currentFormat.underline && 'bg-gray-300')}
-            title="Underline"
-          >
-            <Underline className="w-4 h-4" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" title="Text color" className="hover:bg-gray-200">
-                <div className="flex flex-col items-center">
-                  <div className="text-lg">A</div>
-                  <div 
-                    className="w-4 h-1 rounded-sm" 
-                    style={{ backgroundColor: currentFormat.textColor || '#000000' }}
-                  ></div>
+          {/* Templates Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            {spreadsheetTemplates.map((template) => (
+              <Card 
+                key={template.id}
+                className="cursor-pointer hover:shadow-md transition-shadow bg-white border border-gray-200"
+                onClick={() => {
+                  console.log('Spreadsheet template clicked:', template.id, template.title);
+                  handleCreateSpreadsheet(template);
+                }}
+              >
+                <div className="aspect-[3/4] bg-gray-50 rounded-t-lg overflow-hidden">
+                  {template.id === "blank" ? (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="w-16 h-16 bg-white rounded border-2 border-gray-300 flex items-center justify-center">
+                        <div className="text-green-600 text-3xl font-bold">+</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                      <div className="text-xs text-gray-400 text-center p-2">
+                        Template Preview
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <ColorPicker 
-                onColorSelect={(color) => handleColorSelect(color, 'textColor')} 
-                type="text"
-              />
-            </PopoverContent>
-          </Popover>
-          
-          <Popover open={fillColorOpen} onOpenChange={setFillColorOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size="sm" title="Fill color" className="hover:bg-gray-200">
-                <div className="flex flex-col items-center">
-                  <div className="w-4 h-3 border border-gray-400 rounded-sm relative overflow-hidden">
-                    <div 
-                      className="absolute inset-0" 
-                      style={{ backgroundColor: currentFormat.backgroundColor || 'transparent' }}
-                    ></div>
-                  </div>
-                  <div 
-                    className="w-4 h-1 rounded-sm mt-0.5" 
-                    style={{ backgroundColor: currentFormat.backgroundColor || '#ffff00' }}
-                  ></div>
+                
+                <div className="p-2">
+                  <h3 className="text-sm font-medium text-gray-900 mb-1">{template.title}</h3>
+                  {template.subtitle && (
+                    <p className="text-xs text-gray-500">{template.subtitle}</p>
+                  )}
                 </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Recent Spreadsheets Section */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-normal text-gray-700">Recent spreadsheets</h2>
+            
+            <div className="flex items-center space-x-2">
+              <Button variant="ghost" size="sm" className="text-gray-600">
+                Owned by anyone
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <ColorPicker 
-                onColorSelect={(color) => handleColorSelect(color, 'backgroundColor')} 
-                type="fill"
-              />
-            </PopoverContent>
-          </Popover>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Button variant="ghost" size="sm" onClick={() => toast.success("Borders applied")} title="Borders" className="hover:bg-gray-200">
-            <Grid3x3 className="w-4 h-4" />
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => toast.success("Merge cells")} title="Merge cells" className="hover:bg-gray-200">
-            <Merge className="w-4 h-4" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => toggleCellFormat('textAlign', 'left')}
-            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'left' && 'bg-gray-300')}
-            title="Align left"
-          >
-            <AlignLeft className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => toggleCellFormat('textAlign', 'center')}
-            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'center' && 'bg-gray-300')}
-            title="Align center"
-          >
-            <AlignCenter className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => toggleCellFormat('textAlign', 'right')}
-            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'right' && 'bg-gray-300')}
-            title="Align right"
-          >
-            <AlignRight className="w-4 h-4" />
-          </Button>
-          
-          <div className="w-px h-6 bg-gray-300 mx-2"></div>
-          
-          <Button variant="ghost" size="sm" onClick={() => toast.success("More options")} title="More options" className="hover:bg-gray-200">
-            <MoreHorizontal className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+              <Button variant="ghost" size="sm" className="text-gray-600">
+                Last opened by me
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Grid3X3 className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
 
-      {/* Name Box and Formula Bar */}
-      <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-gray-600 font-medium w-12">{selectedCell}</div>
-            <Button variant="ghost" size="sm">
-              <ChevronDown className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="flex-1">
-            <Input 
-              className="border-0 focus-visible:ring-0 text-sm"
-              placeholder="Start typing..."
-              value={editingCell === selectedCell ? inputValue : gridData[selectedCell] || ''}
-              onChange={(e) => {
-                if (editingCell === selectedCell) {
-                  handleInputChange(e.target.value);
-                } else {
-                  setEditingCell(selectedCell);
-                  setInputValue(e.target.value);
-                  handleInputChange(e.target.value);
-                }
-              }}
-            />
+          {/* Empty state */}
+          <div className="text-center py-16">
+            <p className="text-gray-600 mb-2">No spreadsheets yet</p>
+            <p className="text-sm text-gray-500">
+              Select a blank spreadsheet or choose another template above to get started
+            </p>
           </div>
         </div>
-      </div>
-
-      {/* Spreadsheet Grid */}
-      <div className="flex-1 overflow-auto bg-white" style={{ transform: `scale(${zoom / 100})`, transformOrigin: 'top left' }}>
-        <div className="inline-block min-w-full">
-          <table className="border-collapse">
-            <thead>
-              <tr>
-                <th className="w-12 h-8 bg-gray-50 border border-gray-300 text-center text-xs text-gray-600"></th>
-                {Array.from({ length: cols }, (_, i) => (
-                  <th key={i} className="min-w-[100px] h-8 bg-gray-50 border border-gray-300 text-center text-xs font-medium text-gray-600">
-                    {generateColumnLabel(i)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: rows }, (_, row) => (
-                <tr key={row}>
-                  <td className="w-12 h-6 bg-gray-50 border border-gray-300 text-center text-xs text-gray-600 font-medium">
-                    {row + 1}
-                  </td>
-                  {Array.from({ length: cols }, (_, col) => {
-                    const cellId = `${generateColumnLabel(col)}${row + 1}`;
-                    const isSelected = selectedCell === cellId;
-                    const isEditing = editingCell === cellId;
-                    const format = cellFormatting[cellId] || {};
-                    return (
-                      <td 
-                        key={col}
-                        className={cn(
-                          "min-w-[100px] h-6 border border-gray-300 cursor-cell relative",
-                          isSelected && "ring-2 ring-blue-500 bg-blue-50"
-                        )}
-                        style={{
-                          backgroundColor: format.backgroundColor || (isSelected ? '#e3f2fd' : 'transparent'),
-                          color: format.textColor || '#000',
-                        }}
-                        onClick={() => handleCellClick(row, col)}
-                        onDoubleClick={() => handleCellDoubleClick(row, col)}
-                      >
-                        {isEditing ? (
-                          <input
-                            ref={inputRef}
-                            className="w-full h-full px-2 text-sm border-none outline-none bg-transparent"
-                            value={inputValue}
-                            onChange={(e) => handleInputChange(e.target.value)}
-                            onBlur={handleInputBlur}
-                            onKeyDown={handleInputKeyDown}
-                          />
-                        ) : (
-                          <div 
-                            className="px-2 text-sm h-full flex items-center"
-                            style={{
-                              fontWeight: format.bold ? 'bold' : 'normal',
-                              fontStyle: format.italic ? 'italic' : 'normal',
-                              textDecoration: format.underline ? 'underline' : 'none',
-                              textAlign: format.textAlign || 'left',
-                            }}
-                          >
-                            {gridData[cellId] || ''}
-                          </div>
-                        )}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Bottom Status Bar */}
-      <div className="border-t border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="text-xs bg-white border border-gray-300">
-              Sheet1
-            </Button>
-            <Button variant="ghost" size="sm">
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="text-xs text-gray-500">
-            All changes saved in Drive
-          </div>
-        </div>
-      </div>
+      </main>
     </div>
   );
-};
-
-export default GoogleSheets;
+}
