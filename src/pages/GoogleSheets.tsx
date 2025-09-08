@@ -87,9 +87,6 @@ interface CellFormat {
 const generateGrid = (rows: number, cols: number) => {
   const grid: { [key: string]: string } = {};
   
-  // Add the example text from the screenshot
-  grid['A1'] = 'Type "@" then a file name to insert a file smart chip';
-  
   return grid;
 };
 
