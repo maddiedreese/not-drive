@@ -36,7 +36,7 @@ const sidebarItems = [
   { label: "My Drive", icon: Folder, hasExpander: true, route: "/" },
   { label: "Shared drives", icon: UsersRound, hasExpander: true, route: "/shared-drives" },
   { label: "Shared with me", icon: UsersRound },
-  { label: "Recent", icon: Clock },
+  { label: "Recent", icon: Clock, route: "/recent" },
   { label: "Starred", icon: Star },
   { label: "Spam", icon: Info },
   { label: "Trash", icon: Trash2 },
@@ -58,6 +58,9 @@ export function Sidebar() {
     if (location.pathname === "/shared-drives" && activeItem === itemLabel && itemLabel === "Shared drives") {
       return true;
     }
+    if (location.pathname === "/recent" && activeItem === itemLabel && itemLabel === "Recent") {
+      return true;
+    }
     return false;
   };
 
@@ -74,6 +77,8 @@ export function Sidebar() {
       setActiveItem("Home");
     } else if (location.pathname === "/shared-drives") {
       setActiveItem("Shared drives");
+    } else if (location.pathname === "/recent") {
+      setActiveItem("Recent");
     }
   }, [location.pathname]);
 

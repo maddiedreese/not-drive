@@ -38,6 +38,7 @@ interface FileGridProps {
   currentPath: string[];
   currentFolderId?: string;
   isSharedDrives?: boolean;
+  isRecent?: boolean;
 }
 
 const getFileIcon = (document: Document) => {
@@ -75,7 +76,7 @@ const isFileOld = (document: Document): boolean => {
   return new Date(document.created_at) < oneDayAgo;
 };
 
-export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, isSharedDrives = false }: FileGridProps) {
+export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, isSharedDrives = false, isRecent = false }: FileGridProps) {
   const { documents, loading, deleteDocument, downloadFile, createDocument } = useDocuments(currentFolderId);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -88,8 +89,10 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
   const { crazyMode } = useCrazyMode();
   const { user } = useAuth();
 
-  // For shared drives, show empty state
-  const displayDocuments = isSharedDrives ? [] : documents;
+  // For shared drives, show empty state. For recent, sort by updated_at
+  const displayDocuments = isSharedDrives ? [] : 
+    isRecent ? [...documents].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()) : 
+    documents;
 
   const filteredDocuments = displayDocuments.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())

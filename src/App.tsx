@@ -8,6 +8,7 @@ import { CrazyModeProvider } from "@/components/CrazyModeProvider";
 import Index from "./pages/Index";
 import GoogleDocs from "./pages/GoogleDocs";
 import SharedDrives from "./pages/SharedDrives";
+import Recent from "./pages/Recent";
 import DocumentEditor from "./pages/DocumentEditor";
 import NotFound from "./pages/NotFound";
 
@@ -25,6 +26,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/docs" element={<GoogleDocs />} />
             <Route path="/shared-drives" element={<SharedDrives />} />
+            <Route path="/recent" element={<Recent />} />
             <Route path="/document/:documentId" element={<DocumentEditor />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
