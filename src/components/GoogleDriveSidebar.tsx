@@ -192,6 +192,10 @@ export function Sidebar() {
                 <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5" />
                 <span className="text-sm text-gray-700">Google Docs</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.location.href = '/sheets'} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
+                <img src="/lovable-uploads/4c411c67-6aa0-4cf3-a00e-58ad7c51bc1e.png" alt="Google Sheets" className="w-5 h-5" />
+                <span className="text-sm text-gray-700">Google Sheets</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
