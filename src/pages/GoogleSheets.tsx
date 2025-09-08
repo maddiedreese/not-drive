@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { 
   FileText, 
@@ -48,6 +49,16 @@ const generateColumnLabel = (index: number): string => {
   return result;
 };
 
+// Common colors for the color picker
+const commonColors = [
+  '#000000', '#434343', '#666666', '#999999', '#b7b7b7', '#cccccc', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff',
+  '#980000', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#4a86e8', '#0000ff', '#9900ff', '#ff00ff',
+  '#e6b8af', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#c9daf8', '#cfe2f3', '#d9d2e9', '#ead1dc',
+  '#dd7e6b', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#a4c2f4', '#9fc5e8', '#b4a7d6', '#d5a6bd',
+  '#cc4125', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#6fc3df', '#8e7cc3', '#c27ba0',
+  '#a61c00', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3c78d8', '#3d85c6', '#674ea7', '#a64d79'
+];
+
 // Cell formatting interface
 interface CellFormat {
   bold?: boolean;
@@ -85,6 +96,8 @@ const GoogleSheets = () => {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [zoom, setZoom] = useState(100);
   const [fileName, setFileName] = useState('Untitled spreadsheet');
+  const [textColorOpen, setTextColorOpen] = useState(false);
+  const [fillColorOpen, setFillColorOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const rows = 50;
@@ -230,6 +243,52 @@ const GoogleSheets = () => {
   const getCurrentCellFormat = (): CellFormat => {
     return cellFormatting[selectedCell] || {};
   };
+
+  const handleColorSelect = (color: string, type: 'textColor' | 'backgroundColor') => {
+    saveToHistory();
+    setCellFormatting(prev => ({
+      ...prev,
+      [selectedCell]: {
+        ...prev[selectedCell],
+        [type]: color
+      }
+    }));
+    toast.success(`${type === 'textColor' ? 'Text' : 'Fill'} color applied`);
+    
+    // Close the color picker
+    if (type === 'textColor') {
+      setTextColorOpen(false);
+    } else {
+      setFillColorOpen(false);
+    }
+  };
+
+  const ColorPicker = ({ onColorSelect, type }: { onColorSelect: (color: string) => void, type: 'text' | 'fill' }) => (
+    <div className="w-64 p-4 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+      <div className="mb-3">
+        <h4 className="text-sm font-medium text-gray-700 mb-2">{type === 'text' ? 'Text color' : 'Fill color'}</h4>
+        <div className="grid grid-cols-10 gap-1">
+          {commonColors.map((color) => (
+            <button
+              key={color}
+              className="w-6 h-6 border border-gray-300 rounded hover:scale-110 transition-transform"
+              style={{ backgroundColor: color }}
+              onClick={() => onColorSelect(color)}
+              title={color}
+            />
+          ))}
+        </div>
+      </div>
+      {type === 'fill' && (
+        <button
+          className="w-full mt-2 px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded border"
+          onClick={() => onColorSelect('transparent')}
+        >
+          No fill
+        </button>
+      )}
+    </div>
+  );
 
   const currentFormat = getCurrentCellFormat();
 
@@ -390,12 +449,50 @@ const GoogleSheets = () => {
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('textColor', '#000000')} title="Text color" className="hover:bg-gray-200">
-            <div className="w-4 h-4 bg-black rounded-sm"></div>
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('backgroundColor', '#ffff00')} title="Fill color" className="hover:bg-gray-200">
-            <div className="w-4 h-4 border border-gray-400 rounded-sm bg-yellow-200"></div>
-          </Button>
+          <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" title="Text color" className="hover:bg-gray-200">
+                <div className="flex flex-col items-center">
+                  <div className="text-lg">A</div>
+                  <div 
+                    className="w-4 h-1 rounded-sm" 
+                    style={{ backgroundColor: currentFormat.textColor || '#000000' }}
+                  ></div>
+                </div>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <ColorPicker 
+                onColorSelect={(color) => handleColorSelect(color, 'textColor')} 
+                type="text"
+              />
+            </PopoverContent>
+          </Popover>
+          
+          <Popover open={fillColorOpen} onOpenChange={setFillColorOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="sm" title="Fill color" className="hover:bg-gray-200">
+                <div className="flex flex-col items-center">
+                  <div className="w-4 h-3 border border-gray-400 rounded-sm relative overflow-hidden">
+                    <div 
+                      className="absolute inset-0" 
+                      style={{ backgroundColor: currentFormat.backgroundColor || 'transparent' }}
+                    ></div>
+                  </div>
+                  <div 
+                    className="w-4 h-1 rounded-sm mt-0.5" 
+                    style={{ backgroundColor: currentFormat.backgroundColor || '#ffff00' }}
+                  ></div>
+                </div>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <ColorPicker 
+                onColorSelect={(color) => handleColorSelect(color, 'backgroundColor')} 
+                type="fill"
+              />
+            </PopoverContent>
+          </Popover>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
