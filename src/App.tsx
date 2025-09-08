@@ -32,6 +32,7 @@ const App = () => (
             <Route path="/sheets" element={<GoogleSheets />} />
             <Route path="/spreadsheet/:documentId" element={<SpreadsheetEditor />} />
             <Route path="/my-drive" element={<MyDrive />} />
+            <Route path="/my-drive/:folderId" element={<MyDrive />} />
             <Route path="/shared-drives" element={<SharedDrives />} />
             <Route path="/recent" element={<Recent />} />
             <Route path="/trash" element={<Trash />} />

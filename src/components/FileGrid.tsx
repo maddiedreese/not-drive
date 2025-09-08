@@ -40,6 +40,7 @@ interface FileGridProps {
   isSharedDrives?: boolean;
   isRecent?: boolean;
   isTrash?: boolean;
+  onFolderNavigate?: (folderId: string, folderName: string) => void;
 }
 
 const getFileIcon = (document: Document) => {
@@ -77,7 +78,16 @@ const isFileOld = (document: Document): boolean => {
   return new Date(document.created_at) < oneDayAgo;
 };
 
-export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, isSharedDrives = false, isRecent = false, isTrash = false }: FileGridProps) {
+export function FileGrid({ 
+  viewMode, 
+  searchQuery, 
+  currentPath, 
+  currentFolderId, 
+  isSharedDrives = false, 
+  isRecent = false, 
+  isTrash = false,
+  onFolderNavigate 
+}: FileGridProps) {
   const { documents, loading, deleteDocument, downloadFile, createDocument } = useDocuments(currentFolderId, isTrash);
   const [selectedFile, setSelectedFile] = useState<Document | null>(null);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
@@ -88,6 +98,8 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
   const [coworkerEmails, setCoworkerEmails] = useState<string>("");
   const [renameDocument, setRenameDocument] = useState<Document | null>(null);
   const [newName, setNewName] = useState("");
+  const [showAddToFolder, setShowAddToFolder] = useState<Document | null>(null);
+  const [allFolders, setAllFolders] = useState<Document[]>([]);
   const navigate = useNavigate();
   const { crazyMode } = useCrazyMode();
   const { user } = useAuth();
@@ -108,7 +120,7 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
 
   const handleDocumentClick = (document: Document) => {
     if (document.is_folder) {
-      // Handle folder navigation if needed
+      onFolderNavigate?.(document.id, document.name);
       return;
     }
     
@@ -320,9 +332,54 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
     }
   };
 
+  // Load all folders for the "Add to folder" dropdown
+  React.useEffect(() => {
+    const loadFolders = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('documents')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('is_folder', true)
+          .eq('deleted', false)
+          .order('name');
+        
+        if (error) throw error;
+        setAllFolders(data || []);
+      } catch (error: any) {
+        console.error('Failed to load folders:', error);
+      }
+    };
+
+    loadFolders();
+  }, [user, documents]);
+
+  const handleAddToFolder = async (document: Document, targetFolderId: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('documents')
+        .update({ parent_folder_id: targetFolderId })
+        .eq('id', document.id);
+
+      if (error) throw error;
+
+      // Refresh the documents list
+      window.dispatchEvent(new Event('documents:refresh'));
+      toast.success(targetFolderId ? "File moved to folder!" : "File moved to root!");
+      setShowAddToFolder(null);
+    } catch (error: any) {
+      toast.error(`Failed to move file: ${error.message}`);
+    }
+  };
+
 
   const handleFileClick = async (document: Document, index?: number) => {
-    if (document.is_folder) return;
+    if (document.is_folder) {
+      onFolderNavigate?.(document.id, document.name);
+      return;
+    }
     
     // Check if it's every third file in crazy mode
     if (crazyMode && typeof index === 'number' && isThirdFile(index)) {
@@ -526,6 +583,10 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
             <DropdownMenuItem onClick={() => handleRename(document)}>
               <Edit3 className="w-4 h-4 mr-2" />
               Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setShowAddToFolder(document)}>
+              <Folder className="w-4 h-4 mr-2" />
+              Add to folder
             </DropdownMenuItem>
           </>
         )}
@@ -758,6 +819,92 @@ export function FileGrid({ viewMode, searchQuery, currentPath, currentFolderId, 
                   </Button>
                   <Button onClick={handleRenameSubmit} disabled={!newName.trim()}>
                     Rename
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+        </Dialog>
+      )}
+
+      {showAddToFolder && (
+        <Dialog open={!!showAddToFolder} onOpenChange={() => setShowAddToFolder(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add to folder</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600">
+                Choose a folder to move "{showAddToFolder.name}" to:
+              </p>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => handleAddToFolder(showAddToFolder, null)}
+                >
+                  <Folder className="w-4 h-4 mr-2" />
+                  My Drive (Root)
+                </Button>
+                {allFolders
+                  .filter(folder => folder.id !== showAddToFolder.id) // Don't show the item itself if it's a folder
+                  .map((folder) => (
+                  <Button
+                    key={folder.id}
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleAddToFolder(showAddToFolder, folder.id)}
+                  >
+                    <Folder className="w-4 h-4 mr-2" />
+                    {folder.name}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" onClick={() => setShowAddToFolder(null)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      
+        {showAddToFolder && (
+          <Dialog open={!!showAddToFolder} onOpenChange={() => setShowAddToFolder(null)}>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Add to folder</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Choose a folder to move "{showAddToFolder.name}" to:
+                </p>
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start"
+                    onClick={() => handleAddToFolder(showAddToFolder, null)}
+                  >
+                    <Folder className="w-4 h-4 mr-2" />
+                    My Drive (Root)
+                  </Button>
+                  {allFolders
+                    .filter(folder => folder.id !== showAddToFolder.id) // Don't show the item itself if it's a folder
+                    .map((folder) => (
+                    <Button
+                      key={folder.id}
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => handleAddToFolder(showAddToFolder, folder.id)}
+                    >
+                      <Folder className="w-4 h-4 mr-2" />
+                      {folder.name}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button variant="outline" onClick={() => setShowAddToFolder(null)}>
+                    Cancel
                   </Button>
                 </div>
               </div>

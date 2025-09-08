@@ -1,7 +1,9 @@
 import { GoogleDriveLayout } from "@/components/GoogleDriveLayout";
+import { useParams } from "react-router-dom";
 
 const MyDrive = () => {
-  return <GoogleDriveLayout />;
+  const { folderId } = useParams();
+  return <GoogleDriveLayout currentFolderId={folderId} />;
 };
 
 export default MyDrive;

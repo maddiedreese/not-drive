@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 
 interface BreadcrumbsProps {
   path: string[];
-  onNavigate: (newPath: string[]) => void;
+  folderPath: {id: string | null, name: string}[];
+  onNavigate: (index: number) => void;
 }
 
-export function Breadcrumbs({ path, onNavigate }: BreadcrumbsProps) {
+export function Breadcrumbs({ path, folderPath, onNavigate }: BreadcrumbsProps) {
   const handleNavigate = (index: number) => {
-    onNavigate(path.slice(0, index + 1));
+    onNavigate(index);
   };
 
   return (

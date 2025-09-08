@@ -15,7 +15,17 @@ import { useCrazyMode } from "./CrazyModeProvider";
 import { useDocuments } from "@/hooks/useDocuments";
 import { supabase } from "@/integrations/supabase/client";
 import googleDriveLogo from "@/assets/google-drive-logo.png";
-export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, isTrash = false }: { isSharedDrives?: boolean; isRecent?: boolean; isTrash?: boolean }) {
+export function GoogleDriveLayout({ 
+  isSharedDrives = false, 
+  isRecent = false, 
+  isTrash = false, 
+  currentFolderId 
+}: { 
+  isSharedDrives?: boolean; 
+  isRecent?: boolean; 
+  isTrash?: boolean;
+  currentFolderId?: string;
+}) {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [currentPath, setCurrentPath] = useState<string[]>(
@@ -24,6 +34,9 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
     isTrash ? ["Trash"] :
     ["My Drive"]
   );
+  const [folderPath, setFolderPath] = useState<{id: string | null, name: string}[]>([
+    { id: null, name: isSharedDrives ? "Shared drives" : isRecent ? "Recent" : isTrash ? "Trash" : "My Drive" }
+  ]);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [showMigrationBanner, setShowMigrationBanner] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -36,8 +49,9 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
   const { crazyMode, toggleCrazyMode } = useCrazyMode();
   const {
     createDocument,
-    refetch
-  } = useDocuments();
+    refetch,
+    documents
+  } = useDocuments(currentFolderId);
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Update currentPath when isSharedDrives, isRecent, or isTrash changes
   useEffect(() => {
@@ -47,7 +61,49 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
       isTrash ? ["Trash"] :
       ["My Drive"]
     );
+    setFolderPath([
+      { id: null, name: isSharedDrives ? "Shared drives" : isRecent ? "Recent" : isTrash ? "Trash" : "My Drive" }
+    ]);
   }, [isSharedDrives, isRecent, isTrash]);
+
+  // Load folder hierarchy when currentFolderId changes
+  useEffect(() => {
+    const loadFolderPath = async () => {
+      if (!currentFolderId || !user) return;
+      
+      try {
+        const path = [];
+        let folderId = currentFolderId;
+        
+        // Build path by traversing up the folder hierarchy
+        while (folderId) {
+          const { data, error } = await supabase
+            .from('documents')
+            .select('id, name, parent_folder_id')
+            .eq('id', folderId)
+            .single();
+          
+          if (error) throw error;
+          if (!data) break;
+          
+          path.unshift({ id: data.id, name: data.name });
+          folderId = data.parent_folder_id;
+        }
+        
+        const basePath = { 
+          id: null, 
+          name: isSharedDrives ? "Shared drives" : isRecent ? "Recent" : isTrash ? "Trash" : "My Drive" 
+        };
+        
+        setFolderPath([basePath, ...path]);
+        setCurrentPath([basePath.name, ...path.map(p => p.name)]);
+      } catch (error: any) {
+        console.error('Failed to load folder path:', error);
+      }
+    };
+
+    loadFolderPath();
+  }, [currentFolderId, user, isSharedDrives, isRecent, isTrash]);
   const handleCreateDocument = async (name: string, type: 'folder' | 'document' | 'spreadsheet') => {
     if (!user) return;
     try {
@@ -56,6 +112,7 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
           user_id: user.id,
           name,
           type,
+          parent_folder_id: currentFolderId,
           is_folder: type === 'folder',
         },
       ]).select().single();
@@ -105,6 +162,7 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
           file_path: uploadData.path,
           file_size: file.size,
           mime_type: file.type,
+          parent_folder_id: currentFolderId,
           is_folder: false
         }]);
         if (dbError) throw dbError;
@@ -238,7 +296,18 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>}
-                <Breadcrumbs path={currentPath} onNavigate={setCurrentPath} />
+                <Breadcrumbs 
+                  path={currentPath} 
+                  folderPath={folderPath}
+                  onNavigate={(index) => {
+                    const targetFolder = folderPath[index];
+                    if (targetFolder.id) {
+                      window.location.href = `/my-drive/${targetFolder.id}`;
+                    } else {
+                      window.location.href = '/my-drive';
+                    }
+                  }} 
+                />
               </div>
               
               <div className="flex items-center gap-2">
@@ -277,7 +346,18 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
           {/* File Content Area */}
           <div className="flex-1 flex bg-white">
             <div className="flex-1 p-6 bg-white">
-              <FileGrid viewMode={viewMode} searchQuery={searchQuery} currentPath={currentPath} isSharedDrives={isSharedDrives} isRecent={isRecent} isTrash={isTrash} />
+              <FileGrid 
+                viewMode={viewMode} 
+                searchQuery={searchQuery} 
+                currentPath={currentPath} 
+                currentFolderId={currentFolderId}
+                isSharedDrives={isSharedDrives} 
+                isRecent={isRecent} 
+                isTrash={isTrash} 
+                onFolderNavigate={(folderId, folderName) => {
+                  window.location.href = `/my-drive/${folderId}`;
+                }}
+              />
             </div>
             
             {/* Right Sidebar */}
