@@ -16,7 +16,6 @@ import {
   ChevronRight,
   UploadCloud,
   FileText,
-  Presentation,
   Sheet,
   FolderPlus
 } from "lucide-react";
@@ -133,7 +132,7 @@ export function Sidebar() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleCreate = async (name: string, type: 'folder' | 'document' | 'spreadsheet' | 'presentation') => {
+  const handleCreate = async (name: string, type: 'folder' | 'document' | 'spreadsheet') => {
     if (!user) return;
     try {
       const { data, error } = await supabase.from('documents').insert([
