@@ -33,7 +33,7 @@ const sidebarItems = [
   { label: "Home", icon: Home, route: "/" },
   { label: "Activity", icon: Bell },
   { label: "Workspaces", icon: Users },
-  { label: "My Drive", icon: Folder, hasExpander: true, route: "/" },
+  { label: "My Drive", icon: Folder, hasExpander: true, route: "/my-drive" },
   { label: "Shared drives", icon: UsersRound, hasExpander: true, route: "/shared-drives" },
   { label: "Shared with me", icon: UsersRound },
   { label: "Recent", icon: Clock, route: "/recent" },
@@ -52,7 +52,10 @@ export function Sidebar() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isActiveItem = (itemLabel: string) => {
-    if (location.pathname === "/" && activeItem === itemLabel && (itemLabel === "Home" || itemLabel === "My Drive")) {
+    if (location.pathname === "/" && activeItem === itemLabel && itemLabel === "Home") {
+      return true;
+    }
+    if (location.pathname === "/my-drive" && activeItem === itemLabel && itemLabel === "My Drive") {
       return true;
     }
     if (location.pathname === "/shared-drives" && activeItem === itemLabel && itemLabel === "Shared drives") {
@@ -76,14 +79,17 @@ export function Sidebar() {
 
   // Update activeItem based on route changes
   useEffect(() => {
-    if (location.pathname === "/shared-drives") {
+    if (location.pathname === "/" && activeItem !== "Home") {
+      setActiveItem("Home");
+    } else if (location.pathname === "/my-drive") {
+      setActiveItem("My Drive");
+    } else if (location.pathname === "/shared-drives") {
       setActiveItem("Shared drives");
     } else if (location.pathname === "/recent") {
       setActiveItem("Recent");
     } else if (location.pathname === "/trash") {
       setActiveItem("Trash");
     }
-    // Don't automatically reset to "Home" when on "/" - keep the user's choice
   }, [location.pathname]);
 
 

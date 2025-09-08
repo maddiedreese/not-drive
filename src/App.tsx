@@ -7,6 +7,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import { CrazyModeProvider } from "@/components/CrazyModeProvider";
 import Index from "./pages/Index";
 import GoogleDocs from "./pages/GoogleDocs";
+import MyDrive from "./pages/MyDrive";
 import SharedDrives from "./pages/SharedDrives";
 import Recent from "./pages/Recent";
 import Trash from "./pages/Trash";
@@ -26,6 +27,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/docs" element={<GoogleDocs />} />
+            <Route path="/my-drive" element={<MyDrive />} />
             <Route path="/shared-drives" element={<SharedDrives />} />
             <Route path="/recent" element={<Recent />} />
             <Route path="/trash" element={<Trash />} />
