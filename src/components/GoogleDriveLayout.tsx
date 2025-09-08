@@ -18,7 +18,7 @@ import googleDriveLogo from "@/assets/google-drive-logo.png";
 export function GoogleDriveLayout({ isSharedDrives = false }: { isSharedDrives?: boolean }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [currentPath, setCurrentPath] = useState(["My Drive"]);
+  const [currentPath, setCurrentPath] = useState<string[]>(isSharedDrives ? ["Shared drives"] : ["My Drive"]);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
   const [showMigrationBanner, setShowMigrationBanner] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -34,11 +34,10 @@ export function GoogleDriveLayout({ isSharedDrives = false }: { isSharedDrives?:
     refetch
   } = useDocuments();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Update currentPath when isSharedDrives changes
   useEffect(() => {
-    if (!loading && !user) {
-      setShowAuthModal(true);
-    }
-  }, [user, loading]);
+    setCurrentPath(isSharedDrives ? ["Shared drives"] : ["My Drive"]);
+  }, [isSharedDrives]);
   const handleCreateDocument = async (name: string, type: string) => {
     await createDocument(name, type);
     refetch();
