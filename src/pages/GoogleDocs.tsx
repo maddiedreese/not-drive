@@ -91,7 +91,10 @@ export default function GoogleDocs() {
 
       toast.success(`${documentName} created successfully`);
       
-      // Navigate to a document editor page (we'll create this next)
+      // Refresh the drive view
+      window.dispatchEvent(new Event('documents:refresh'));
+      
+      // Navigate to document editor
       navigate(`/document/${data.id}`);
     } catch (error: any) {
       toast.error(error.message || 'Failed to create document');

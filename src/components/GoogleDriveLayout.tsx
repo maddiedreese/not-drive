@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
 import { Sidebar } from "./GoogleDriveSidebar";
 import { FileGrid } from "./FileGrid";
 import { Breadcrumbs } from "./Breadcrumbs";
@@ -52,6 +53,7 @@ export function GoogleDriveLayout({
     refetch,
     documents
   } = useDocuments(currentFolderId);
+  const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
   // Update currentPath when isSharedDrives, isRecent, or isTrash changes
   useEffect(() => {
@@ -119,9 +121,14 @@ export function GoogleDriveLayout({
       
       if (error) throw error;
       
-      // Navigate to editor for spreadsheets
-      if (type === 'spreadsheet' && data) {
-        window.location.href = `/spreadsheet/${data.id}`;
+      // Dispatch refresh event to update drive view
+      window.dispatchEvent(new Event('documents:refresh'));
+      
+      // Navigate to appropriate editor
+      if (type === 'document' && data) {
+        navigate(`/document/${data.id}`);
+      } else if (type === 'spreadsheet' && data) {
+        navigate(`/spreadsheet/${data.id}`);
       } else {
         refetch();
       }
