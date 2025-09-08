@@ -280,28 +280,29 @@ const GoogleSheets = () => {
 
       {/* Menu Bar */}
       <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-6 text-sm bg-gray-100 rounded-full px-4 py-2 w-fit">
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">File</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Edit</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">View</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Insert</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Format</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Data</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Tools</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Extensions</button>
-          <button className="text-gray-700 hover:text-gray-900 px-2 py-1 rounded hover:bg-gray-200 transition-colors">Help</button>
+        <div className="flex items-center gap-6 text-sm">
+          <button className="text-gray-700 hover:text-gray-900">File</button>
+          <button className="text-gray-700 hover:text-gray-900">Edit</button>
+          <button className="text-gray-700 hover:text-gray-900">View</button>
+          <button className="text-gray-700 hover:text-gray-900">Insert</button>
+          <button className="text-gray-700 hover:text-gray-900">Format</button>
+          <button className="text-gray-700 hover:text-gray-900">Data</button>
+          <button className="text-gray-700 hover:text-gray-900">Tools</button>
+          <button className="text-gray-700 hover:text-gray-900">Extensions</button>
+          <button className="text-gray-700 hover:text-gray-900">Help</button>
         </div>
       </div>
 
       {/* Toolbar */}
       <div className="border-b border-gray-200 bg-white px-6 py-2">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 bg-gray-100 rounded-full px-4 py-2 w-fit">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleUndo}
             disabled={historyIndex <= 0}
             title="Undo"
+            className="hover:bg-gray-200"
           >
             <Undo className="w-4 h-4" />
           </Button>
@@ -311,37 +312,38 @@ const GoogleSheets = () => {
             onClick={handleRedo}
             disabled={historyIndex >= history.length - 1}
             title="Redo"
+            className="hover:bg-gray-200"
           >
             <Redo className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={handlePrint} title="Print">
+          <Button variant="ghost" size="sm" onClick={handlePrint} title="Print" className="hover:bg-gray-200">
             <Printer className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toast.success("Paint format")} title="Paint format">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Paint format")} title="Paint format" className="hover:bg-gray-200">
             <Palette className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" className="text-xs px-2" title="Zoom">
+          <Button variant="ghost" size="sm" className="text-xs px-2 hover:bg-gray-200" title="Zoom">
             {zoom}%
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleZoomOut} title="Zoom out">
+          <Button variant="ghost" size="sm" onClick={handleZoomOut} title="Zoom out" className="hover:bg-gray-200">
             <ZoomOut className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleZoomIn} title="Zoom in">
+          <Button variant="ghost" size="sm" onClick={handleZoomIn} title="Zoom in" className="hover:bg-gray-200">
             <ZoomIn className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" onClick={handleFormatCurrency} title="Format as currency">
+          <Button variant="ghost" size="sm" onClick={handleFormatCurrency} title="Format as currency" className="hover:bg-gray-200">
             <DollarSign className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={handleFormatPercent} title="Format as percent">
+          <Button variant="ghost" size="sm" onClick={handleFormatPercent} title="Format as percent" className="hover:bg-gray-200">
             <Percent className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toast.success("More number formats")} title="More number formats">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("More number formats")} title="More number formats" className="hover:bg-gray-200">
             <Hash className="w-4 h-4" />
           </Button>
           
@@ -351,7 +353,7 @@ const GoogleSheets = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => toggleCellFormat('bold')}
-            className={currentFormat.bold ? 'bg-gray-200' : ''}
+            className={cn("hover:bg-gray-200", currentFormat.bold && 'bg-gray-300')}
             title="Bold"
           >
             <Bold className="w-4 h-4" />
@@ -360,7 +362,7 @@ const GoogleSheets = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => toggleCellFormat('italic')}
-            className={currentFormat.italic ? 'bg-gray-200' : ''}
+            className={cn("hover:bg-gray-200", currentFormat.italic && 'bg-gray-300')}
             title="Italic"
           >
             <Italic className="w-4 h-4" />
@@ -369,7 +371,7 @@ const GoogleSheets = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => toggleCellFormat('underline')}
-            className={currentFormat.underline ? 'bg-gray-200' : ''}
+            className={cn("hover:bg-gray-200", currentFormat.underline && 'bg-gray-300')}
             title="Underline"
           >
             <Underline className="w-4 h-4" />
@@ -377,19 +379,19 @@ const GoogleSheets = () => {
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('textColor', '#000000')} title="Text color">
+          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('textColor', '#000000')} title="Text color" className="hover:bg-gray-200">
             <div className="w-4 h-4 bg-black rounded-sm"></div>
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('backgroundColor', '#ffff00')} title="Fill color">
+          <Button variant="ghost" size="sm" onClick={() => toggleCellFormat('backgroundColor', '#ffff00')} title="Fill color" className="hover:bg-gray-200">
             <div className="w-4 h-4 border border-gray-400 rounded-sm bg-yellow-200"></div>
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" onClick={() => toast.success("Borders applied")} title="Borders">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Borders applied")} title="Borders" className="hover:bg-gray-200">
             <Grid3x3 className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => toast.success("Merge cells")} title="Merge cells">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Merge cells")} title="Merge cells" className="hover:bg-gray-200">
             <Merge className="w-4 h-4" />
           </Button>
           
@@ -399,7 +401,7 @@ const GoogleSheets = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => toggleCellFormat('textAlign', 'left')}
-            className={currentFormat.textAlign === 'left' ? 'bg-gray-200' : ''}
+            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'left' && 'bg-gray-300')}
             title="Align left"
           >
             <AlignLeft className="w-4 h-4" />
@@ -408,7 +410,7 @@ const GoogleSheets = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => toggleCellFormat('textAlign', 'center')}
-            className={currentFormat.textAlign === 'center' ? 'bg-gray-200' : ''}
+            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'center' && 'bg-gray-300')}
             title="Align center"
           >
             <AlignCenter className="w-4 h-4" />
@@ -417,7 +419,7 @@ const GoogleSheets = () => {
             variant="ghost" 
             size="sm" 
             onClick={() => toggleCellFormat('textAlign', 'right')}
-            className={currentFormat.textAlign === 'right' ? 'bg-gray-200' : ''}
+            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'right' && 'bg-gray-300')}
             title="Align right"
           >
             <AlignRight className="w-4 h-4" />
@@ -425,7 +427,7 @@ const GoogleSheets = () => {
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
           
-          <Button variant="ghost" size="sm" onClick={() => toast.success("More options")} title="More options">
+          <Button variant="ghost" size="sm" onClick={() => toast.success("More options")} title="More options" className="hover:bg-gray-200">
             <MoreHorizontal className="w-4 h-4" />
           </Button>
         </div>
