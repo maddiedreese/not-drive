@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus, FileText, Presentation, Sheet, Folder, UploadCloud, Palette } from "lucide-react";
+import { Search, LayoutGrid, Settings, HelpCircle, Grid3X3, List, Upload, FolderPlus, Filter, ChevronDown, Info, X, MoreVertical, Plus, FileText, Sheet, Folder, UploadCloud, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
@@ -48,9 +48,29 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
       ["My Drive"]
     );
   }, [isSharedDrives, isRecent, isTrash]);
-  const handleCreateDocument = async (name: string, type: string) => {
-    await createDocument(name, type);
-    refetch();
+  const handleCreateDocument = async (name: string, type: 'folder' | 'document' | 'spreadsheet') => {
+    if (!user) return;
+    try {
+      const { data, error } = await supabase.from('documents').insert([
+        {
+          user_id: user.id,
+          name,
+          type,
+          is_folder: type === 'folder',
+        },
+      ]).select().single();
+      
+      if (error) throw error;
+      
+      // Navigate to editor for spreadsheets
+      if (type === 'spreadsheet' && data) {
+        window.location.href = `/spreadsheet/${data.id}`;
+      } else {
+        refetch();
+      }
+    } catch (e: any) {
+      console.error('Failed to create:', e);
+    }
   };
   const handleFileUploaded = () => {
     refetch();
@@ -206,29 +226,15 @@ export function GoogleDriveLayout({ isSharedDrives = false, isRecent = false, is
                       <DropdownMenuItem onClick={() => {
                     handleCreateDocument("Untitled document", "document");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
-                          <FileText className="w-3 h-3 text-white" />
-                        </div>
+                        <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5" />
                         <span className="text-sm text-gray-700">Google Docs</span>
-                        <ChevronDown className="w-4 h-4 text-gray-400 ml-auto rotate-[-90deg]" />
                       </DropdownMenuItem>
 
                       <DropdownMenuItem onClick={() => {
                     handleCreateDocument("Untitled spreadsheet", "spreadsheet");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <div className="w-5 h-5 bg-green-500 rounded flex items-center justify-center">
-                          <Sheet className="w-3 h-3 text-white" />
-                        </div>
+                        <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-5 h-5" />
                         <span className="text-sm text-gray-700">Google Sheets</span>
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem onClick={() => {
-                    handleCreateDocument("Untitled presentation", "presentation");
-                  }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <div className="w-5 h-5 bg-orange-500 rounded flex items-center justify-center">
-                          <Presentation className="w-3 h-3 text-white" />
-                        </div>
-                        <span className="text-sm text-gray-700">Google Slides</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>}
