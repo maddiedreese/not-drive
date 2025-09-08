@@ -547,6 +547,165 @@ const SpreadsheetEditor = () => {
                 <Clipboard className="w-4 h-4 mr-2" />
                 Paste
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleEditAction('find')}>
+                <Search className="w-4 h-4 mr-2" />
+                Find and replace
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">View</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleViewAction('freeze')}>
+                Freeze
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewAction('gridlines')}>
+                Gridlines
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleViewAction('formulas')}>
+                Show formulas
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleZoomIn}>
+                <ZoomIn className="w-4 h-4 mr-2" />
+                Zoom in
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleZoomOut}>
+                <ZoomOut className="w-4 h-4 mr-2" />
+                Zoom out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Insert</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleInsertAction('rows')}>
+                Rows above
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('rows')}>
+                Rows below
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('columns')}>
+                Columns left
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('columns')}>
+                Columns right
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleInsertAction('cells')}>
+                Cells
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleInsertAction('chart')}>
+                Chart
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Format</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleFormatAction('bold')}>
+                <Bold className="w-4 h-4 mr-2" />
+                Bold
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFormatAction('italic')}>
+                <Italic className="w-4 h-4 mr-2" />
+                Italic
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFormatAction('underline')}>
+                <Underline className="w-4 h-4 mr-2" />
+                Underline
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleFormatCurrency}>
+                <DollarSign className="w-4 h-4 mr-2" />
+                Number format
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleFormatAction('borders')}>
+                <Grid3x3 className="w-4 h-4 mr-2" />
+                Borders
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Data</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleDataAction('sort')}>
+                <SortAsc className="w-4 h-4 mr-2" />
+                Sort range
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleDataAction('filter')}>
+                <Filter className="w-4 h-4 mr-2" />
+                Create a filter
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => handleDataAction('pivot')}>
+                <Database className="w-4 h-4 mr-2" />
+                Pivot table
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Tools</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => handleToolsAction('spelling')}>
+                Spelling and grammar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleToolsAction('script')}>
+                <Calculator className="w-4 h-4 mr-2" />
+                Script editor
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Extensions</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => toast.success("Add-ons menu")}>
+                Add-ons
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success("Apps Script")}>
+                Apps Script
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="text-gray-700 hover:text-gray-900 px-3 py-1 rounded hover:bg-gray-100 transition-colors">Help</button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56 bg-white border border-gray-200 shadow-lg z-50">
+              <DropdownMenuItem onClick={() => window.open('https://support.google.com/docs/topic/1382883', '_blank')}>
+                <HelpCircle className="w-4 h-4 mr-2" />
+                Sheets Help
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success("Training materials opened")}>
+                Training
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast.success("Updates and news")}>
+                Updates
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => toast.success("Keyboard shortcuts shown")}>
+                Keyboard shortcuts
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -575,8 +734,15 @@ const SpreadsheetEditor = () => {
           >
             <Redo className="w-4 h-4" />
           </Button>
+          <Button variant="ghost" size="sm" onClick={handlePrint} title="Print" className="hover:bg-gray-200">
+            <Printer className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Paint format")} title="Paint format" className="hover:bg-gray-200">
+            <Palette className="w-4 h-4" />
+          </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          
           
           <Button variant="ghost" size="sm" className="text-xs px-2 hover:bg-gray-200" title="Zoom">
             {zoom}%
@@ -586,6 +752,18 @@ const SpreadsheetEditor = () => {
           </Button>
           <Button variant="ghost" size="sm" onClick={handleZoomIn} title="Zoom in" className="hover:bg-gray-200">
             <ZoomIn className="w-4 h-4" />
+          </Button>
+          
+          <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          
+          <Button variant="ghost" size="sm" onClick={handleFormatCurrency} title="Format as currency" className="hover:bg-gray-200">
+            <DollarSign className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleFormatPercent} title="Format as percent" className="hover:bg-gray-200">
+            <Percent className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => toast.success("More number formats")} title="More number formats" className="hover:bg-gray-200">
+            <Hash className="w-4 h-4" />
           </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
@@ -608,8 +786,18 @@ const SpreadsheetEditor = () => {
           >
             <Italic className="w-4 h-4" />
           </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('underline')}
+            className={cn("hover:bg-gray-200", currentFormat.underline && 'bg-gray-300')}
+            title="Underline"
+          >
+            <Underline className="w-4 h-4" />
+          </Button>
           
           <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          
           
           <Popover open={textColorOpen} onOpenChange={setTextColorOpen}>
             <PopoverTrigger asChild>
@@ -655,6 +843,51 @@ const SpreadsheetEditor = () => {
               />
             </PopoverContent>
           </Popover>
+          
+          <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Borders applied")} title="Borders" className="hover:bg-gray-200">
+            <Grid3x3 className="w-4 h-4" />
+          </Button>
+          <Button variant="ghost" size="sm" onClick={() => toast.success("Merge cells")} title="Merge cells" className="hover:bg-gray-200">
+            <Merge className="w-4 h-4" />
+          </Button>
+          
+          <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('textAlign', 'left')}
+            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'left' && 'bg-gray-300')}
+            title="Align left"
+          >
+            <AlignLeft className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('textAlign', 'center')}
+            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'center' && 'bg-gray-300')}
+            title="Align center"
+          >
+            <AlignCenter className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => toggleCellFormat('textAlign', 'right')}
+            className={cn("hover:bg-gray-200", currentFormat.textAlign === 'right' && 'bg-gray-300')}
+            title="Align right"
+          >
+            <AlignRight className="w-4 h-4" />
+          </Button>
+          
+          <div className="w-px h-6 bg-gray-300 mx-2"></div>
+          
+          <Button variant="ghost" size="sm" onClick={() => toast.success("More options")} title="More options" className="hover:bg-gray-200">
+            <MoreHorizontal className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
