@@ -76,15 +76,14 @@ export function Sidebar() {
 
   // Update activeItem based on route changes
   useEffect(() => {
-    if (location.pathname === "/" && !["Home", "My Drive"].includes(activeItem)) {
-      setActiveItem("Home");
-    } else if (location.pathname === "/shared-drives") {
+    if (location.pathname === "/shared-drives") {
       setActiveItem("Shared drives");
     } else if (location.pathname === "/recent") {
       setActiveItem("Recent");
     } else if (location.pathname === "/trash") {
       setActiveItem("Trash");
     }
+    // Don't automatically reset to "Home" when on "/" - keep the user's choice
   }, [location.pathname]);
 
 
