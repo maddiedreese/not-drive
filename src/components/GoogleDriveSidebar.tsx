@@ -45,18 +45,19 @@ const sidebarItems = [
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [activeItem, setActiveItem] = useState<string>("Home"); // Default to Home
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isActiveRoute = (route?: string) => {
-    if (route === "/" && location.pathname === "/") return true;
-    return false;
+  const isActiveItem = (itemLabel: string) => {
+    return location.pathname === "/" && activeItem === itemLabel;
   };
 
   const handleNavItemClick = (item: any) => {
     if (item.route) {
+      setActiveItem(item.label);
       navigate(item.route);
     }
   };
@@ -185,7 +186,7 @@ export function Sidebar() {
                   onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    isActiveRoute(item.route)
+                    isActiveItem(item.label)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
@@ -217,7 +218,7 @@ export function Sidebar() {
                   onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    isActiveRoute(item.route)
+                    isActiveItem(item.label)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
@@ -249,7 +250,7 @@ export function Sidebar() {
                   onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    isActiveRoute(item.route)
+                    isActiveItem(item.label)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
@@ -281,7 +282,7 @@ export function Sidebar() {
                   onClick={() => handleNavItemClick(item)}
                   className={cn(
                     "w-full justify-start h-8 px-3 rounded-full text-sm font-normal transition-colors relative",
-                    isActiveRoute(item.route)
+                    isActiveItem(item.label)
                       ? "bg-[#c2e7ff] text-[#041e49] font-medium" 
                       : "text-[#3c4043] hover:bg-[#f1f3f4]",
                   )}
