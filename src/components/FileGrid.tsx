@@ -490,103 +490,60 @@ export function FileGrid({
       );
     }
 
-    // Spreadsheet type preview - render actual grid data
+    // Spreadsheet type preview - render entire first page
     if (document.type === 'spreadsheet') {
       const spreadsheetData = document.spreadsheet_data as any || {};
       const hasData = Object.keys(spreadsheetData).length > 0;
       
+      // Show full spreadsheet view (12 columns x 20 rows)
+      const columns = Array.from({ length: 12 }, (_, i) => String.fromCharCode(65 + i)); // A-L
+      const rows = Array.from({ length: 20 }, (_, i) => i + 1); // 1-20
+      
       return (
         <div className="w-16 h-16 rounded overflow-hidden bg-white border border-gray-200 shadow-sm">
-          {hasData ? (
-            <div className="w-full h-full relative">
-              {/* Mini spreadsheet grid - 4x8 */}
-              <div className="absolute inset-0 grid grid-cols-4 grid-rows-8 gap-0">
-                {Array.from({ length: 32 }, (_, i) => {
-                  const row = Math.floor(i / 4) + 1;
-                  const col = String.fromCharCode(65 + (i % 4)); // A-D
-                  const cellId = `${col}${row}`;
-                  const cellValue = spreadsheetData[cellId];
+          <div className="w-full h-full relative text-[2px] leading-tight">
+            {/* Column headers */}
+            <div className="flex bg-gray-100 border-b border-gray-200">
+              <div className="w-2 h-1 border-r border-gray-200 flex-shrink-0"></div>
+              {columns.map(col => (
+                <div key={col} className="flex-1 min-w-0 h-1 border-r border-gray-200 flex items-center justify-center text-gray-600 font-medium">
+                  {col}
+                </div>
+              ))}
+            </div>
+            
+            {/* Rows */}
+            <div className="flex-1 overflow-hidden">
+              {rows.map(rowNum => (
+                <div key={rowNum} className="flex border-b border-gray-100" style={{ height: '0.75px' }}>
+                  {/* Row number */}
+                  <div className="w-2 bg-gray-50 border-r border-gray-200 flex items-center justify-center text-gray-500 text-[1.5px] flex-shrink-0">
+                    {rowNum}
+                  </div>
                   
-                  return (
-                    <div
-                      key={cellId}
-                      className="border-r border-b border-gray-300 text-[0.5px] leading-none overflow-hidden bg-white flex items-center justify-center"
-                      style={{ 
-                        fontSize: '0.5px',
-                        minHeight: '0.125rem',
-                        padding: '0.5px'
-                      }}
-                    >
-                      {cellValue ? (
-                        <span className="text-gray-700 font-mono text-center block w-full truncate">
-                          {String(cellValue).substring(0, 2)}
-                        </span>
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-              {/* Column headers A-H */}
-              <div className="absolute top-0 left-0 right-0 bg-gray-100 border-b border-gray-300 grid grid-cols-8" style={{ height: '0.125rem' }}>
-                {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'].map(col => (
-                  <div 
-                    key={col} 
-                    className="text-[0.4px] text-center text-gray-500 border-r border-gray-300 flex items-center justify-center"
-                    style={{ fontSize: '0.4px', lineHeight: 1 }}
-                  >
-                    {col}
-                  </div>
-                ))}
-              </div>
-              {/* Row numbers 1-8 */}
-              <div className="absolute left-0 bottom-0 bg-gray-100 border-r border-gray-300 grid grid-rows-8" style={{ width: '0.125rem', top: '0.125rem' }}>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                  <div 
-                    key={num} 
-                    className="text-[0.4px] text-center text-gray-500 border-b border-gray-300 flex items-center justify-center"
-                    style={{ fontSize: '0.4px', lineHeight: 1 }}
-                  >
-                    {num}
-                  </div>
-                ))}
-              </div>
+                  {/* Cells */}
+                  {columns.map(col => {
+                    const cellId = `${col}${rowNum}`;
+                    const cellValue = spreadsheetData[cellId];
+                    
+                    return (
+                      <div
+                        key={cellId}
+                        className="flex-1 min-w-0 border-r border-gray-100 px-0.5 flex items-center text-gray-800"
+                        style={{ fontSize: '1.5px' }}
+                      >
+                        {cellValue && (
+                          <span className="truncate w-full">
+                            {String(cellValue)}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
             </div>
-          ) : (
-            // Empty spreadsheet grid - 4x8
-            <div className="w-full h-full relative bg-white">
-              <div className="absolute inset-0 grid grid-cols-4 grid-rows-8 gap-0">
-                {Array.from({ length: 32 }, (_, i) => (
-                  <div
-                    key={i}
-                    className="border-r border-b border-gray-300 bg-white"
-                    style={{ minHeight: '0.125rem' }}
-                  />
-                ))}
-              </div>
-              <div className="absolute top-0 left-0 right-0 bg-gray-100 border-b border-gray-300 grid grid-cols-4" style={{ height: '0.125rem' }}>
-                {['A', 'B', 'C', 'D'].map(col => (
-                  <div 
-                    key={col} 
-                    className="text-[0.4px] text-center text-gray-500 border-r border-gray-300 flex items-center justify-center"
-                    style={{ fontSize: '0.4px', lineHeight: 1 }}
-                  >
-                    {col}
-                  </div>
-                ))}
-              </div>
-              <div className="absolute left-0 bottom-0 bg-gray-100 border-r border-gray-300 grid grid-rows-8" style={{ width: '0.125rem', top: '0.125rem' }}>
-                {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                  <div 
-                    key={num} 
-                    className="text-[0.4px] text-center text-gray-500 border-b border-gray-300 flex items-center justify-center"
-                    style={{ fontSize: '0.4px', lineHeight: 1 }}
-                  >
-                    {num}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       );
     }
