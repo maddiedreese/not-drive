@@ -317,7 +317,7 @@ export function GoogleDriveLayout({
                     console.log('Google Sheets button clicked');
                     handleCreateDocument("Untitled spreadsheet", "spreadsheet");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
-                        <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-5 h-5" />
+                        <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-5 h-5 object-contain" />
                         <span className="text-sm text-gray-700">Not Sheets</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
