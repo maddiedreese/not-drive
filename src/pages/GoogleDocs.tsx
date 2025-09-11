@@ -141,14 +141,14 @@ export default function GoogleDocs() {
                   onClick={() => navigate("/")}
                 >
                   <img src="/lovable-uploads/4c411c67-6aa0-4cf3-a00e-58ad7c51bc1e.png" alt="Google Drive" className="w-6 h-6 object-contain" />
-                  <span className="text-sm text-gray-700">Drive</span>
+                  <span className="text-sm text-gray-700">Not Drive</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             
             <div className="flex items-center space-x-2">
               <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Docs" className="w-8 h-8 object-contain" />
-              <span className="text-xl font-normal text-gray-700">Docs</span>
+              <span className="text-xl font-normal text-gray-700">Not Docs</span>
             </div>
           </div>
 

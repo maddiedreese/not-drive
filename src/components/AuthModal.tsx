@@ -50,7 +50,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Welcome to Drive</DialogTitle>
+          <DialogTitle>Welcome to Not Drive</DialogTitle>
           <DialogDescription>Sign in or create an account to manage your files.</DialogDescription>
         </DialogHeader>
         

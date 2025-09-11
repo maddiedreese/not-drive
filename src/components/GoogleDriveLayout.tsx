@@ -208,7 +208,7 @@ export function GoogleDriveLayout({
           <div className="w-10 h-10 relative">
             <img src="/lovable-uploads/4c411c67-6aa0-4cf3-a00e-58ad7c51bc1e.png" alt="Google Drive" className="w-10 h-10 object-contain" />
           </div>
-          <h1 className="text-[22px] text-[#5f6368] font-normal font-roboto">Drive</h1>
+          <h1 className="text-[22px] text-[#5f6368] font-normal font-roboto">Not Drive</h1>
         </div>
 
         {/* Search Bar */}
@@ -310,7 +310,7 @@ export function GoogleDriveLayout({
                     handleCreateDocument("Untitled document", "document");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                          <img src="/lovable-uploads/34bbee19-7259-4cec-8abb-c0f595c8f7ae.png" alt="Google Docs" className="w-5 h-5 object-contain" />
-                         <span className="text-sm text-gray-700">Google Docs</span>
+                         <span className="text-sm text-gray-700">Not Docs</span>
                        </DropdownMenuItem>
 
                        <DropdownMenuItem onClick={() => {
@@ -318,7 +318,7 @@ export function GoogleDriveLayout({
                     handleCreateDocument("Untitled spreadsheet", "spreadsheet");
                   }} className="flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded cursor-pointer">
                         <img src="/lovable-uploads/fc341c1a-c84e-4871-ba13-962c23a89cea.png" alt="Google Sheets" className="w-5 h-5" />
-                        <span className="text-sm text-gray-700">Google Sheets</span>
+                        <span className="text-sm text-gray-700">Not Sheets</span>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>}
